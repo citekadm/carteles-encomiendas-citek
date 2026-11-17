@@ -1,0 +1,29 @@
+# Credenciales y autenticación local
+.clasprc.json
+.clasprc
+.credentials/
+credentials.json
+*.pem
+*.key
+
+# Configuración local que puede contener identificadores o datos privados
+.env
+.env.*
+!.env.example
+.clasp.json
+.clasp.local.json
+
+# Dependencias y archivos generados
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+coverage/
+dist/
+build/
+
+# Datos reales o exportaciones de clientes
+*.xlsx
+*.xls
+*.csv
+*.ods
