@@ -10,6 +10,7 @@ credentials.json
 .env
 .env.*
 !.env.example
+.clasp.json
 .clasp.local.json
 
 # Dependencias y archivos generados
@@ -26,3 +27,4 @@ build/
 *.xls
 *.csv
 *.ods
+
