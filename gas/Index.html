@@ -1,7 +1,28 @@
-<!--
-  Carteles de encomiendas — Citek
-
-  MARCADOR DE POSICIÓN. No es una interfaz funcional todavía.
-  Responsabilidad prevista: estructura HTML principal de la aplicación.
-  Requisitos: ver docs/ESPECIFICACION_FUNCIONAL.md
--->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <title>Carteles de encomiendas — Citek</title>
+  <?!= include('Styles'); ?>
+</head>
+<body>
+  <div class="ui">
+    <div class="no-print">
+      <h1>Carteles de encomiendas — Citek</h1>
+      <div id="estado" class="estado">Iniciando…</div>
+      <div class="barra">
+        <button id="b-recargar">Recargar clientes</button>
+        <button id="b-prueba" class="principal">Cargar hojas de prueba</button>
+        <button id="b-imprimir">Imprimir</button>
+        <button id="b-png">Generar PNG de prueba</button>
+      </div>
+      <p class="aviso">PROTOTIPO de Etapas 1-2: las hojas de prueba son datos de ejemplo, no un envío real.
+        Al imprimir elegí papel A4, escala 100 %, márgenes «Ninguno», activá «Gráficos de fondo» y desactivá «Encabezados y pies de página».</p>
+      <div id="png-res"></div>
+    </div>
+    <div id="vista" class="vista"></div>
+  </div>
+  <?!= include('JavaScript'); ?>
+</body>
+</html>
