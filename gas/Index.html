@@ -8,20 +8,46 @@
 </head>
 <body>
   <div class="ui">
-    <div class="no-print">
-      <h1>Carteles de encomiendas — Citek</h1>
-      <div id="estado" class="estado">Iniciando…</div>
-      <div class="barra">
-        <button id="b-recargar">Recargar clientes</button>
-        <button id="b-prueba" class="principal">Cargar hojas de prueba</button>
-        <button id="b-imprimir">Imprimir</button>
-        <button id="b-png">Generar PNG de prueba</button>
+    <h1 class="no-print">Carteles de encomiendas — Citek</h1>
+    <div id="estado" class="estado no-print">Iniciando…</div>
+    <div class="cols">
+      <div class="col no-print">
+        <div class="barra">
+          <button id="b-recargar">Recargar clientes</button>
+          <button id="b-nuevo">Nuevo envío</button>
+        </div>
+        <div class="buscador">
+          <label for="f-buscar">Buscar cliente (cuenta, razón social o nombre fantasía)</label>
+          <input type="text" id="f-buscar" autocomplete="off">
+          <ul id="sugerencias" class="sugerencias" hidden></ul>
+        </div>
+        <div id="sin-res" class="aviso" hidden>Sin resultados: completá los datos manualmente para este envío.</div>
+        <p id="origen" class="origen"></p>
+        <label for="f-razon">Razón social</label><input type="text" id="f-razon">
+        <label for="f-fantasia">Nombre fantasía</label><input type="text" id="f-fantasia">
+        <label for="f-dir">Dirección</label><textarea id="f-dir" rows="2"></textarea>
+        <label for="f-tel">Teléfono</label><input type="text" id="f-tel">
+        <label for="f-depto">Departamento</label><input type="text" id="f-depto">
+        <label for="f-cajas">Cantidad de cajas (1 a 999)</label><input type="text" id="f-cajas" inputmode="numeric" autocomplete="off">
+        <label class="check"><input type="checkbox" id="c-factura" checked> Imprimir FACTURA EN CAJA</label>
+        <label for="f-cond">Condición especial</label><input type="text" id="f-cond">
+        <label class="check"><input type="checkbox" id="c-cond"> Imprimir condición especial</label>
       </div>
-      <p class="aviso">PROTOTIPO de Etapas 1-2: las hojas de prueba son datos de ejemplo, no un envío real.
-        Al imprimir elegí papel A4, escala 100 %, márgenes «Ninguno», activá «Gráficos de fondo» y desactivá «Encabezados y pies de página».</p>
-      <div id="png-res"></div>
+      <div class="col">
+        <div class="no-print">
+          <div id="resumen" class="resumen"></div>
+          <div class="barra">
+            <button id="b-prueba" class="principal">Cargar hojas de prueba</button>
+            <button id="b-imprimir">Imprimir</button>
+            <button id="b-png">Generar PNG de prueba</button>
+          </div>
+          <p class="aviso">PROTOTIPO: «Generar carteles» con los datos del formulario llega en la próxima etapa; por ahora las hojas son de ejemplo.
+            Al imprimir elegí papel A4, escala 100 %, márgenes «Ninguno», activá «Gráficos de fondo» y desactivá «Encabezados y pies de página».</p>
+          <div id="png-res"></div>
+        </div>
+        <div id="vista" class="vista"></div>
+      </div>
     </div>
-    <div id="vista" class="vista"></div>
   </div>
   <?!= include('JavaScript'); ?>
 </body>

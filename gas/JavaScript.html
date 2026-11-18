@@ -144,6 +144,159 @@
       .cargarClientes();
   }
 
+  // ===== Etapa 3: reglas puras (sin DOM ni estado global) =====
+  var Reglas = {
+    norm: norm,
+    validarCajas: function (t) {
+      t = String(t == null ? '' : t).trim();
+      if (t === '') return { ok: false, mensaje: 'Ingresá la cantidad de cajas.' };
+      if (!/^\d+$/.test(t)) return { ok: false, mensaje: 'La cantidad de cajas debe ser un número entero positivo, sin decimales ni signos.' };
+      var v = parseInt(t, 10);
+      if (v < 1 || v > 999) return { ok: false, mensaje: 'La cantidad de cajas debe estar entre 1 y 999.' };
+      return { ok: true, valor: v };
+    },
+    bultos: function (cajas) { return Math.ceil(cajas / 3); },
+    hojas: function (bultos) { return Math.ceil(bultos / 2); },
+    // Solo para el resumen en pantalla; nunca se imprime en el cartel.
+    agrupacion: function (cajas) {
+      var g = Math.floor(cajas / 3), r = cajas % 3, p = [], i;
+      if (g <= 4) { for (i = 0; i < g; i++) p.push('3'); if (r) p.push(String(r)); return p.join('+'); }
+      return g + ' × 3' + (r ? ' + ' + r : '');
+    },
+    condPorDefecto: function (t) { return String(t || '').trim() !== ''; },
+    // Un descriptor por bulto: numeración correlativa, factura solo en el 1, condición en todos.
+    descriptores: function (cajas, o) {
+      var total = Reglas.bultos(cajas), texto = String(o.condTexto || '').trim(), out = [];
+      for (var n = 1; n <= total; n++) {
+        out.push({ n: n, total: total, factura: !!o.factura && n === 1, cond: o.condActiva && texto ? texto : '' });
+      }
+      return out;
+    },
+    // Todas las palabras deben aparecer; orden: cuenta exacta, comienzo de campo, resto.
+    buscar: function (lista, texto, max) {
+      var q = norm(texto);
+      if (!q) return [];
+      var tk = q.split(' '), out = [];
+      lista.forEach(function (c, i) {
+        var cu = norm(c.cuenta), rz = norm(c.razonSocial), fa = norm(c.fantasia);
+        var todo = cu + ' ' + rz + ' ' + fa;
+        for (var j = 0; j < tk.length; j++) if (todo.indexOf(tk[j]) < 0) return;
+        var r = cu === q ? 0 : (cu.indexOf(q) === 0 || rz.indexOf(q) === 0 || fa.indexOf(q) === 0) ? 1 : 2;
+        out.push({ c: c, r: r, i: i });
+      });
+      out.sort(function (a, b) { return a.r - b.r || a.i - b.i; });
+      return out.slice(0, max || 8).map(function (x) { return x.c; });
+    }
+  };
+
+  // Autopruebas: ejecutar autopruebas() en la consola del navegador.
+  window.autopruebas = function () {
+    var fallos = [], total = 0;
+    function eq(nombre, got, esp) { total++; if (got !== esp) fallos.push(nombre + ': obtuvo ' + got + ', esperaba ' + esp); }
+    [[1, 1], [2, 1], [3, 1], [4, 2], [5, 2], [6, 2], [7, 3], [8, 3], [9, 3], [10, 4], [999, 333]].forEach(function (p) {
+      eq('bultos(' + p[0] + ')', Reglas.bultos(p[0]), p[1]);
+      eq('descriptores(' + p[0] + ')', Reglas.descriptores(p[0], { factura: true }).length, p[1]);
+    });
+    ['0', '-1', '1.5', 'abc', '1000', '1e2', ' ', '2 3', '', '+5'].forEach(function (t) { eq('rechaza "' + t + '"', Reglas.validarCajas(t).ok, false); });
+    [['1', 1], ['999', 999], [' 7 ', 7]].forEach(function (p) { eq('acepta "' + p[0] + '"', Reglas.validarCajas(p[0]).valor, p[1]); });
+    eq('agrupa 4', Reglas.agrupacion(4), '3+1'); eq('agrupa 7', Reglas.agrupacion(7), '3+3+1');
+    eq('agrupa 10', Reglas.agrupacion(10), '3+3+3+1'); eq('agrupa 999', Reglas.agrupacion(999), '333 × 3');
+    var d = Reglas.descriptores(7, { factura: true, condActiva: true, condTexto: ' Enviar por Nuñez ' });
+    eq('factura bulto 1', d[0].factura, true); eq('sin factura bulto 2', d[1].factura, false); eq('sin factura bulto 3', d[2].factura, false);
+    eq('condición en todos', d.every(function (x) { return x.cond === 'Enviar por Nuñez'; }), true);
+    eq('numeración', d[2].n + '/' + d[2].total, '3/3');
+    eq('factura desactivada', Reglas.descriptores(3, { factura: false })[0].factura, false);
+    eq('condición desactivada', Reglas.descriptores(3, { condActiva: false, condTexto: 'X' })[0].cond, '');
+    eq('condición vacía', Reglas.descriptores(3, { condActiva: true, condTexto: '   ' })[0].cond, '');
+    eq('norm ñ', norm('NUÑEZ'), 'nunez'); eq('norm espacios', norm(' Rincón  Artigas '), 'rincon artigas');
+    var L = [{ cuenta: '00123', razonSocial: 'Núñez Hnos', fantasia: 'Almacén Sol' }, { cuenta: '0456', razonSocial: 'Sol SA', fantasia: '' }];
+    eq('busca ñ como n', Reglas.buscar(L, 'NUNEZ').length, 1);
+    eq('busca varias palabras', Reglas.buscar(L, 'almacen SOL').length, 1);
+    eq('busca cuenta exacta primero', Reglas.buscar(L, '0456')[0].cuenta, '0456');
+    eq('comienzo antes que resto', Reglas.buscar(L, 'sol')[0].cuenta, '0456');
+    var G = []; for (var i = 0; i < 20; i++) G.push({ cuenta: 'A' + i, razonSocial: 'Cliente ' + i, fantasia: '' });
+    eq('máximo 8', Reglas.buscar(G, 'cliente').length, 8);
+    eq('búsqueda vacía', Reglas.buscar(G, '  ').length, 0);
+    console.log(fallos.length ? 'FALLOS (' + fallos.length + ' de ' + total + '):\n' + fallos.join('\n') : 'Autopruebas OK: ' + total + ' comprobaciones.');
+    return { total: total, fallos: fallos };
+  };
+
+  // ===== Etapa 4: formulario, búsqueda y estado temporal (solo en memoria) =====
+  var CAMPOS = { razon: 'f-razon', fantasia: 'f-fantasia', dir: 'f-dir', tel: 'f-tel', depto: 'f-depto' };
+  var estado, sel = -1, sugerencias = [];
+  function estadoVacio() {
+    return { origen: 'manual', cuenta: '', razon: '', fantasia: '', dir: '', tel: '', depto: '', cond: '', condActiva: false, condManual: false, factura: true, cajas: '' };
+  }
+  function resumen() {
+    var r = $('resumen'), v = Reglas.validarCajas(estado.cajas);
+    r.className = 'resumen' + (v.ok || estado.cajas.trim() === '' ? '' : ' error');
+    if (!v.ok) { r.textContent = v.mensaje; return; }
+    var b = Reglas.bultos(v.valor), h = Reglas.hojas(b);
+    r.textContent = v.valor + (v.valor > 1 ? ' cajas' : ' caja') + ' → ' + b + (b > 1 ? ' bultos' : ' bulto') + ' (' + Reglas.agrupacion(v.valor) + '). ' +
+      h + (h > 1 ? ' hojas' : ' hoja') + ' A4' + (b % 2 ? '; la mitad inferior de la última queda vacía.' : '.');
+  }
+  function volcar() { // estado -> formulario
+    for (var k in CAMPOS) $(CAMPOS[k]).value = estado[k];
+    $('f-cond').value = estado.cond; $('c-cond').checked = estado.condActiva;
+    $('c-factura').checked = estado.factura; $('f-cajas').value = estado.cajas;
+    $('origen').textContent = estado.origen === 'base'
+      ? 'Cliente de la base (cuenta ' + estado.cuenta + '). Los cambios valen solo para este envío.'
+      : 'Cliente manual: no se guarda en la base.';
+    resumen();
+  }
+  function cerrarLista() { $('sugerencias').hidden = true; $('sin-res').hidden = true; sel = -1; }
+  function elegir(c) { // copia de los datos; la base nunca se modifica
+    estado.origen = 'base'; estado.cuenta = c.cuenta; estado.razon = c.razonSocial; estado.fantasia = c.fantasia;
+    estado.dir = c.direccion; estado.tel = c.telefono; estado.depto = c.departamento;
+    estado.cond = c.condicion; estado.condActiva = Reglas.condPorDefecto(c.condicion); estado.condManual = false;
+    $('f-buscar').value = ''; cerrarLista(); volcar();
+  }
+  function marcar() {
+    Array.prototype.forEach.call($('sugerencias').children, function (li, i) { li.className = i === sel ? 'sel' : ''; });
+  }
+  function mostrarLista() {
+    var ul = $('sugerencias'), q = $('f-buscar').value.trim();
+    ul.textContent = ''; sel = -1;
+    sugerencias = Reglas.buscar(clientes, q, 8);
+    sugerencias.forEach(function (c) {
+      var li = el('li', null, c.cuenta + ' — ' + c.razonSocial + (c.fantasia ? ' (' + c.fantasia + ')' : ''));
+      li.onmousedown = function (e) { e.preventDefault(); elegir(c); };
+      ul.appendChild(li);
+    });
+    ul.hidden = !sugerencias.length;
+    $('sin-res').hidden = !(q && !sugerencias.length);
+  }
+  $('f-buscar').addEventListener('input', mostrarLista);
+  $('f-buscar').addEventListener('blur', cerrarLista);
+  $('f-buscar').addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      if (!sugerencias.length) return;
+      e.preventDefault();
+      sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + sugerencias.length) % sugerencias.length; marcar();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (sugerencias.length) elegir(sugerencias[sel >= 0 ? sel : 0]);
+    } else if (e.key === 'Escape') { cerrarLista(); }
+  });
+  Object.keys(CAMPOS).forEach(function (k) {
+    $(CAMPOS[k]).addEventListener('input', function () { estado[k] = this.value; });
+  });
+  // La casilla de condición sigue al texto hasta que el usuario la toca.
+  $('f-cond').addEventListener('input', function () {
+    estado.cond = this.value;
+    if (!estado.condManual) { estado.condActiva = Reglas.condPorDefecto(this.value); $('c-cond').checked = estado.condActiva; }
+  });
+  $('c-cond').addEventListener('change', function () { estado.condManual = true; estado.condActiva = this.checked; });
+  $('c-factura').addEventListener('change', function () { estado.factura = this.checked; });
+  $('f-cajas').addEventListener('input', function () { estado.cajas = this.value; resumen(); });
+  $('b-nuevo').onclick = function () {
+    estado = estadoVacio();
+    $('f-buscar').value = ''; cerrarLista(); volcar();
+    $('vista').textContent = ''; $('png-res').textContent = '';
+  };
+  estado = estadoVacio();
+  volcar();
+
   $('b-recargar').onclick = cargar;
   $('b-prueba').onclick = function () {
     var f = renderVista(MUESTRAS);
