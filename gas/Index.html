@@ -7,48 +7,77 @@
   <?!= include('Styles'); ?>
 </head>
 <body>
-  <div class="ui">
-    <h1 class="no-print">Carteles de encomiendas — Citek</h1>
-    <div id="estado" class="estado no-print">Iniciando…</div>
-    <div class="cols">
-      <div class="col no-print">
-        <div class="barra">
-          <button id="b-recargar">Recargar clientes</button>
-          <button id="b-nuevo">Nuevo envío</button>
-        </div>
-        <div class="buscador">
-          <label for="f-buscar">Buscar cliente (cuenta, razón social o nombre fantasía)</label>
-          <input type="text" id="f-buscar" autocomplete="off">
-          <ul id="sugerencias" class="sugerencias" hidden></ul>
-        </div>
-        <div id="sin-res" class="aviso" hidden>Sin resultados: completá los datos manualmente para este envío.</div>
-        <p id="origen" class="origen"></p>
-        <label for="f-razon">Razón social</label><input type="text" id="f-razon">
-        <label for="f-fantasia">Nombre fantasía</label><input type="text" id="f-fantasia">
-        <label for="f-dir">Dirección</label><textarea id="f-dir" rows="2"></textarea>
-        <label for="f-tel">Teléfono</label><input type="text" id="f-tel">
-        <label for="f-depto">Departamento</label><input type="text" id="f-depto">
-        <label for="f-cajas">Cantidad de cajas (1 a 999)</label><input type="text" id="f-cajas" inputmode="numeric" autocomplete="off">
-        <label class="check"><input type="checkbox" id="c-factura" checked> Imprimir FACTURA EN CAJA</label>
-        <label for="f-cond">Condición especial</label><input type="text" id="f-cond">
-        <label class="check"><input type="checkbox" id="c-cond"> Imprimir condición especial</label>
+  <div class="app no-print">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">C</div>
+        <div><h1>Carteles de encomiendas</h1><p>Citek</p></div>
       </div>
+      <div class="top-r">
+        <div id="estado" class="estado">Iniciando…</div>
+        <button id="b-recargar" class="btn sm">Recargar clientes</button>
+      </div>
+    </header>
+
+    <main class="grid">
       <div class="col">
-        <div class="no-print">
-          <div id="resumen" class="resumen"></div>
-          <div class="barra">
-            <button id="b-generar" class="principal">Generar carteles</button>
-            <button id="b-imprimir">Imprimir</button>
-            <button id="b-png">Generar PNG</button>
+        <section class="card">
+          <h2>Cliente</h2>
+          <div class="buscador">
+            <label class="f" for="f-buscar">Buscar por cuenta, razón social o nombre fantasía</label>
+            <input type="text" id="f-buscar" autocomplete="off" placeholder="Escribí para buscar…">
+            <ul id="sugerencias" class="sugerencias" hidden></ul>
           </div>
-          <p class="aviso">Una vez generados, los carteles se actualizan solos al cambiar el formulario.
-            Al imprimir elegí papel A4, escala 100 %, márgenes «Ninguno», activá «Gráficos de fondo» y desactivá «Encabezados y pies de página».</p>
-          <div id="avisos" class="avisos"></div>
-          <div id="png-res"></div>
-        </div>
-        <div id="vista" class="vista"></div>
+          <div id="sin-res" class="aviso" hidden>Sin resultados: completá los datos manualmente para este envío.</div>
+          <span id="origen" class="chip manual"></span>
+          <label class="f" for="f-razon">Razón social</label><input type="text" id="f-razon">
+          <label class="f" for="f-fantasia">Nombre fantasía</label><input type="text" id="f-fantasia">
+          <label class="f" for="f-dir">Dirección</label><textarea id="f-dir" rows="2"></textarea>
+          <div class="row2">
+            <div><label class="f" for="f-tel">Teléfono</label><input type="text" id="f-tel"></div>
+            <div><label class="f" for="f-depto">Departamento</label><input type="text" id="f-depto"></div>
+          </div>
+        </section>
+        <section class="card">
+          <h2>Envío</h2>
+          <label class="f" for="f-cajas">Cantidad de cajas (1 a 999)</label>
+          <input type="text" id="f-cajas" inputmode="numeric" autocomplete="off">
+          <label class="sw"><span>Imprimir FACTURA EN CAJA</span><input type="checkbox" class="switch" id="c-factura" checked></label>
+          <label class="f" for="f-cond">Condición especial</label><input type="text" id="f-cond">
+          <label class="sw"><span>Imprimir condición especial</span><input type="checkbox" class="switch" id="c-cond"></label>
+        </section>
       </div>
-    </div>
+
+      <div class="col2">
+        <section class="card" id="resumen">
+          <h2>Resumen</h2>
+          <div class="stats">
+            <div class="stat"><b id="s-cajas">–</b><span>cajas</span></div>
+            <div class="stat"><b id="s-bultos">–</b><span>bultos</span></div>
+            <div class="stat"><b id="s-hojas">–</b><span>hojas A4</span></div>
+          </div>
+          <p id="resumen-txt"></p>
+        </section>
+        <section class="card acciones">
+          <button id="b-generar" class="btn prim">Generar carteles</button>
+          <button id="b-imprimir" class="btn">Imprimir</button>
+          <button id="b-png" class="btn">Generar PNG</button>
+          <button id="b-nuevo" class="btn fuera">Nuevo envío</button>
+        </section>
+        <div id="avisos" class="avisos"></div>
+        <details id="prev" class="card" open hidden>
+          <summary>Vista previa <small id="prev-info"></small></summary>
+          <div class="prev-body"><div id="vista" class="vista"></div></div>
+        </details>
+        <p class="aviso">Al imprimir elegí papel A4, escala 100 %, márgenes «Ninguno», activá «Gráficos de fondo» y desactivá «Encabezados y pies de página».</p>
+      </div>
+    </main>
+  </div>
+
+  <div id="impresion"></div>
+
+  <div id="modal" class="modal no-print" hidden>
+    <div id="modal-card" class="modal-card" role="dialog" aria-modal="true"></div>
   </div>
   <?!= include('JavaScript'); ?>
 </body>
