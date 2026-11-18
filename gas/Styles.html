@@ -25,6 +25,7 @@ button.principal { background: #1c1c1c; color: #fff; }
 .sugerencias li.sel, .sugerencias li:hover { background: #e3e8f3; }
 .origen { font-size: 13px; color: #444; margin: 8px 0 0; }
 .resumen { padding: 10px 12px; background: #fff; border-left: 4px solid #2e7d32; margin: 0 0 12px; }
+.avisos { color: #b71c1c; font-weight: 600; margin: 0 0 8px; }
 .resumen.error { border-color: #b71c1c; }
 
 /* ===== Hoja y cartel (misma estructura en vista previa e impresión) ===== */
@@ -36,16 +37,16 @@ button.principal { background: #1c1c1c; color: #fff; }
   font-family: "Times New Roman", Times, "Liberation Serif", serif; }
 .hoja .cartel:first-child { border-bottom: .3mm dashed #000; } /* línea de corte */
 .cartel > * { max-width: 100%; overflow-wrap: break-word; }
-.bulto { font-size: calc(11pt * var(--k)); font-weight: 700; }
-.razon { font-size: calc(36pt * var(--k)); font-weight: 700; }
-.fant, .dir, .tel { font-size: calc(28pt * var(--k)); }
+.bulto { font-size: max(8pt, calc(11pt * var(--k))); font-weight: 700; }
+.razon { font-size: max(16pt, calc(36pt * var(--k))); font-weight: 700; }
+.fant, .dir, .tel { font-size: max(12pt, calc(28pt * var(--k))); }
 .dir { white-space: pre-line; }
 .zona-depto { flex: 1; display: flex; align-items: center; justify-content: center; }
-.depto { font-size: calc(72pt * var(--k)); font-weight: 700; text-transform: uppercase; }
-.factura { width: 100%; background: #ff0; border: .3mm solid #000; font-weight: 700; text-transform: uppercase; font-size: calc(55pt * var(--k)); }
-.cond { width: 100%; background: #fff; border: .3mm solid #000; font-weight: 700; text-transform: uppercase; font-size: calc(24pt * var(--k)); margin-top: 1.5mm; }
-.rte1 { color: #f00; font-size: calc(28pt * var(--k)); margin-top: 1.5mm; }
-.rte2 { color: #f00; font-size: calc(18pt * var(--k)); }
+.depto { font-size: max(28pt, calc(72pt * var(--k))); font-weight: 700; text-transform: uppercase; }
+.factura { width: 100%; background: #ff0; border: .3mm solid #000; font-weight: 700; text-transform: uppercase; font-size: max(24pt, calc(55pt * var(--k))); }
+.cond { width: 100%; background: #fff; border: .3mm solid #000; font-weight: 700; text-transform: uppercase; font-size: max(12pt, calc(24pt * var(--k))); margin-top: 1.5mm; }
+.rte1 { color: #f00; font-size: max(12pt, calc(28pt * var(--k))); margin-top: 1.5mm; }
+.rte2 { color: #f00; font-size: max(9pt, calc(18pt * var(--k))); }
 
 /* ===== Impresión A4 vertical ===== */
 @page { size: A4 portrait; margin: 0; }

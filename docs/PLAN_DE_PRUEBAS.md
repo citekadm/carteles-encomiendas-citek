@@ -136,6 +136,23 @@ Probar cantidades de bultos pares e impares:
 - [ ] Se prueba el mismo enlace desde más de una PC autorizada.
 - [ ] Se documenta cómo actualizar el despliegue después de cambios.
 
+## 9 bis. PNG y reglas posteriores (especificación, sección 15)
+
+- [ ] «Generar PNG» copia al portapapeles solo el Bulto 1; se pega en WhatsApp y en un mail.
+- [ ] Dimensiones 1240 × 874 px; el diseño coincide con el cartel impreso.
+- [ ] PNG con y sin FACTURA EN CAJA, con y sin condición especial, y con textos largos.
+- [ ] Sin cantidad de cajas válida no se genera ni se copia nada.
+- [ ] Fantasía igual a razón social (con otras mayúsculas o tildes): no se imprime.
+- [ ] El teléfono se imprime como «Tel: número»; sin teléfono no hay línea.
+- [ ] Saltos de línea de la dirección respetados.
+- [ ] Departamento en mayúsculas y negrita, incluso con «Treinta y Tres» (dos líneas).
+- [ ] Condición especial en negrita, mayúsculas y ancho completo.
+- [ ] Caso completo (factura, condición, fantasía y teléfono): todo entra en media hoja sin desbordar.
+- [ ] Texto que no entra ni al mínimo: aparece el aviso y no se recorta nada.
+- [ ] La casilla de condición sigue al texto hasta que se modifica a mano.
+- [ ] Tras «Generar carteles», los cambios del formulario actualizan la vista previa.
+- [ ] Autopruebas (`autopruebas()` en la consola): todas OK.
+
 ## 10. Criterio de aprobación
 
 La versión solo se acepta cuando todos los puntos críticos están verificados, especialmente:

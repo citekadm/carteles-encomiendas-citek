@@ -26,13 +26,14 @@
 │   ├── ARQUITECTURA_Y_PLAN.md
 │   └── PLAN_DE_PRUEBAS.md
 └── gas/
+    ├── appsscript.json
     ├── Code.gs
     ├── Index.html
     ├── Styles.html
     └── JavaScript.html
 ```
 
-Los archivos de `gas/` son marcadores de posición. No contienen la aplicación ni deben interpretarse como código funcional.
+`gas/appsscript.json` (manifiesto) se agregó a la estructura inicial. Los archivos de `gas/` contienen la aplicación implementada.
 
 ## 3. Responsabilidad prevista por archivo
 
@@ -179,3 +180,13 @@ Estas cuestiones no alteran los requisitos funcionales y deben ser resueltas por
 - Qué opciones exactas de acceso estarán disponibles en el despliegue de Apps Script y cómo se autorizarán las PC/usuarios.
 
 No inventar valores ni asumir que estas decisiones ya fueron tomadas. Claude debe explicar ventajas, límites y recomendación, y esperar aprobación donde corresponda.
+
+## 10. Decisiones resueltas en el análisis
+
+- **ID de la planilla:** propiedad de script `SHEET_ID`.
+- **Recarga de clientes:** sin caché; «Recargar clientes» lee siempre la hoja.
+- **Errores:** código y mensaje diferenciados (sin configuración, planilla inaccesible, hoja inexistente, encabezados distintos) y la aplicación sigue utilizable en modo manual.
+- **Paginación en A4:** hoja de 296 mm con dos carteles de 148 mm, `@page` A4 con margen cero, salto de página por hoja y verificación con impresión real desde Chrome.
+- **Acceso:** ejecutar como propietario, acceso «solo yo», misma cuenta en ambas PC.
+- **Alcance de permisos:** `spreadsheets` (ver sección 15.4 de la especificación).
+- **Lógica:** toda la lógica de negocio corre en el navegador como funciones puras (`Reglas`); el servidor solo entrega la interfaz y lee la hoja.

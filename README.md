@@ -4,7 +4,7 @@ Aplicación web para generar e imprimir carteles de encomiendas a partir de los 
 
 ## Estado del proyecto
 
-**Fase actual: documentación y definición.** Todavía no se implementó la aplicación. Los archivos de `gas/` son marcadores de posición para la futura implementación en Google Apps Script.
+**Fase actual: implementación y pruebas.** La aplicación está implementada en `gas/` (lectura de `Hoja2`, búsqueda, formulario, generación de carteles, vista previa, impresión A4 y PNG). Faltan las pruebas completas del plan (impresión real con 1 a 6 bultos y con 333) y la guía final de entrega. Las decisiones posteriores a la especificación están en la sección 15 de `docs/ESPECIFICACION_FUNCIONAL.md`.
 
 ## Documentación principal
 
@@ -23,6 +23,7 @@ Aplicación web para generar e imprimir carteles de encomiendas a partir de los 
 │   ├── ARQUITECTURA_Y_PLAN.md
 │   └── PLAN_DE_PRUEBAS.md
 └── gas/
+    ├── appsscript.json
     ├── Code.gs
     ├── Index.html
     ├── Styles.html
