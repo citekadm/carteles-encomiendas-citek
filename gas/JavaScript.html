@@ -119,12 +119,13 @@
       card.appendChild(b);
       setTimeout(function () { b.focus(); }, 50);
     }
-    m.dataset.tipo = o.tipo;
+    m.dataset.tipo = o.tipo; m.dataset.cerrado = '';
     m.hidden = false;
-    requestAnimationFrame(function () { m.classList.add('abierto'); });
+    requestAnimationFrame(function () { if (!m.dataset.cerrado) m.classList.add('abierto'); });
   }
   function cerrarModal() {
     var m = $('modal');
+    m.dataset.cerrado = '1';
     m.classList.remove('abierto');
     setTimeout(function () { if (!m.classList.contains('abierto')) m.hidden = true; }, 200);
   }
