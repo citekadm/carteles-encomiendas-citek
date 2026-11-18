@@ -26,6 +26,7 @@ La aplicación debe ser sencilla de utilizar, confiable y especialmente cuidados
 - Opción para imprimir «FACTURA EN CAJA».
 - Vista previa de los carteles.
 - Impresión en A4 vertical, dos carteles por hoja.
+- Imagen PNG del primer bulto copiada al portapapeles (sección 15).
 - Acceso mediante una aplicación web de Apps Script para usuarios autorizados.
 
 ### Fuera del alcance de esta versión
@@ -272,6 +273,7 @@ Controles y acciones:
 - Botón **«Generar carteles»**.
 - Botón **«Imprimir»**.
 - Botón **«Nuevo envío»**.
+- Botón **«Generar PNG»** (sección 15).
 
 La vista previa y el resumen deben actualizarse de acuerdo con los datos y opciones seleccionados. Los controles de la interfaz no deben aparecer en el papel.
 
@@ -319,3 +321,45 @@ La aplicación no se considera terminada hasta que:
 ## 14. Control de cambios
 
 Esta especificación recoge decisiones ya acordadas. El desarrollador no debe reinterpretar requisitos, introducir funcionalidades no solicitadas ni cambiar reglas de negocio por iniciativa propia. Ante contradicciones, ambigüedades o limitaciones técnicas, debe detenerse y plantear la consulta antes de implementar.
+
+---
+
+## 15. Decisiones aprobadas con posterioridad
+
+Registro de las decisiones tomadas durante el análisis y la implementación. Complementan las secciones anteriores.
+
+### 15.1 Generar PNG
+
+- Botón **«Generar PNG»**: crea una imagen solo del **Bulto 1**, con todos los datos del cartel («BULTO 1 DE N», cliente, departamento, «FACTURA EN CAJA» si está activa, condición especial si corresponde y remitente).
+- Formato A5 apaisado (210 × 148 mm) a 150 dpi (1240 × 874 px), con el mismo diseño del cartel.
+- La imagen se **copia al portapapeles** para pegarla en WhatsApp o en un mail. Si el navegador bloquea la copia, se muestra la imagen para copiarla con el menú contextual.
+- Requiere una cantidad de cajas válida y se genera con el estado actual del formulario.
+
+### 15.2 Contenido del cartel
+
+- **N1.** Si el nombre fantasía es igual a la razón social (sin distinguir mayúsculas ni tildes), no se imprime.
+- **N2.** La hoja trae solo el número de teléfono; el cartel antepone «Tel: ». Sin teléfono se omite la línea completa.
+- **N3.** Se imprimen los datos de la planilla tal como vienen, sin campo de localidad. Los saltos de línea de la dirección se respetan.
+- **N4.** Dirección y teléfono van en líneas separadas.
+- **N5.** El departamento se imprime siempre en mayúsculas y negrita.
+- **N6.** La condición especial se imprime en mayúsculas y negrita, en un recuadro de ancho completo, con tamaño menor que «FACTURA EN CAJA».
+- **N7.** Los tamaños del Word original son máximos: razón social 36 pt, fantasía/dirección/teléfono 28 pt, departamento 72 pt, factura 55 pt, condición 24 pt, remitente 28 pt y 18 pt. Cada elemento tiene un tamaño mínimo legible.
+- Nombre fantasía entre comillas tipográficas “ ”.
+- **Ajuste de texto (D9):** un elemento puede ocupar hasta dos líneas; si el cartel no entra en media hoja, se reducen todos los textos en cascada hasta el mínimo legible. Si aun así no entra, se avisa en pantalla y no se recorta ni se abrevia nada.
+
+### 15.3 Interfaz y datos
+
+- Ningún campo es obligatorio salvo la cantidad de cajas.
+- La búsqueda trata la «ñ» como «n».
+- La casilla «Imprimir condición especial» sigue al texto del campo hasta que el usuario la modifica; desde entonces respeta su elección.
+- El cliente manual lleva un indicador de origen («de la base» / «manual»).
+- El resumen en pantalla muestra la agrupación de cajas (por ejemplo «3+3+3+1»); nunca se imprime.
+- Tras «Generar carteles», cualquier cambio del formulario actualiza la vista previa automáticamente.
+
+### 15.4 Plataforma y acceso
+
+- Todo se diseña y prueba en A4 vertical. La página Letter del Word original es solo referencia de estilo.
+- La lectura de la planilla con `SpreadsheetApp.openById` exige el alcance `https://www.googleapis.com/auth/spreadsheets` (el alcance `spreadsheets.readonly` no alcanza). Por eso el carácter de solo lectura se garantiza por código y con las pruebas de integridad de la hoja, no por el permiso de Google.
+- Acceso: ejecutar como propietario, acceso «solo yo»; las dos PC usan la misma cuenta, de preferencia con un perfil de Chrome dedicado.
+- El ID de la planilla se guarda en la propiedad de script `SHEET_ID`, nunca en el repositorio.
+- No se usa caché: «Recargar clientes» lee siempre la hoja.

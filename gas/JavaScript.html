@@ -19,8 +19,9 @@
   // ---- Cartel (prototipo: tamaños de referencia como máximos) ----
   function crearCartel(d) {
     var c = el('div', 'cartel');
+    c.dataset.v = d.factura && d.n === 1 ? 'a' : 'b'; // variante de ajuste: con o sin FACTURA EN CAJA
     c.appendChild(el('div', 'bulto', 'BULTO ' + d.n + ' DE ' + d.total));
-    c.appendChild(el('div', 'razon', d.razon));
+    if (d.razon) c.appendChild(el('div', 'razon', d.razon));
     if (d.fantasia && norm(d.fantasia) !== norm(d.razon)) c.appendChild(el('div', 'fant', '\u201C' + d.fantasia + '\u201D'));
     if (d.dir) c.appendChild(el('div', 'dir', d.dir));
     if (d.tel) c.appendChild(el('div', 'tel', 'Tel: ' + d.tel));
@@ -35,42 +36,65 @@
     return c;
   }
 
-  // Reducción en cascada simple (el algoritmo definitivo llega en la Etapa 5).
+  // Reducción en cascada: todos los textos escalan con --k hasta que el cartel entra en media hoja A4;
+  // cada elemento tiene un tamaño mínimo legible (ver Styles.html). Devuelve {ok, k}.
   function ajustar(c) {
     var k = 1;
     c.style.setProperty('--k', k);
-    while (c.scrollHeight > c.clientHeight + 1 && k > 0.4) {
+    while (c.scrollHeight > c.clientHeight + 1 && k > 0.3) {
       k -= 0.03;
       c.style.setProperty('--k', k.toFixed(2));
     }
-    return c.scrollHeight <= c.clientHeight + 1;
+    return { ok: c.scrollHeight <= c.clientHeight + 1, k: k };
+  }
+  // Medición fuera de pantalla y a tamaño real (210 mm), sin depender del zoom de la vista previa.
+  function medir(d) {
+    var caja = el('div');
+    caja.style.cssText = 'position:absolute;left:-10000px;top:0;width:210mm;';
+    document.body.appendChild(caja);
+    var c = crearCartel(d);
+    caja.appendChild(c);
+    var r = ajustar(c);
+    document.body.removeChild(caja);
+    return r;
   }
 
-  var OWL = { razon: 'OWL SRL', fantasia: 'Minimarket OWL', dir: 'Av. Soriano Y Dr. Felippone', tel: '4724 1917', depto: 'Paysandu' };
-  function m(base, extra) { var o = {}, k; for (k in base) o[k] = base[k]; for (k in extra) o[k] = extra[k]; return o; }
-  var MUESTRAS = [
-    m(OWL, { n: 1, total: 2, factura: true, cond: '' }),
-    m(OWL, { n: 2, total: 2, factura: true, cond: '' }),
-    { n: 1, total: 1, factura: true, cond: 'Enviar por Nuñez', razon: 'LICKSOL S.A', fantasia: 'Licksol S.A', dir: 'Rincón Artigas 695\nMELO', tel: '4642 1340', depto: 'Cerro Largo' },
-    { n: 1, total: 1, factura: false, cond: '', razon: 'DISTRIBUIDORA DEL ESTE LIMITADA', fantasia: 'Almacén Los Tres Hermanos', dir: 'Avenida Brigadier General Manuel Oribe 1234', tel: '', depto: 'Treinta y Tres' },
-    m(OWL, { n: 1, total: 1, factura: true, cond: '' })
-  ];
-
-  // Hojas A4: dos carteles por hoja; con cantidad impar la mitad inferior queda vacía.
-  function renderVista(lista) {
-    var v = $('vista');
-    v.textContent = '';
+  // ---- Generación de carteles y vista previa (misma estructura que la impresión) ----
+  var generado = false, timer = null;
+  function datosCartel(e, d) { // datos del formulario + descriptor del bulto
+    return { n: d.n, total: d.total, factura: d.factura, cond: d.cond, razon: e.razon.trim(), fantasia: e.fantasia.trim(),
+      dir: e.dir.trim(), tel: e.tel.trim(), depto: e.depto.trim() };
+  }
+  function renderCarteles() {
+    var v = Reglas.validarCajas(estado.cajas), vista = $('vista'), av = $('avisos');
+    vista.textContent = ''; av.textContent = '';
+    if (!v.ok) return; // sin cantidad válida no se genera nada; el resumen muestra el motivo
+    var lista = Reglas.descriptores(v.valor, { factura: estado.factura, condActiva: estado.condActiva, condTexto: estado.cond })
+      .map(function (d) { return datosCartel(estado, d); });
+    // Un solo ajuste por variante (con factura / sin factura): 333 carteles no implican 333 mediciones.
+    var ks = {}, fallos = [];
+    if (lista[0].factura) { ks.a = medir(lista[0]); if (!ks.a.ok) fallos.push('el bulto 1 (con FACTURA EN CAJA)'); }
+    if (lista.length > 1 || !lista[0].factura) { ks.b = medir(lista[lista.length - 1]); if (!ks.b.ok) fallos.push('los demás bultos'); }
+    function armar(d) {
+      var c = crearCartel(d);
+      c.style.setProperty('--k', ks[c.dataset.v].k.toFixed(2));
+      return c;
+    }
+    var frag = document.createDocumentFragment();
     for (var i = 0; i < lista.length; i += 2) {
       var h = el('div', 'hoja');
-      h.appendChild(crearCartel(lista[i]));
-      h.appendChild(i + 1 < lista.length ? crearCartel(lista[i + 1]) : el('div', 'cartel vacio'));
-      v.appendChild(h);
+      h.appendChild(armar(lista[i]));
+      h.appendChild(i + 1 < lista.length ? armar(lista[i + 1]) : el('div', 'cartel vacio'));
+      frag.appendChild(h);
     }
-    var fallos = [];
-    Array.prototype.forEach.call(v.querySelectorAll('.cartel:not(.vacio)'), function (c, i) {
-      if (!ajustar(c)) fallos.push(i + 1);
-    });
-    return fallos;
+    vista.appendChild(frag);
+    if (fallos.length) av.textContent = 'Atención: en ' + fallos.join(' y en ') + ' el texto no entra ni con el tamaño mínimo. Revisá la longitud de los datos.';
+  }
+  // Una vez generados, cualquier cambio del formulario actualiza la vista previa.
+  function actualizar() {
+    if (!generado) return;
+    clearTimeout(timer);
+    timer = setTimeout(renderCarteles, 150);
   }
 
   // ---- PNG del primer cartel: A5 apaisado 210 x 148 mm a 150 dpi (1240 x 874 px), copiado al portapapeles ----
@@ -243,6 +267,7 @@
       ? 'Cliente de la base (cuenta ' + estado.cuenta + '). Los cambios valen solo para este envío.'
       : 'Cliente manual: no se guarda en la base.';
     resumen();
+    actualizar();
   }
   function cerrarLista() { $('sugerencias').hidden = true; $('sin-res').hidden = true; sel = -1; }
   function elegir(c) { // copia de los datos; la base nunca se modifica
@@ -290,20 +315,32 @@
   $('c-factura').addEventListener('change', function () { estado.factura = this.checked; });
   $('f-cajas').addEventListener('input', function () { estado.cajas = this.value; resumen(); });
   $('b-nuevo').onclick = function () {
+    generado = false; clearTimeout(timer);
     estado = estadoVacio();
     $('f-buscar').value = ''; cerrarLista(); volcar();
-    $('vista').textContent = ''; $('png-res').textContent = '';
+    $('vista').textContent = ''; $('png-res').textContent = ''; $('avisos').textContent = '';
   };
   estado = estadoVacio();
   volcar();
 
   $('b-recargar').onclick = cargar;
-  $('b-prueba').onclick = function () {
-    var f = renderVista(MUESTRAS);
-    $('estado').className = f.length ? 'estado error' : 'estado ok';
-    $('estado').textContent = f.length ? 'Carteles que no entran ni al tamaño mínimo: ' + f.join(', ') : 'Hojas de prueba generadas (' + MUESTRAS.length + ' carteles).';
+  $('b-generar').onclick = function () {
+    var v = Reglas.validarCajas(estado.cajas);
+    if (!v.ok) {
+      generado = false; $('vista').textContent = ''; $('avisos').textContent = '';
+      resumen(); $('resumen').className = 'resumen error';
+      return;
+    }
+    generado = true;
+    renderCarteles();
   };
-  $('b-imprimir').onclick = function () { window.print(); };
+  ['input', 'change'].forEach(function (t) {
+    document.querySelector('.col').addEventListener(t, function (e) { if (e.target.id !== 'f-buscar') actualizar(); });
+  });
+  $('b-imprimir').onclick = function () {
+    if (!document.querySelector('#vista .cartel:not(.vacio)')) { $('avisos').textContent = 'Primero generá los carteles.'; return; }
+    window.print();
+  };
   $('b-png').onclick = generarPNG;
   cargar();
 })();
