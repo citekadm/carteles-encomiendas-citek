@@ -39,7 +39,7 @@ function cargarClientes() {
 
     var ss;
     try { ss = SpreadsheetApp.openById(id); }
-    catch (e) { return error_('SIN_ACCESO', 'No se pudo abrir la planilla. Revisá el ID y los permisos de la cuenta.'); }
+    catch (e) { console.error('openById falló: ' + e); return error_('SIN_ACCESO', 'No se pudo abrir la planilla. Revisá el ID y los permisos de la cuenta.'); }
 
     var hoja = ss.getSheetByName(HOJA);
     if (!hoja) return error_('SIN_HOJA', 'No existe la pestaña "' + HOJA + '" en la planilla.');
