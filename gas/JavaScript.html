@@ -1,70 +1,157 @@
-/*
- * Carteles de encomiendas — Citek
- * Etapas 1-2: entrega de la interfaz y lectura de Hoja2 (solo lectura).
- * El ID de la planilla se guarda en Propiedades del script (clave SHEET_ID), nunca en el código.
- */
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var clientes = [];
 
-var HOJA = 'Hoja2';
-var ENCABEZADOS = ['Cuenta', 'Razon Social', 'Nombre fantasia', 'Direccion', 'Telefono', 'Departamento', 'Condiciones Especiales'];
-var CLAVES = ['cuenta', 'razonSocial', 'fantasia', 'direccion', 'telefono', 'departamento', 'condicion'];
+  // Regla pura: búsqueda sin mayúsculas ni tildes; la ñ cuenta como n.
+  function norm(s) {
+    return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+  // DOM siempre con textContent (nunca innerHTML con datos de la hoja).
+  function el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
 
-function doGet() {
-  return HtmlService.createTemplateFromFile('Index').evaluate()
-    .setTitle('Carteles de encomiendas — Citek')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-}
+  // ---- Cartel (prototipo: tamaños de referencia como máximos) ----
+  function crearCartel(d) {
+    var c = el('div', 'cartel');
+    c.appendChild(el('div', 'bulto', 'BULTO ' + d.n + ' DE ' + d.total));
+    c.appendChild(el('div', 'razon', d.razon));
+    if (d.fantasia && norm(d.fantasia) !== norm(d.razon)) c.appendChild(el('div', 'fant', '\u201C' + d.fantasia + '\u201D'));
+    if (d.dir) c.appendChild(el('div', 'dir', d.dir));
+    if (d.tel) c.appendChild(el('div', 'tel', 'Tel: ' + d.tel));
+    var z = el('div', 'zona-depto');
+    z.appendChild(el('div', 'depto', d.depto));
+    c.appendChild(z);
+    if (d.factura && d.n === 1) c.appendChild(el('div', 'factura', 'FACTURA EN CAJA'));
+    if (d.cond) c.appendChild(el('div', 'cond', d.cond));
+    c.appendChild(el('div', 'rte1', 'Rte.: Citek Ltda.'));
+    c.appendChild(el('div', 'rte2', 'Cerrito 282 bis - Tel.: 2915 5380'));
+    c.appendChild(el('div', 'rte2', 'MONTEVIDEO'));
+    return c;
+  }
 
-// Permite incluir Styles y JavaScript dentro de Index mediante <?!= include('...') ?>
-function include(nombre) {
-  return HtmlService.createHtmlOutputFromFile(nombre).getContent();
-}
+  // Reducción en cascada simple (el algoritmo definitivo llega en la Etapa 5).
+  function ajustar(c) {
+    var k = 1;
+    c.style.setProperty('--k', k);
+    while (c.scrollHeight > c.clientHeight + 1 && k > 0.4) {
+      k -= 0.03;
+      c.style.setProperty('--k', k.toFixed(2));
+    }
+    return c.scrollHeight <= c.clientHeight + 1;
+  }
 
-// Comparación de encabezados tolerante a mayúsculas y tildes (no reordena columnas).
-function normalizar_(s) {
-  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
-}
+  var OWL = { razon: 'OWL SRL', fantasia: 'Minimarket OWL', dir: 'Av. Soriano Y Dr. Felippone', tel: '4724 1917', depto: 'Paysandu' };
+  function m(base, extra) { var o = {}, k; for (k in base) o[k] = base[k]; for (k in extra) o[k] = extra[k]; return o; }
+  var MUESTRAS = [
+    m(OWL, { n: 1, total: 2, factura: true, cond: '' }),
+    m(OWL, { n: 2, total: 2, factura: true, cond: '' }),
+    { n: 1, total: 1, factura: true, cond: 'Enviar por Nuñez', razon: 'LICKSOL S.A', fantasia: 'Licksol S.A', dir: 'Rincón Artigas 695\nMELO', tel: '4642 1340', depto: 'Cerro Largo' },
+    { n: 1, total: 1, factura: false, cond: '', razon: 'DISTRIBUIDORA DEL ESTE LIMITADA', fantasia: 'Almacén Los Tres Hermanos', dir: 'Avenida Brigadier General Manuel Oribe 1234', tel: '', depto: 'Treinta y Tres' },
+    m(OWL, { n: 1, total: 1, factura: true, cond: '' })
+  ];
 
-function error_(codigo, mensaje) {
-  return { ok: false, codigo: codigo, mensaje: mensaje };
-}
+  // Hojas A4: dos carteles por hoja; con cantidad impar la mitad inferior queda vacía.
+  function renderVista(lista) {
+    var v = $('vista');
+    v.textContent = '';
+    for (var i = 0; i < lista.length; i += 2) {
+      var h = el('div', 'hoja');
+      h.appendChild(crearCartel(lista[i]));
+      h.appendChild(i + 1 < lista.length ? crearCartel(lista[i + 1]) : el('div', 'cartel vacio'));
+      v.appendChild(h);
+    }
+    var fallos = [];
+    Array.prototype.forEach.call(v.querySelectorAll('.cartel:not(.vacio)'), function (c, i) {
+      if (!ajustar(c)) fallos.push(i + 1);
+    });
+    return fallos;
+  }
 
-/**
- * Lee los clientes de Hoja2 (A:G, datos desde la fila 2) con getDisplayValues().
- * Devuelve {ok:true, clientes:[...]} o {ok:false, codigo, mensaje}. Nunca escribe en la planilla.
- */
-function cargarClientes() {
-  try {
-    var id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
-    if (!id) return error_('SIN_CONFIG', 'Falta configurar SHEET_ID en Propiedades del script.');
+  // ---- PNG del primer cartel: A5 apaisado 210 x 148 mm a 150 dpi (1240 x 874 px), copiado al portapapeles ----
+  function generarPNG() {
+    var res = $('png-res');
+    var c = document.querySelector('.cartel:not(.vacio)');
+    res.textContent = '';
+    if (!c) { res.textContent = 'Primero cargá las hojas de prueba.'; return; }
+    var W = 210 * 96 / 25.4, H = 148 * 96 / 25.4;
+    var clon = c.cloneNode(true);
+    clon.style.width = '210mm';
+    var css = $('estilos').textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="874" viewBox="0 0 ' + W + ' ' + H + '">' +
+      '<foreignObject width="' + W + '" height="' + H + '"><div xmlns="http://www.w3.org/1999/xhtml"><style>' + css + '</style>' +
+      new XMLSerializer().serializeToString(clon) + '</div></foreignObject></svg>';
 
-    var ss;
-    try { ss = SpreadsheetApp.openById(id); }
-    catch (e) { console.error('openById falló: ' + e); return error_('SIN_ACCESO', 'No se pudo abrir la planilla. Revisá el ID y los permisos de la cuenta.'); }
+    // La imagen se entrega al portapapeles como promesa para no perder el permiso del clic.
+    var blobPromise = new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var cv = document.createElement('canvas');
+          cv.width = 1240; cv.height = 874;
+          var ctx = cv.getContext('2d');
+          ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 1240, 874);
+          ctx.drawImage(img, 0, 0, 1240, 874);
+          cv.toBlob(function (b) { b ? resolve(b) : reject(new Error('no se obtuvo la imagen')); }, 'image/png');
+        } catch (e) { reject(e); }
+      };
+      img.onerror = function () { reject(new Error('no se pudo renderizar el cartel')); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    });
 
-    var hoja = ss.getSheetByName(HOJA);
-    if (!hoja) return error_('SIN_HOJA', 'No existe la pestaña "' + HOJA + '" en la planilla.');
-
-    var cab = hoja.getRange(1, 1, 1, ENCABEZADOS.length).getDisplayValues()[0];
-    for (var i = 0; i < ENCABEZADOS.length; i++) {
-      if (normalizar_(cab[i]) !== normalizar_(ENCABEZADOS[i])) {
-        return error_('ENCABEZADOS', 'La columna ' + (i + 1) + ' debería llamarse "' + ENCABEZADOS[i] + '" y dice "' + cab[i] + '".');
-      }
+    // Alternativa si el navegador bloquea el portapapeles: mostrar la imagen para copiarla a mano.
+    function mostrar() {
+      blobPromise.then(function (b) {
+        res.textContent = 'No se pudo copiar automáticamente. Hacé clic derecho sobre la imagen y elegí «Copiar imagen».';
+        var im = el('img');
+        im.src = URL.createObjectURL(b); im.alt = 'PNG del bulto 1';
+        res.appendChild(im);
+      }, function (e) { res.textContent = 'No se pudo generar el PNG: ' + e.message; });
     }
 
-    var ultima = hoja.getLastRow();
-    if (ultima < 2) return { ok: true, clientes: [] };
-
-    var filas = hoja.getRange(2, 1, ultima - 1, ENCABEZADOS.length).getDisplayValues();
-    var clientes = [];
-    filas.forEach(function (f) {
-      if (f.join('').trim() === '') return; // descarta filas vacías
-      var c = {};
-      CLAVES.forEach(function (k, j) { c[k] = String(f[j]).trim(); });
-      clientes.push(c);
-    });
-    return { ok: true, clientes: clientes };
-  } catch (e) {
-    console.error(e);
-    return error_('ERROR', 'Error inesperado al leer la planilla.');
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })])
+        .then(function () { res.textContent = 'PNG del bulto 1 copiado al portapapeles. Pegalo en WhatsApp o en el mail con Ctrl+V.'; })
+        .catch(mostrar);
+    } else { mostrar(); }
   }
-}
+
+  // ---- Lectura de clientes (Etapa 1) ----
+  function cargar() {
+    var e = $('estado');
+    e.className = 'estado'; e.textContent = 'Leyendo clientes…';
+    google.script.run
+      .withSuccessHandler(function (r) {
+        if (r && r.ok) {
+          clientes = r.clientes;
+          e.className = 'estado ok';
+          var p = clientes[0];
+          e.textContent = 'Clientes leídos: ' + clientes.length + (p ? '. Primero: ' + p.cuenta + ' | ' + p.razonSocial + ' | ' + p.departamento : '.');
+        } else {
+          e.className = 'estado error';
+          e.textContent = (r && r.mensaje) || 'Error desconocido al leer clientes.';
+        }
+      })
+      .withFailureHandler(function () {
+        e.className = 'estado error';
+        e.textContent = 'No se pudo conectar con el servidor.';
+      })
+      .cargarClientes();
+  }
+
+  $('b-recargar').onclick = cargar;
+  $('b-prueba').onclick = function () {
+    var f = renderVista(MUESTRAS);
+    $('estado').className = f.length ? 'estado error' : 'estado ok';
+    $('estado').textContent = f.length ? 'Carteles que no entran ni al tamaño mínimo: ' + f.join(', ') : 'Hojas de prueba generadas (' + MUESTRAS.length + ' carteles).';
+  };
+  $('b-imprimir').onclick = function () { window.print(); };
+  $('b-png').onclick = generarPNG;
+  cargar();
+})();
+</script>
