@@ -65,9 +65,12 @@
     return { n: d.n, total: d.total, factura: d.factura, cond: d.cond, razon: e.razon.trim(), fantasia: e.fantasia.trim(),
       dir: e.dir.trim(), tel: e.tel.trim(), depto: e.depto.trim() };
   }
+  function limpiarSalida() {
+    $('vista').textContent = ''; $('impresion').textContent = ''; $('avisos').textContent = ''; $('prev').hidden = true;
+  }
   function renderCarteles() {
-    var v = Reglas.validarCajas(estado.cajas), vista = $('vista'), av = $('avisos');
-    vista.textContent = ''; av.textContent = '';
+    var v = Reglas.validarCajas(estado.cajas);
+    limpiarSalida();
     if (!v.ok) return; // sin cantidad válida no se genera nada; el resumen muestra el motivo
     var lista = Reglas.descriptores(v.valor, { factura: estado.factura, condActiva: estado.condActiva, condTexto: estado.cond })
       .map(function (d) { return datosCartel(estado, d); });
@@ -80,6 +83,7 @@
       c.style.setProperty('--k', ks[c.dataset.v].k.toFixed(2));
       return c;
     }
+    // Todas las hojas van a #impresion (oculto en pantalla, visible al imprimir); la vista previa muestra solo la primera.
     var frag = document.createDocumentFragment();
     for (var i = 0; i < lista.length; i += 2) {
       var h = el('div', 'hoja');
@@ -87,8 +91,11 @@
       h.appendChild(i + 1 < lista.length ? armar(lista[i + 1]) : el('div', 'cartel vacio'));
       frag.appendChild(h);
     }
-    vista.appendChild(frag);
-    if (fallos.length) av.textContent = 'Atención: en ' + fallos.join(' y en ') + ' el texto no entra ni con el tamaño mínimo. Revisá la longitud de los datos.';
+    $('impresion').appendChild(frag);
+    $('vista').appendChild($('impresion').firstChild.cloneNode(true));
+    $('prev-info').textContent = 'Hoja 1 de ' + Reglas.hojas(lista.length) + ' · ' + lista.length + (lista.length > 1 ? ' carteles' : ' cartel');
+    $('prev').hidden = false;
+    if (fallos.length) $('avisos').textContent = 'Atención: en ' + fallos.join(' y en ') + ' el texto no entra ni con el tamaño mínimo. Revisá la longitud de los datos.';
   }
   // Una vez generados, cualquier cambio del formulario actualiza la vista previa.
   function actualizar() {
@@ -97,12 +104,37 @@
     timer = setTimeout(renderCarteles, 150);
   }
 
-  // ---- PNG del primer cartel: A5 apaisado 210 x 148 mm a 150 dpi (1240 x 874 px), copiado al portapapeles ----
+  // ---- Ventana emergente (carga, éxito, aviso o error) ----
+  function modal(o) {
+    var m = $('modal'), card = $('modal-card');
+    card.textContent = '';
+    var ic = el('div', 'm-icono m-' + o.tipo, o.tipo === 'error' ? '!' : o.tipo === 'info' ? 'i' : '');
+    card.appendChild(ic);
+    card.appendChild(el('h2', null, o.titulo));
+    card.appendChild(el('p', null, o.texto));
+    if (o.img) { var im = el('img'); im.src = o.img; im.alt = 'PNG del bulto 1'; card.appendChild(im); }
+    if (o.tipo !== 'carga') {
+      var b = el('button', 'btn prim', 'Cerrar');
+      b.onclick = cerrarModal;
+      card.appendChild(b);
+      setTimeout(function () { b.focus(); }, 50);
+    }
+    m.dataset.tipo = o.tipo; m.dataset.cerrado = '';
+    m.hidden = false;
+    requestAnimationFrame(function () { if (!m.dataset.cerrado) m.classList.add('abierto'); });
+  }
+  function cerrarModal() {
+    var m = $('modal');
+    m.dataset.cerrado = '1';
+    m.classList.remove('abierto');
+    setTimeout(function () { if (!m.classList.contains('abierto')) m.hidden = true; }, 200);
+  }
+
+  // ---- PNG del Bulto 1: A5 apaisado 210 x 148 mm a 150 dpi (1240 x 874 px), copiado al portapapeles ----
   function generarPNG() {
-    var res = $('png-res');
-    var c = document.querySelector('.cartel:not(.vacio)');
-    res.textContent = '';
-    if (!c) { res.textContent = 'Primero cargá las hojas de prueba.'; return; }
+    var c = document.querySelector('#vista .cartel:not(.vacio)');
+    if (!c) { modal({ tipo: 'info', titulo: 'Primero generá los carteles', texto: 'El PNG se crea a partir del Bulto 1 de tu envío.' }); return; }
+    modal({ tipo: 'carga', titulo: 'Generando imagen…', texto: 'Preparando el Bulto 1.' });
     var W = 210 * 96 / 25.4, H = 148 * 96 / 25.4;
     var clon = c.cloneNode(true);
     clon.style.width = '210mm';
@@ -129,20 +161,17 @@
     });
 
     // Alternativa si el navegador bloquea el portapapeles: mostrar la imagen para copiarla a mano.
-    function mostrar() {
+    function manual() {
       blobPromise.then(function (b) {
-        res.textContent = 'No se pudo copiar automáticamente. Hacé clic derecho sobre la imagen y elegí «Copiar imagen».';
-        var im = el('img');
-        im.src = URL.createObjectURL(b); im.alt = 'PNG del bulto 1';
-        res.appendChild(im);
-      }, function (e) { res.textContent = 'No se pudo generar el PNG: ' + e.message; });
+        modal({ tipo: 'info', titulo: 'Copiala manualmente', texto: 'El navegador no permitió copiar automáticamente. Hacé clic derecho sobre la imagen y elegí «Copiar imagen».', img: URL.createObjectURL(b) });
+      }, function (e) { modal({ tipo: 'error', titulo: 'No se pudo generar el PNG', texto: e.message }); });
     }
 
     if (navigator.clipboard && window.ClipboardItem) {
       navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })])
-        .then(function () { res.textContent = 'PNG del bulto 1 copiado al portapapeles. Pegalo en WhatsApp o en el mail con Ctrl+V.'; })
-        .catch(mostrar);
-    } else { mostrar(); }
+        .then(function () { modal({ tipo: 'ok', titulo: 'Copiado al portapapeles', texto: 'El PNG del Bulto 1 está listo. Pegalo en WhatsApp o en un mail con Ctrl+V.' }); })
+        .catch(manual);
+    } else { manual(); }
   }
 
   // ---- Lectura de clientes (Etapa 1) ----
@@ -154,8 +183,7 @@
         if (r && r.ok) {
           clientes = r.clientes;
           e.className = 'estado ok';
-          var p = clientes[0];
-          e.textContent = 'Clientes leídos: ' + clientes.length + (p ? '. Primero: ' + p.cuenta + ' | ' + p.razonSocial + ' | ' + p.departamento : '.');
+          e.textContent = clientes.length + (clientes.length === 1 ? ' cliente cargado' : ' clientes cargados');
         } else {
           e.className = 'estado error';
           e.textContent = (r && r.mensaje) || 'Error desconocido al leer clientes.';
@@ -252,20 +280,25 @@
     return { origen: 'manual', cuenta: '', razon: '', fantasia: '', dir: '', tel: '', depto: '', cond: '', condActiva: false, condManual: false, factura: true, cajas: '' };
   }
   function resumen() {
-    var r = $('resumen'), v = Reglas.validarCajas(estado.cajas);
-    r.className = 'resumen' + (v.ok || estado.cajas.trim() === '' ? '' : ' error');
-    if (!v.ok) { r.textContent = v.mensaje; return; }
+    var v = Reglas.validarCajas(estado.cajas), t = $('resumen-txt');
+    $('resumen').classList.toggle('error', !v.ok && estado.cajas.trim() !== '');
+    if (!v.ok) {
+      $('s-cajas').textContent = $('s-bultos').textContent = $('s-hojas').textContent = '–';
+      t.textContent = v.mensaje;
+      return;
+    }
     var b = Reglas.bultos(v.valor), h = Reglas.hojas(b);
-    r.textContent = v.valor + (v.valor > 1 ? ' cajas' : ' caja') + ' → ' + b + (b > 1 ? ' bultos' : ' bulto') + ' (' + Reglas.agrupacion(v.valor) + '). ' +
-      h + (h > 1 ? ' hojas' : ' hoja') + ' A4' + (b % 2 ? '; la mitad inferior de la última queda vacía.' : '.');
+    $('s-cajas').textContent = v.valor; $('s-bultos').textContent = b; $('s-hojas').textContent = h;
+    t.textContent = 'Distribución: ' + Reglas.agrupacion(v.valor) + (b % 2 ? ' · la mitad inferior de la última hoja queda vacía.' : '.');
   }
   function volcar() { // estado -> formulario
     for (var k in CAMPOS) $(CAMPOS[k]).value = estado[k];
     $('f-cond').value = estado.cond; $('c-cond').checked = estado.condActiva;
     $('c-factura').checked = estado.factura; $('f-cajas').value = estado.cajas;
     $('origen').textContent = estado.origen === 'base'
-      ? 'Cliente de la base (cuenta ' + estado.cuenta + '). Los cambios valen solo para este envío.'
-      : 'Cliente manual: no se guarda en la base.';
+      ? 'De la base · cuenta ' + estado.cuenta + ' · cambios solo para este envío'
+      : 'Cliente manual · no se guarda en la base';
+    $('origen').className = 'chip ' + (estado.origen === 'base' ? 'base' : 'manual');
     resumen();
     actualizar();
   }
@@ -318,7 +351,7 @@
     generado = false; clearTimeout(timer);
     estado = estadoVacio();
     $('f-buscar').value = ''; cerrarLista(); volcar();
-    $('vista').textContent = ''; $('png-res').textContent = ''; $('avisos').textContent = '';
+    limpiarSalida();
   };
   estado = estadoVacio();
   volcar();
@@ -327,8 +360,8 @@
   $('b-generar').onclick = function () {
     var v = Reglas.validarCajas(estado.cajas);
     if (!v.ok) {
-      generado = false; $('vista').textContent = ''; $('avisos').textContent = '';
-      resumen(); $('resumen').className = 'resumen error';
+      generado = false; limpiarSalida();
+      resumen(); $('resumen').classList.add('error');
       return;
     }
     generado = true;
@@ -338,10 +371,12 @@
     document.querySelector('.col').addEventListener(t, function (e) { if (e.target.id !== 'f-buscar') actualizar(); });
   });
   $('b-imprimir').onclick = function () {
-    if (!document.querySelector('#vista .cartel:not(.vacio)')) { $('avisos').textContent = 'Primero generá los carteles.'; return; }
+    if (!document.querySelector('#impresion .cartel:not(.vacio)')) { modal({ tipo: 'info', titulo: 'Primero generá los carteles', texto: 'Tocá «Generar carteles» y después imprimí.' }); return; }
     window.print();
   };
   $('b-png').onclick = generarPNG;
+  $('modal').addEventListener('click', function (e) { if (e.target.id === 'modal' && $('modal').dataset.tipo !== 'carga') cerrarModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('modal').hidden && $('modal').dataset.tipo !== 'carga') cerrarModal(); });
   cargar();
 })();
 </script>
