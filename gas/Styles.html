@@ -17,9 +17,10 @@ h1 { margin: 0; font-size: 20px; letter-spacing: -.02em; line-height: 1.1; }
 .estado::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: #aeaeb2; }
 .estado.ok { color: var(--txt); } .estado.ok::before { background: var(--ok); }
 .estado.error { color: var(--err); } .estado.error::before { background: var(--err); }
-.grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 20px; align-items: start; }
-.col, .col2 { display: flex; flex-direction: column; gap: 20px; }
-@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+.grid { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr) 224px; gap: 20px; align-items: start; }
+.col, .col2, .col3 { display: flex; flex-direction: column; gap: 20px; }
+@media (max-width: 1000px) { .grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } .col3 { grid-column: 1 / -1; align-items: center; } }
+@media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
 .card { background: var(--card); border-radius: 22px; padding: 20px; box-shadow: var(--sombra); }
 .card h2 { margin: 0 0 4px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--sub); }
 label.f { display: block; margin: 14px 0 6px; font-size: 12px; font-weight: 600; color: var(--sub); }
@@ -63,8 +64,19 @@ details.card summary small { margin-left: auto; font-weight: 400; color: var(--s
 details.card summary::after { content: ""; width: 9px; height: 9px; border: solid var(--sub); border-width: 0 2px 2px 0; transform: rotate(45deg); transition: transform .2s; margin: -4px 4px 0 6px; }
 details.card[open] summary::after { transform: rotate(-135deg); margin-top: 4px; }
 .prev-body { padding: 4px 20px 20px; display: grid; justify-content: center; background: var(--card); animation: sube .2s ease-out; }
-.vista { zoom: .5; } .vista .hoja { box-shadow: 0 2px 14px rgba(0,0,0,.28); }
-@media (max-width: 520px) { .vista { zoom: .38; } .acciones { grid-template-columns: 1fr 1fr; } }
+.stepper { display: flex; gap: 8px; align-items: stretch; }
+.stepper input { flex: 1; min-width: 0; }
+.paso { display: flex; flex-direction: column; gap: 3px; width: 46px; }
+.btn-paso { flex: 1; min-height: 0; padding: 0; border: 0; border-radius: 9px; cursor: pointer; font-size: 11px; line-height: 1; color: var(--tint); background: color-mix(in srgb, var(--tint) 13%, transparent); transition: transform .12s, filter .12s; }
+.btn-paso:hover { filter: brightness(.94); } .btn-paso:active { transform: scale(.94); }
+.btn-paso:focus-visible { outline: 3px solid color-mix(in srgb, var(--tint) 40%, transparent); outline-offset: 2px; }
+/* Vista previa reducida: es solo una referencia (la impresión usa las hojas a tamaño real) */
+.col3 { position: sticky; top: 76px; }
+.col3 details.card summary { padding: 12px 14px; font-size: 13px; flex-wrap: wrap; gap: 2px 8px; }
+.col3 details.card summary small { margin-left: 0; font-size: 11px; flex-basis: 100%; order: 3; }
+.col3 .prev-body { padding: 0 12px 14px; }
+.vista { zoom: .24; } .vista .hoja { box-shadow: 0 2px 14px rgba(0,0,0,.28); }
+@media (max-width: 520px) { .acciones { grid-template-columns: 1fr 1fr; } }
 #impresion { display: none; }
 .modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(0,0,0,.35); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); opacity: 0; transition: opacity .18s; }
 .modal.abierto { opacity: 1; }
