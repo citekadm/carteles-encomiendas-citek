@@ -347,6 +347,17 @@
   $('c-cond').addEventListener('change', function () { estado.condManual = true; estado.condActiva = this.checked; });
   $('c-factura').addEventListener('change', function () { estado.factura = this.checked; });
   $('f-cajas').addEventListener('input', function () { estado.cajas = this.value; resumen(); });
+  // Botones ▲/▼ y flechas del teclado: suman o restan 1 dentro del rango 1–999 reutilizando el evento 'input'.
+  function pasoCajas(d) {
+    var f = $('f-cajas'), v = Reglas.validarCajas(f.value), n = v.ok ? v.valor + d : 1;
+    f.value = String(Math.min(999, Math.max(1, n)));
+    f.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  $('b-mas').onclick = function () { pasoCajas(1); };
+  $('b-menos').onclick = function () { pasoCajas(-1); };
+  $('f-cajas').addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); pasoCajas(e.key === 'ArrowUp' ? 1 : -1); }
+  });
   $('b-nuevo').onclick = function () {
     generado = false; clearTimeout(timer);
     estado = estadoVacio();
@@ -368,7 +379,7 @@
     renderCarteles();
   };
   ['input', 'change'].forEach(function (t) {
-    document.querySelector('.col').addEventListener(t, function (e) { if (e.target.id !== 'f-buscar') actualizar(); });
+    document.querySelector('.grid').addEventListener(t, function (e) { if (e.target.id !== 'f-buscar') actualizar(); });
   });
   $('b-imprimir').onclick = function () {
     if (!document.querySelector('#impresion .cartel:not(.vacio)')) { modal({ tipo: 'info', titulo: 'Primero generá los carteles', texto: 'Tocá «Generar carteles» y después imprimí.' }); return; }

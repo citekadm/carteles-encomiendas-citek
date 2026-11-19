@@ -38,17 +38,29 @@
             <div><label class="f" for="f-depto">Departamento</label><input type="text" id="f-depto"></div>
           </div>
         </section>
+      </div>
+
+      <div class="col2">
         <section class="card">
           <h2>Envío</h2>
           <label class="f" for="f-cajas">Cantidad de cajas (1 a 999)</label>
-          <input type="text" id="f-cajas" inputmode="numeric" autocomplete="off">
+          <div class="stepper">
+            <input type="text" id="f-cajas" inputmode="numeric" autocomplete="off">
+            <div class="paso">
+              <button type="button" id="b-mas" class="btn-paso" aria-label="Sumar una caja" title="Sumar una caja">&#9650;</button>
+              <button type="button" id="b-menos" class="btn-paso" aria-label="Restar una caja" title="Restar una caja">&#9660;</button>
+            </div>
+          </div>
           <label class="sw"><span>Imprimir FACTURA EN CAJA</span><input type="checkbox" class="switch" id="c-factura" checked></label>
           <label class="f" for="f-cond">Condición especial</label><input type="text" id="f-cond">
           <label class="sw"><span>Imprimir condición especial</span><input type="checkbox" class="switch" id="c-cond"></label>
         </section>
-      </div>
-
-      <div class="col2">
+        <section class="card acciones">
+          <button id="b-generar" class="btn prim">Generar carteles</button>
+          <button id="b-imprimir" class="btn">Imprimir</button>
+          <button id="b-png" class="btn">Generar PNG</button>
+          <button id="b-nuevo" class="btn fuera">Nuevo envío</button>
+        </section>
         <section class="card" id="resumen">
           <h2>Resumen</h2>
           <div class="stats">
@@ -58,18 +70,15 @@
           </div>
           <p id="resumen-txt"></p>
         </section>
-        <section class="card acciones">
-          <button id="b-generar" class="btn prim">Generar carteles</button>
-          <button id="b-imprimir" class="btn">Imprimir</button>
-          <button id="b-png" class="btn">Generar PNG</button>
-          <button id="b-nuevo" class="btn fuera">Nuevo envío</button>
-        </section>
         <div id="avisos" class="avisos"></div>
+        <p class="aviso">Al imprimir elegí papel A4, escala 100 %, márgenes «Ninguno», activá «Gráficos de fondo» y desactivá «Encabezados y pies de página».</p>
+      </div>
+
+      <div class="col3">
         <details id="prev" class="card" open hidden>
           <summary>Vista previa <small id="prev-info"></small></summary>
           <div class="prev-body"><div id="vista" class="vista"></div></div>
         </details>
-        <p class="aviso">Al imprimir elegí papel A4, escala 100 %, márgenes «Ninguno», activá «Gráficos de fondo» y desactivá «Encabezados y pies de página».</p>
       </div>
     </main>
   </div>
