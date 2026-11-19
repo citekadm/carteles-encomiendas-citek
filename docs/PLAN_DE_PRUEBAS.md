@@ -10,7 +10,7 @@
 - [ ] Usa encabezados en fila 1 y datos desde fila 2.
 - [ ] Lee las columnas A:G en el orden documentado.
 - [ ] Usa `getDisplayValues()` para conservar ceros iniciales y formato visible.
-- [ ] No modifica, inserta ni elimina datos de `Hoja2`.
+- [ ] No modifica ni elimina datos de `Hoja2`; la única escritura es el alta explícita de un cliente nuevo (sección 2.1).
 - [ ] «Recargar clientes» vuelve a obtener los datos actualizados.
 - [ ] Un error de lectura se informa de forma comprensible y no genera datos falsos.
 
@@ -24,10 +24,27 @@
 - [ ] Se muestran como máximo 8 sugerencias.
 - [ ] Al seleccionar un cliente, se precargan los campos correctos.
 - [ ] Se puede ingresar un cliente inexistente manualmente.
-- [ ] El cliente manual no se agrega a la hoja.
+- [ ] El cliente manual no se agrega a la hoja salvo que se toque «+ Nuevo cliente».
 - [ ] Se puede editar temporalmente un dato de un cliente seleccionado.
 - [ ] Al finalizar, la hoja conserva exactamente sus datos originales.
 - [ ] Los campos opcionales vacíos no generan líneas ni espacios innecesarios.
+
+## 2.1 Alta de cliente nuevo
+
+- [ ] El botón «+ Nuevo cliente» está al final de los campos del cliente.
+- [ ] Sin razón social, avisa y no guarda.
+- [ ] Aparece «¿Agregar número de cuenta?» con campo opcional; Cancelar no guarda nada.
+- [ ] Guardar con cuenta: agrega una fila al final de `Hoja2` con las 7 columnas en orden.
+- [ ] Guardar sin cuenta: agrega la fila con la columna A vacía.
+- [ ] Cuenta con ceros iniciales (p. ej. 00777) y teléfono se conservan; un texto que empieza con «=» no se convierte en fórmula.
+- [ ] Una cuenta existente se rechaza y no se agrega nada.
+- [ ] Razón social ya existente: avisa y permite agregar igual.
+- [ ] No se modifica ninguna fila existente.
+- [ ] Tras guardar aparece el mensaje de confirmación y el cliente es buscable sin recargar.
+- [ ] Dos guardados casi simultáneos desde dos PC generan dos filas distintas.
+- [ ] Al escribir en Razón social o Nombre fantasía se sugieren clientes existentes; elegir uno carga sus datos.
+- [ ] Con un cliente de la base ya elegido no aparecen sugerencias al editar esos campos.
+- [ ] Tras actualizar el despliegue, se reautoriza y el alta funciona desde otra PC autorizada.
 
 ## 3. Cantidad de cajas y bultos
 

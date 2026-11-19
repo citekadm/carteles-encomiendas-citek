@@ -215,6 +215,11 @@
       if (g <= 4) { for (i = 0; i < g; i++) p.push('3'); if (r) p.push(String(r)); return p.join('+'); }
       return g + ' × 3' + (r ? ' + ' + r : '');
     },
+    // Clientes de la base con la misma razón social (sin distinguir mayúsculas ni tildes).
+    existentes: function (lista, razon) {
+      var q = norm(razon);
+      return q ? lista.filter(function (c) { return norm(c.razonSocial) === q; }) : [];
+    },
     condPorDefecto: function (t) { return String(t || '').trim() !== ''; },
     // Un descriptor por bulto: numeración correlativa, factura solo en el 1, condición en todos.
     descriptores: function (cajas, o) {
@@ -266,6 +271,9 @@
     eq('busca varias palabras', Reglas.buscar(L, 'almacen SOL').length, 1);
     eq('busca cuenta exacta primero', Reglas.buscar(L, '0456')[0].cuenta, '0456');
     eq('comienzo antes que resto', Reglas.buscar(L, 'sol')[0].cuenta, '0456');
+    eq('misma razón social', Reglas.existentes(L, ' NUNEZ  hnos ').length, 1);
+    eq('razón social distinta', Reglas.existentes(L, 'Nuñez').length, 0);
+    eq('razón social vacía', Reglas.existentes(L, '  ').length, 0);
     var G = []; for (var i = 0; i < 20; i++) G.push({ cuenta: 'A' + i, razonSocial: 'Cliente ' + i, fantasia: '' });
     eq('máximo 8', Reglas.buscar(G, 'cliente').length, 8);
     eq('búsqueda vacía', Reglas.buscar(G, '  ').length, 0);
@@ -296,8 +304,8 @@
     $('f-cond').value = estado.cond; $('c-cond').checked = estado.condActiva;
     $('c-factura').checked = estado.factura; $('f-cajas').value = estado.cajas;
     $('origen').textContent = estado.origen === 'base'
-      ? 'De la base · cuenta ' + estado.cuenta + ' · cambios solo para este envío'
-      : 'Cliente manual · no se guarda en la base';
+      ? 'De la base · ' + (estado.cuenta ? 'cuenta ' + estado.cuenta : 'sin cuenta') + ' · cambios solo para este envío'
+      : 'Cliente manual · aún no está en la base';
     $('origen').className = 'chip ' + (estado.origen === 'base' ? 'base' : 'manual');
     resumen();
     actualizar();
@@ -364,6 +372,114 @@
     $('f-buscar').value = ''; cerrarLista(); volcar();
     limpiarSalida();
   };
+
+  // ===== Autocompletado en los campos de datos: si el cliente ya existe, se ofrece al ir escribiendo =====
+  function autoCampo(idInput, idUl) {
+    var inp = $(idInput), ul = $(idUl), lista = [], pos = -1;
+    function cerrar() { ul.hidden = true; ul.textContent = ''; lista = []; pos = -1; }
+    function marcarPos() { Array.prototype.forEach.call(ul.children, function (li, i) { li.className = i === pos ? 'sel' : ''; }); }
+    inp.addEventListener('input', function () {
+      var q = inp.value.trim();
+      cerrar();
+      if (estado.origen === 'base' || norm(q).length < 2) return; // con un cliente de la base ya elegido no se ofrece nada
+      lista = Reglas.buscar(clientes, q, 8);
+      lista.forEach(function (c) {
+        var li = el('li', null, c.cuenta + ' — ' + c.razonSocial + (c.fantasia ? ' (' + c.fantasia + ')' : ''));
+        li.onmousedown = function (e) { e.preventDefault(); cerrar(); elegir(c); };
+        ul.appendChild(li);
+      });
+      ul.hidden = !lista.length;
+    });
+    inp.addEventListener('blur', cerrar);
+    inp.addEventListener('keydown', function (e) {
+      if (ul.hidden || !lista.length) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        pos = (pos + (e.key === 'ArrowDown' ? 1 : -1) + lista.length) % lista.length; marcarPos();
+      } else if (e.key === 'Enter' && pos >= 0) {
+        e.preventDefault(); var c = lista[pos]; cerrar(); elegir(c);
+      } else if (e.key === 'Escape') { cerrar(); }
+    });
+  }
+  autoCampo('f-razon', 'sug-razon');
+  autoCampo('f-fantasia', 'sug-fantasia');
+
+  // ===== Nuevo cliente: único guardado en la base, solo al tocar el botón y confirmar =====
+  function modalConfirmar(o) { // o: titulo, texto, campo{etiqueta}, ok, alOk(valorCampo)
+    var m = $('modal'), card = $('modal-card'), inp = null;
+    card.textContent = '';
+    card.appendChild(el('div', 'm-icono m-info', '+'));
+    card.appendChild(el('h2', null, o.titulo));
+    if (o.texto) card.appendChild(el('p', null, o.texto));
+    if (o.campo) {
+      card.appendChild(el('label', 'f', o.campo.etiqueta));
+      inp = el('input'); inp.type = 'text'; inp.autocomplete = 'off'; inp.maxLength = 50;
+      card.appendChild(inp);
+    }
+    var fila = el('div', 'm-botones'), cancelar = el('button', 'btn', 'Cancelar'), ok = el('button', 'btn prim', o.ok);
+    cancelar.type = 'button'; ok.type = 'button';
+    cancelar.onclick = cerrarModal;
+    ok.onclick = function () { o.alOk(inp ? inp.value.trim() : ''); };
+    if (inp) inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); ok.click(); } });
+    fila.appendChild(cancelar); fila.appendChild(ok); card.appendChild(fila);
+    m.dataset.tipo = 'confirmar'; m.dataset.cerrado = '';
+    m.hidden = false;
+    requestAnimationFrame(function () { if (!m.dataset.cerrado) m.classList.add('abierto'); });
+    setTimeout(function () { (inp || ok).focus(); }, 50);
+  }
+  function guardarNuevoCliente() {
+    var datos = { cuenta: '', razonSocial: estado.razon.trim(), fantasia: estado.fantasia.trim(), direccion: estado.dir.trim(),
+      telefono: estado.tel.trim(), departamento: estado.depto.trim(), condicion: estado.cond.trim() };
+    if (!datos.razonSocial) {
+      modal({ tipo: 'info', titulo: 'Falta la razón social', texto: 'Completá al menos la razón social para agregar el cliente.' });
+      return;
+    }
+    function pedirCuenta() {
+      modalConfirmar({
+        titulo: '¿Agregar número de cuenta?',
+        texto: 'Se guardará «' + datos.razonSocial + '» en la base. Si no escribís cuenta, queda sin cuenta.',
+        campo: { etiqueta: 'Número de cuenta (opcional)' }, ok: 'Guardar cliente',
+        alOk: function (cuenta) {
+          if (cuenta && clientes.some(function (c) { return norm(c.cuenta) === norm(cuenta); })) {
+            modal({ tipo: 'error', titulo: 'La cuenta ya existe', texto: 'La cuenta ' + cuenta + ' ya está en la base. No se agregó nada.' });
+            return;
+          }
+          datos.cuenta = cuenta;
+          enviar();
+        }
+      });
+    }
+    function enviar() {
+      modal({ tipo: 'carga', titulo: 'Guardando cliente…', texto: 'Agregando a la base.' });
+      google.script.run
+        .withSuccessHandler(function (r) {
+          if (r && r.ok) {
+            clientes.push(r.cliente);
+            estado.origen = 'base'; estado.cuenta = r.cliente.cuenta;
+            $('estado').textContent = clientes.length + (clientes.length === 1 ? ' cliente cargado' : ' clientes cargados');
+            volcar();
+            modal({ tipo: 'ok', titulo: 'Cliente agregado a la base', texto: r.cliente.razonSocial + (r.cliente.cuenta ? ' · cuenta ' + r.cliente.cuenta : ' · sin cuenta') });
+          } else {
+            modal({ tipo: 'error', titulo: 'No se guardó el cliente', texto: (r && r.mensaje) || 'Error desconocido.' });
+          }
+        })
+        .withFailureHandler(function () {
+          modal({ tipo: 'error', titulo: 'No se pudo confirmar el guardado', texto: 'No hubo respuesta del servidor. Tocá «Recargar clientes» para comprobar si el cliente se agregó antes de reintentar.' });
+        })
+        .agregarCliente(datos);
+    }
+    var iguales = Reglas.existentes(clientes, datos.razonSocial);
+    if (iguales.length) {
+      modalConfirmar({
+        titulo: 'Ya existe esa razón social',
+        texto: iguales.slice(0, 3).map(function (c) { return (c.cuenta || 'sin cuenta') + (c.direccion ? ' · ' + c.direccion.replace(/\s+/g, ' ') : ''); }).join('\n') +
+          '\n¿Agregar igual como cliente nuevo (por ejemplo, otra dirección)?',
+        ok: 'Agregar igual', alOk: pedirCuenta
+      });
+    } else { pedirCuenta(); }
+  }
+  $('b-nuevo-cli').onclick = guardarNuevoCliente;
+
   estado = estadoVacio();
   volcar();
 

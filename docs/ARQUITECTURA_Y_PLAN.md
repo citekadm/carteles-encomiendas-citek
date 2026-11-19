@@ -9,7 +9,7 @@
 - Google Sheets como fuente de datos de clientes.
 - Separar acceso a datos, lógica de negocio, presentación y estilos.
 - Mantener las reglas de negocio en funciones pequeñas y comprobables.
-- La hoja de clientes es de solo lectura.
+- La hoja de clientes es de solo lectura, salvo el alta explícita de un cliente nuevo (`agregarCliente`), que solo agrega una fila al final.
 - Los cambios del formulario son temporales y pertenecen al envío actual.
 - Vista previa e impresión comparten la misma estructura HTML/CSS.
 - No incorporar dependencias externas salvo que se justifique y se apruebe.
@@ -45,7 +45,7 @@ Responsabilidad de servidor:
 - Obtener la hoja `Hoja2` y leer los datos de clientes.
 - Entregar al navegador los datos necesarios.
 - Validar y normalizar los datos recibidos cuando corresponda.
-- No escribir en la hoja de clientes.
+- No escribir en la hoja de clientes, salvo `agregarCliente()` por acción explícita del usuario.
 - Mantener separadas las funciones de acceso a Sheets y las reglas de negocio.
 
 ### `gas/Index.html`
@@ -83,7 +83,7 @@ La distribución final de funciones podrá detallarse durante el diseño técnic
 4. Numeración correlativa: desde 1 hasta el total de bultos.
 5. «FACTURA EN CAJA» solo en el primer cartel si la opción está activa.
 6. Condición especial en todos los carteles si la opción está activa y el texto no está vacío.
-7. Los datos de cliente y las modificaciones del formulario nunca se escriben en la base.
+7. Las modificaciones del formulario nunca se escriben en la base; solo el alta explícita «+ Nuevo cliente» agrega una fila.
 
 Evitar duplicar estas reglas en distintos lugares del código.
 
@@ -125,7 +125,7 @@ Una vez aprobada la arquitectura:
 - Crear los archivos completos.
 - No entregar fragmentos sueltos ni instrucciones ambiguas para ensamblar código.
 - Respetar la especificación.
-- No modificar la hoja de clientes.
+- No modificar la hoja de clientes (salvo el alta explícita de clientes nuevos).
 - No añadir funciones no solicitadas.
 - Comentar las partes técnicas relevantes sin llenar el código de comentarios innecesarios.
 

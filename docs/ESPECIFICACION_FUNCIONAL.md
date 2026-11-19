@@ -31,7 +31,7 @@ La aplicación debe ser sencilla de utilizar, confiable y especialmente cuidados
 
 ### Fuera del alcance de esta versión
 
-- Guardar clientes nuevos en la base.
+- Guardar clientes nuevos en la base de forma automática o silenciosa (el alta solo existe mediante el botón «+ Nuevo cliente», sección 4.1).
 - Modificar datos de clientes existentes en la hoja de origen.
 - Guardar cambios temporales del formulario.
 - Selector de direcciones alternativas para un mismo cliente.
@@ -44,7 +44,7 @@ La aplicación se conectará a un archivo de Google Sheets existente. La pestañ
 
 - Fila 1: encabezados.
 - Datos: desde la fila 2.
-- La aplicación solo debe leer esta hoja. No debe modificar, insertar ni eliminar filas ni celdas.
+- La aplicación lee esta hoja y solo la escribe mediante el alta explícita de un cliente nuevo (sección 4.1), que únicamente agrega una fila al final. No debe modificar ni eliminar filas ni celdas existentes.
 - Leer los datos con `getDisplayValues()`, para conservar la representación visible de valores como cuentas y teléfonos, incluidos ceros iniciales y formatos.
 
 ### 3.1 Estructura de columnas
@@ -77,8 +77,26 @@ Reglas:
 - Debe existir un botón **«Recargar clientes»** para volver a leer la base cuando haya cambios en la hoja.
 - Al elegir un resultado, cargar los datos del cliente en el formulario.
 - Si el cliente no existe, permitir completar los datos manualmente para ese envío.
-- El cliente ingresado manualmente no se agrega automáticamente a `Hoja2`.
+- El cliente ingresado manualmente no se agrega automáticamente a `Hoja2`: solo se agrega si el usuario toca «+ Nuevo cliente» (sección 4.1).
+- Al escribir en los campos «Razón social» o «Nombre fantasía» de un cliente manual, se sugieren clientes existentes (hasta 8) con la misma regla de búsqueda; elegir uno carga sus datos. Con un cliente de la base ya elegido no se sugiere nada.
 - La selección o edición no debe alterar los datos originales.
+
+### 4.1 Alta de cliente nuevo («+ Nuevo cliente»)
+
+Decisión aprobada por el usuario. Es la **única** escritura permitida sobre `Hoja2`.
+
+- Botón **«+ Nuevo cliente»** al final de los campos de datos del cliente (símbolo + y texto).
+- Solo guarda al tocar el botón y confirmar; nunca al editar campos ni de forma silenciosa.
+- Obligatorio: razón social. Los demás campos son opcionales.
+- Guarda razón social, nombre fantasía, dirección, teléfono, departamento y condición especial tal como están en el formulario.
+- Al tocar el botón aparece una ventana «¿Agregar número de cuenta?» con un campo opcional. Si se deja vacío, el cliente se guarda sin cuenta.
+- Si ya existe un cliente con la misma razón social, se avisa y se permite agregar igual (caso de otra dirección: la operativa es crear otro registro).
+- Una cuenta que ya existe se rechaza (en el cliente y en el servidor).
+- Solo se **agrega** una fila al final; nunca se modifican ni eliminan filas existentes.
+- Se escribe como texto plano (conserva ceros iniciales y no interpreta «=» como fórmula).
+- Un bloqueo del script evita que dos PC que guardan a la vez usen la misma fila.
+- Tras guardar, el cliente aparece en el buscador sin recargar y se muestra «Cliente agregado a la base».
+- Quien pueda abrir la aplicación puede agregar clientes (se ejecuta como propietario).
 
 ## 5. Edición temporal de los datos del envío
 
