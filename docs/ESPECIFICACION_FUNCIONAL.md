@@ -1,7 +1,7 @@
 # Especificación funcional
 ## Aplicación de carteles de encomiendas — Citek
 
-**Estado:** requisitos acordados; implementación pendiente.  
+**Estado:** requisitos acordados; aplicación implementada y en pruebas (falta la impresión real desde Chrome).  
 **Fuente de verdad:** este documento y las decisiones expresamente aprobadas por el usuario.  
 **Alcance:** primera versión de la aplicación web.
 
@@ -26,6 +26,9 @@ La aplicación debe ser sencilla de utilizar, confiable y especialmente cuidados
 - Opción para imprimir «FACTURA EN CAJA».
 - Vista previa de los carteles.
 - Impresión en A4 vertical, dos carteles por hoja.
+- Dos formatos de cartel a elegir: A (clásico) y E (cuadros) (secciones 8 y 15.5).
+- Opción FRÁGIL: un cartel por hoja A4 apaisada, con franjas laterales (sección 15.6).
+- Alta explícita de clientes nuevos con «+ Nuevo cliente» (sección 4.1).
 - Imagen PNG del primer bulto copiada al portapapeles (sección 15).
 - Acceso mediante una aplicación web de Apps Script para usuarios autorizados.
 
@@ -180,6 +183,8 @@ Características generales:
 - Distribución limpia, sin elementos superpuestos.
 - Adaptación de tamaño de texto según el contenido disponible.
 
+Las secciones 8.1 a 8.5 describen el **formato A (clásico)**. El **formato E (cuadros)** y su regla de ajuste de texto están en las secciones 15.5 y 15.7.
+
 ### 8.1 Orden de los elementos
 
 Cada cartel debe presentar los elementos en este orden:
@@ -248,6 +253,7 @@ Formato obligatorio:
 - Dos carteles por hoja: uno en la mitad superior y otro en la mitad inferior.
 - Cada cartel corresponde a un bulto.
 - Línea horizontal punteada en el centro de la hoja A4 para facilitar el corte.
+- Con la opción FRÁGIL la hoja es A4 apaisada con un cartel por hoja (sección 15.6).
 
 Reglas de paginación:
 
@@ -275,16 +281,16 @@ La interfaz debe ser moderna, profesional y fácil de utilizar.
 
 Distribución prevista:
 
-- Pantalla principal en dos columnas.
-- Una columna para el formulario de datos y opciones.
-- Otra columna para la vista previa y el resumen del envío.
+- Pantalla principal en tres columnas: datos del cliente; envío, acciones y resumen; vista previa reducida (es solo una referencia).
 
 Controles y acciones:
 
 - Búsqueda/selección de cliente.
 - Recargar clientes.
 - Campos editables para los datos del envío.
-- Cantidad de cajas.
+- Cantidad de cajas, con botones ▲/▼ que suman o restan 1 entre 1 y 999.
+- Selector «Formato de cartel» (A o E).
+- Casilla «Imprimir FRÁGIL» (solo con el formato E).
 - Casilla «Imprimir FACTURA EN CAJA».
 - Campo de condición especial.
 - Casilla «Imprimir condición especial».
@@ -292,6 +298,7 @@ Controles y acciones:
 - Botón **«Imprimir»**.
 - Botón **«Nuevo envío»**.
 - Botón **«Generar PNG»** (sección 15).
+- Botón **«+ Nuevo cliente»**, al final de los datos del cliente (sección 4.1).
 
 La vista previa y el resumen deben actualizarse de acuerdo con los datos y opciones seleccionados. Los controles de la interfaz no deben aparecer en el papel.
 
@@ -349,7 +356,7 @@ Registro de las decisiones tomadas durante el análisis y la implementación. Co
 ### 15.1 Generar PNG
 
 - Botón **«Generar PNG»**: crea una imagen solo del **Bulto 1**, con todos los datos del cartel («BULTO 1 DE N», cliente, departamento, «FACTURA EN CAJA» si está activa, condición especial si corresponde y remitente).
-- Formato A5 apaisado (210 × 148 mm) a 150 dpi (1240 × 874 px), con el mismo diseño del cartel.
+- Formato A5 apaisado (210 × 148 mm) a 150 dpi (1240 × 874 px), con el mismo diseño del cartel. Con FRÁGIL el PNG es la hoja A4 apaisada completa del Bulto 1 (297 × 209 mm, 1754 × 1234 px).
 - La imagen se **copia al portapapeles** para pegarla en WhatsApp o en un mail. Si el navegador bloquea la copia, se muestra la imagen para copiarla con el menú contextual.
 - Requiere una cantidad de cajas válida y se genera con el estado actual del formulario.
 
@@ -361,9 +368,9 @@ Registro de las decisiones tomadas durante el análisis y la implementación. Co
 - **N4.** Dirección y teléfono van en líneas separadas.
 - **N5.** El departamento se imprime siempre en mayúsculas y negrita.
 - **N6.** La condición especial se imprime en mayúsculas y negrita, en un recuadro de ancho completo, con tamaño menor que «FACTURA EN CAJA».
-- **N7.** Los tamaños del Word original son máximos: razón social 36 pt, fantasía/dirección/teléfono 28 pt, departamento 72 pt, factura 55 pt, condición 24 pt, remitente 28 pt y 18 pt. Cada elemento tiene un tamaño mínimo legible.
+- **N7.** (Formato A) Los tamaños del Word original son máximos: razón social 36 pt, fantasía/dirección/teléfono 28 pt, departamento 72 pt, factura 55 pt, condición 24 pt, remitente 28 pt y 18 pt. Cada elemento tiene un tamaño mínimo legible.
 - Nombre fantasía entre comillas tipográficas “ ”.
-- **Ajuste de texto (D9):** un elemento puede ocupar hasta dos líneas; si el cartel no entra en media hoja, se reducen todos los textos en cascada hasta el mínimo legible. Si aun así no entra, se avisa en pantalla y no se recorta ni se abrevia nada.
+- **Ajuste de texto (D9, formato A):** un elemento puede ocupar hasta dos líneas; si el cartel no entra en media hoja, se reducen todos los textos en cascada hasta el mínimo legible. Si aun así no entra, se avisa en pantalla y no se recorta ni se abrevia nada.
 
 ### 15.3 Interfaz y datos
 
@@ -381,3 +388,41 @@ Registro de las decisiones tomadas durante el análisis y la implementación. Co
 - Acceso: ejecutar como propietario, acceso «solo yo»; las dos PC usan la misma cuenta, de preferencia con un perfil de Chrome dedicado.
 - El ID de la planilla se guarda en la propiedad de script `SHEET_ID`, nunca en el repositorio.
 - No se usa caché: «Recargar clientes» lee siempre la hoja.
+
+### 15.5 Formato E (cuadros)
+
+Aprobado por el usuario a partir de las maquetas de la sesión de diseño. Se elige con el selector «Formato de cartel»; el formato A sigue disponible y sin cambios.
+
+- **Formato por defecto:** E. El formato elegido se mantiene al pulsar «Nuevo envío»; no se guarda en ningún lado, así que al recargar la página vuelve a E.
+- **Estructura, de arriba abajo.** Todo va en recuadros de borde negro fino, sin superposición:
+  1. **Franja superior** (solo si hay condición especial o «FACTURA EN CAJA»): la condición a la izquierda y «FACTURA EN CAJA» (fondo amarillo, solo Bulto 1) a la derecha. El lado que no tiene dato queda **en blanco, sin recuadro**.
+  2. **Razón social** (negrita) y **nombre fantasía** entre comillas.
+  3. **Dirección y teléfono** («Tel: …») en dos celdas del mismo recuadro.
+  4. **Departamento**: recuadro de borde grueso, mayúsculas y negrita; ocupa todo el espacio restante.
+  5. **Franja inferior**: recuadro «BULTO n DE N» (grande) y recuadro del remitente.
+- **Sin condición especial ni factura:** la franja superior desaparece y el resto se acomoda para ocupar la media hoja, con letras de referencia más grandes.
+- **Campos vacíos** (fantasía, dirección, teléfono): no se imprime su recuadro ni su línea.
+- **Remitente:** las mismas tres líneas de 8.4. El texto sigue en rojo (la especificación original) pero el recuadro es negro, porque las impresoras son blanco y negro.
+- **Condición especial:** mayúsculas, negrita y centrada; se repite en todos los carteles.
+- **Identificador de bulto:** abajo, junto al remitente; sigue siendo solo `BULTO n DE N`.
+- **Tamaños máximos de referencia (px):** razón social 44, fantasía 28, dirección y teléfono 30, departamento 150, condición 30, factura 36, bulto 40. Sin franja superior: 54, 32, 34 y 170 respectivamente. Los mínimos legibles son: razón social 20, fantasía/dirección/teléfono/condición/bulto 14, factura 20, departamento 36.
+
+### 15.6 FRÁGIL
+
+- Casilla **«Imprimir FRÁGIL»**, apagada por defecto y solo disponible con el formato E. Es una opción del envío: se aplica a todos los bultos y «Nuevo envío» la apaga.
+- Con FRÁGIL, cada bulto ocupa **una hoja A4 apaisada completa** (297 × 209 mm): al centro el cartel del formato E y a los lados dos franjas con la palabra «FRÁGIL» en vertical (la izquierda se lee de abajo hacia arriba, la derecha de arriba hacia abajo).
+- Las franjas son **solo contorno grueso con letras negras, sin relleno**, para no gastar tinta, y quedan a 6,35 mm del borde de la hoja para que la impresora no las recorte.
+- El papel pasa a apaisado mediante una regla `@page` que se agrega solo cuando FRÁGIL está activo.
+- No se agrega línea de corte. En el resumen, «hojas A4» cuenta una hoja por bulto.
+- **Pendientes de confirmar por el usuario** (decididos por el desarrollador): que FRÁGIL se aplique a todos los bultos del envío y no por bulto; que no esté disponible con el formato A; que quede a 6,35 mm del borde.
+
+### 15.7 Regla de ajuste de texto (formato E)
+
+- Los tamaños de la sección 15.5 son **máximos de referencia**, no fijos.
+- Si un texto no entra en su recuadro, se **reduce hasta que entre** (si no entra en el ancho o en el alto del recuadro).
+- **Una sola palabra:** una línea; solo se achica.
+- **Más de una palabra:** puede ocupar **hasta 2 líneas**; se achica solo si con 2 líneas no entra.
+- «BULTO n DE N» y «FACTURA EN CAJA» van siempre en una línea. El teléfono usa una línea si el número no tiene espacios.
+- Dentro de un recuadro con varios textos, el principal se agranda primero (razón social antes que fantasía; dirección antes que teléfono) y el departamento se ajusta al final con el espacio que queda.
+- Nunca se corta ni se abrevia un texto. Si no entra ni con el tamaño mínimo, se avisa en pantalla.
+- El ajuste se mide una vez por variante del envío (con y sin «FACTURA EN CAJA»), usando el último bulto, que tiene el número más largo.

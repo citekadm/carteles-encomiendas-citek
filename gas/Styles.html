@@ -121,7 +121,55 @@ details.card[open] summary::after { transform: rotate(-135deg); margin-top: 4px;
 .rte1 { color: #f00; font-size: max(12pt, calc(28pt * var(--k))); margin-top: 1.5mm; }
 .rte2 { color: #f00; font-size: max(9pt, calc(18pt * var(--k))); }
 
-/* ===== Impresión A4 vertical ===== */
+/* ===== Formato E (cuadros) =====
+   Los tamaños de letra de .f-* son MÁXIMOS de referencia: JavaScript.html los reduce hasta que el texto entra en su recuadro.
+   Una palabra: una sola línea (se achica). Varias palabras: hasta 2 líneas (se achica si hace falta). */
+.cartel-e { padding: 5mm 7mm; gap: 2mm; align-items: stretch; justify-content: flex-start; }
+.cartel-e .fit { display: block; width: 100%; min-width: 0; line-height: 1.05; overflow-wrap: normal; word-break: normal; hyphens: none; }
+.cartel-e .fit.uno { white-space: nowrap; }
+.e-box { border: .5mm solid #000; padding: 1.5mm 2.5mm; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 0; background: #fff; }
+.e-top, .e-foot { display: flex; gap: 2mm; flex: none; }
+.e-top { height: 17mm; } .e-foot { height: 24mm; }
+.e-top > *, .e-foot > * { flex: 1 1 0; min-width: 0; }
+.e-vacio { border: 0; background: none; } /* lado sin dato: queda en blanco, sin recuadro */
+.e-factura { background: #ff0; }
+.e-dest { flex: none; max-height: 36mm; gap: 1mm; }
+.e-dt { flex: none; max-height: 22mm; flex-direction: row; padding: 0; align-items: stretch; justify-content: stretch; }
+.e-celda { flex: 1 1 0; min-width: 0; padding: 1.5mm 2.5mm; display: flex; align-items: center; justify-content: center; }
+.e-celda.e-dir { flex: 2 1 0; }
+.e-celda + .e-celda { border-left: .5mm solid #000; }
+.e-depto { flex: 1 1 0; min-height: 0; border-width: 1.3mm; }
+.e-rte { gap: 0; }
+.e-rte .rte1 { color: #f00; font-size: 26px; line-height: 1.05; }
+.e-rte .rte2 { color: #f00; font-size: 17px; line-height: 1.05; }
+.cartel-e .f-razon { font-size: 44px; font-weight: 700; }
+.cartel-e .f-fant { font-size: 28px; }
+.cartel-e .f-dir, .cartel-e .f-tel { font-size: 30px; }
+.cartel-e .f-depto { font-size: 150px; font-weight: 700; text-transform: uppercase; }
+.cartel-e .f-cond { font-size: 30px; font-weight: 700; text-transform: uppercase; }
+.cartel-e .f-factura { font-size: 36px; font-weight: 700; text-transform: uppercase; }
+.cartel-e .f-bulto { font-size: 40px; font-weight: 700; }
+/* Sin condición ni factura: desaparece la franja superior y el resto aprovecha el espacio */
+.cartel-e.sin-top .f-razon { font-size: 54px; } .cartel-e.sin-top .f-fant { font-size: 32px; }
+.cartel-e.sin-top .f-dir, .cartel-e.sin-top .f-tel { font-size: 34px; } .cartel-e.sin-top .f-depto { font-size: 170px; }
+/* FRÁGIL: una hoja A4 apaisada por bulto; cartel al centro y dos franjas laterales solo con contorno (sin relleno, para ahorrar tinta) */
+.hoja.fragil { width: 297mm; height: 209mm; display: flex; align-items: stretch; }
+.barra-fragil { flex: none; width: 33.3mm; margin: 6.35mm 0 6.35mm 6.35mm; border: 1.3mm solid #000; background: #fff; color: #000; display: flex; align-items: center; justify-content: center;
+  writing-mode: vertical-rl; font: 700 104px/1.05 "Times New Roman", Times, "Liberation Serif", serif; letter-spacing: .14em; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.barra-fragil.b-izq { transform: rotate(180deg); }
+.barra-fragil.b-der { margin: 6.35mm 6.35mm 6.35mm 0; }
+.cartel.cartel-e.ancha { width: 217.7mm; height: 209mm; padding: 6.35mm; border-bottom: 0; flex: none; }
+.ancha .e-top { height: 20.5mm; } .ancha .e-foot { height: 29.6mm; } .ancha .e-dest { max-height: 52mm; } .ancha .e-dt { max-height: 30mm; }
+.ancha .e-rte .rte1 { font-size: 30px; } .ancha .e-rte .rte2 { font-size: 20px; }
+.ancha .f-razon { font-size: 60px; } .ancha .f-fant { font-size: 34px; } .ancha .f-dir, .ancha .f-tel { font-size: 36px; }
+.ancha .f-depto { font-size: 190px; } .ancha .f-cond { font-size: 36px; } .ancha .f-factura { font-size: 40px; } .ancha .f-bulto { font-size: 44px; }
+.cartel-e.ancha.sin-top .f-razon { font-size: 70px; } .cartel-e.ancha.sin-top .f-fant { font-size: 40px; }
+.cartel-e.ancha.sin-top .f-dir, .cartel-e.ancha.sin-top .f-tel { font-size: 42px; } .cartel-e.ancha.sin-top .f-depto { font-size: 210px; }
+.vista.fragil { zoom: .17; }
+.nota { margin: -2px 0 6px; font-size: 12px; color: var(--sub); }
+.card select { width: 100%; font: inherit; color: var(--txt); padding: 11px 14px; border: 1.5px solid transparent; border-radius: 12px; background: var(--fill); outline: none; margin-bottom: 4px; }
+
+/* ===== Impresión A4 vertical (con FRÁGIL, JavaScript.html agrega @page apaisada en #pagina) ===== */
 @page { size: A4 portrait; margin: 0; }
 @media print {
   html, body { margin: 0; padding: 0; background: #fff; height: auto; overflow: visible; }

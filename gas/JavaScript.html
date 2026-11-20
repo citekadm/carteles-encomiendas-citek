@@ -59,6 +59,109 @@
     return r;
   }
 
+
+  // ---- Cartel formato E (cuadros) ----
+  // Regla de texto: los tamaños de CSS son máximos. Cada texto se achica hasta entrar en su recuadro:
+  // una palabra -> una sola línea; varias palabras -> hasta 2 líneas. Nunca se corta ni se abrevia.
+  var MIN_E = { razon: 20, fant: 14, dir: 14, tel: 14, cond: 14, factura: 20, bulto: 14, depto: 36 }; // px, mínimo legible
+  function crearCartelE(d, ancha) {
+    var c = el('div', 'cartel cartel-e' + (ancha ? ' ancha' : ''));
+    var hayTop = !!(d.factura || d.cond);
+    c.dataset.v = d.factura ? 'a' : 'b'; // variante de ajuste: con o sin FACTURA EN CAJA
+    if (!hayTop) c.classList.add('sin-top');
+    function fit(rol, txt, lineas) {
+      var e = el('div', 'fit f-' + rol + (lineas === 1 ? ' uno' : ''), txt);
+      e.dataset.r = rol; e.dataset.l = lineas;
+      return e;
+    }
+    var varias = function (t) { return /\s/.test(String(t).trim()) ? 2 : 1; };
+    if (hayTop) { // condición y factura comparten la franja superior; el lado sin dato queda en blanco
+      var top = el('div', 'e-top'), izq = el('div', d.cond ? 'e-box e-cond' : 'e-vacio'), der = el('div', d.factura ? 'e-box e-factura' : 'e-vacio');
+      if (d.cond) izq.appendChild(fit('cond', d.cond, varias(d.cond)));
+      if (d.factura) der.appendChild(fit('factura', 'FACTURA EN CAJA', 1));
+      top.appendChild(izq); top.appendChild(der); c.appendChild(top);
+    }
+    var fant = d.fantasia && norm(d.fantasia) !== norm(d.razon) ? '\u201C' + d.fantasia + '\u201D' : '';
+    if (d.razon || fant) {
+      var dest = el('div', 'e-box e-dest');
+      if (d.razon) dest.appendChild(fit('razon', d.razon, varias(d.razon)));
+      if (fant) dest.appendChild(fit('fant', fant, varias(fant)));
+      c.appendChild(dest);
+    }
+    if (d.dir || d.tel) {
+      var dt = el('div', 'e-box e-dt');
+      if (d.dir) { var a = el('div', 'e-celda e-dir'); var dir = d.dir.replace(/\s*\n\s*/g, ' '); a.appendChild(fit('dir', dir, varias(dir))); dt.appendChild(a); }
+      if (d.tel) { var t = el('div', 'e-celda e-tel'); t.appendChild(fit('tel', 'Tel: ' + d.tel, varias(d.tel))); dt.appendChild(t); }
+      c.appendChild(dt);
+    }
+    var dp = el('div', 'e-box e-depto');
+    if (d.depto) dp.appendChild(fit('depto', d.depto, varias(d.depto)));
+    c.appendChild(dp);
+    var foot = el('div', 'e-foot'), b = el('div', 'e-box e-bulto'), r = el('div', 'e-box e-rte');
+    b.appendChild(fit('bulto', 'BULTO ' + d.n + ' DE ' + d.total, 1));
+    r.appendChild(el('div', 'rte1', 'Rte.: Citek Ltda.'));
+    r.appendChild(el('div', 'rte2', 'Cerrito 282 bis - Tel.: 2915 5380'));
+    r.appendChild(el('div', 'rte2', 'MONTEVIDEO'));
+    foot.appendChild(b); foot.appendChild(r); c.appendChild(foot);
+    return c;
+  }
+  function entra(e) { // el texto cabe: sin desborde horizontal, dentro de las líneas permitidas y dentro de su recuadro
+    if (e.scrollWidth > e.clientWidth + 1) return false;
+    var lh = parseFloat(getComputedStyle(e).lineHeight), caja = e.closest('.e-box');
+    // Alto real del bloque (no scrollHeight: incluye unos px de holgura propios de la tipografía).
+    if (e.getBoundingClientRect().height > lh * (+e.dataset.l) + 2) return false;
+    return caja.scrollHeight <= caja.clientHeight + 3 && caja.scrollWidth <= caja.clientWidth + 1;
+  }
+  function fijarTam(e) { // mayor tamaño (px entero) entre el mínimo y el máximo de referencia que entra; devuelve {px, ok}
+    var max = +e.dataset.max, min = Math.min(MIN_E[e.dataset.r], max), a = min, b = max, mejor = null;
+    while (a <= b) {
+      var m = Math.floor((a + b) / 2);
+      e.style.fontSize = m + 'px';
+      if (entra(e)) { mejor = m; a = m + 1; } else { b = m - 1; }
+    }
+    e.style.fontSize = (mejor === null ? min : mejor) + 'px';
+    return { px: mejor === null ? min : mejor, ok: mejor !== null };
+  }
+  // Ajusta un cartel E ya insertado en el DOM. Devuelve {ok, sizes:{rol:px}}.
+  function ajustarE(c) {
+    var fits = Array.prototype.slice.call(c.querySelectorAll('.fit')), sizes = {}, ok = true;
+    fits.forEach(function (e) { e.dataset.max = parseFloat(getComputedStyle(e).fontSize); });
+    // Prioridad dentro de un mismo recuadro: los secundarios se reservan en su mínimo mientras se ajusta el principal.
+    var orden = ['cond', 'factura', 'bulto', 'razon', 'fant', 'dir', 'tel', 'depto'];
+    fits.forEach(function (e) { e.style.fontSize = Math.min(MIN_E[e.dataset.r], +e.dataset.max) + 'px'; });
+    orden.forEach(function (rol) {
+      var e = c.querySelector('[data-r="' + rol + '"]');
+      if (!e) return;
+      var r = fijarTam(e);
+      sizes[rol] = r.px; if (!r.ok) ok = false;
+    });
+    if (c.scrollHeight > c.clientHeight + 1) ok = false;
+    return { ok: ok, sizes: sizes };
+  }
+  function aplicarE(c, sizes) {
+    Object.keys(sizes).forEach(function (rol) {
+      var e = c.querySelector('[data-r="' + rol + '"]');
+      if (e) e.style.fontSize = sizes[rol] + 'px';
+    });
+  }
+  function medirE(d, ancha) {
+    var caja = el('div');
+    caja.style.cssText = 'position:absolute;left:-10000px;top:0;width:210mm;';
+    document.body.appendChild(caja);
+    var c = crearCartelE(d, ancha);
+    caja.appendChild(c);
+    var r = ajustarE(c);
+    document.body.removeChild(caja);
+    return r;
+  }
+  function crearHojaFragil(c) { // una hoja A4 apaisada: franja FRÁGIL, cartel, franja FRÁGIL
+    var h = el('div', 'hoja fragil');
+    h.appendChild(el('div', 'barra-fragil b-izq', 'FRÁGIL'));
+    h.appendChild(c);
+    h.appendChild(el('div', 'barra-fragil b-der', 'FRÁGIL'));
+    return h;
+  }
+
   // ---- Generación de carteles y vista previa (misma estructura que la impresión) ----
   var generado = false, timer = null;
   function datosCartel(e, d) { // datos del formulario + descriptor del bulto
@@ -75,25 +178,34 @@
     var lista = Reglas.descriptores(v.valor, { factura: estado.factura, condActiva: estado.condActiva, condTexto: estado.cond })
       .map(function (d) { return datosCartel(estado, d); });
     // Un solo ajuste por variante (con factura / sin factura): 333 carteles no implican 333 mediciones.
+    var E = estado.formato === 'E', fr = E && estado.fragil;
+    // Con FRÁGIL la hoja es apaisada: la regla @page se agrega aparte para no afectar al resto de los formatos.
+    $('pagina').textContent = fr ? '@page { size: A4 landscape; margin: 0; }' : '';
+    $('vista').className = 'vista' + (fr ? ' fragil' : '');
     var ks = {}, fallos = [];
-    if (lista[0].factura) { ks.a = medir(lista[0]); if (!ks.a.ok) fallos.push('el bulto 1 (con FACTURA EN CAJA)'); }
-    if (lista.length > 1 || !lista[0].factura) { ks.b = medir(lista[lista.length - 1]); if (!ks.b.ok) fallos.push('los demás bultos'); }
+    var med = E ? function (d) { return medirE(d, fr); } : medir;
+    if (lista[0].factura) { ks.a = med(lista[0]); if (!ks.a.ok) fallos.push('el bulto 1 (con FACTURA EN CAJA)'); }
+    if (lista.length > 1 || !lista[0].factura) { ks.b = med(lista[lista.length - 1]); if (!ks.b.ok) fallos.push('los demás bultos'); }
     function armar(d) {
-      var c = crearCartel(d);
-      c.style.setProperty('--k', ks[c.dataset.v].k.toFixed(2));
+      var c = E ? crearCartelE(d, fr) : crearCartel(d), r = ks[c.dataset.v];
+      if (E) aplicarE(c, r.sizes); else c.style.setProperty('--k', r.k.toFixed(2));
       return c;
     }
     // Todas las hojas van a #impresion (oculto en pantalla, visible al imprimir); la vista previa muestra solo la primera.
     var frag = document.createDocumentFragment();
-    for (var i = 0; i < lista.length; i += 2) {
-      var h = el('div', 'hoja');
-      h.appendChild(armar(lista[i]));
-      h.appendChild(i + 1 < lista.length ? armar(lista[i + 1]) : el('div', 'cartel vacio'));
-      frag.appendChild(h);
+    if (fr) {
+      lista.forEach(function (d) { frag.appendChild(crearHojaFragil(armar(d))); }); // un cartel por hoja
+    } else {
+      for (var i = 0; i < lista.length; i += 2) {
+        var h = el('div', 'hoja');
+        h.appendChild(armar(lista[i]));
+        h.appendChild(i + 1 < lista.length ? armar(lista[i + 1]) : el('div', 'cartel vacio'));
+        frag.appendChild(h);
+      }
     }
     $('impresion').appendChild(frag);
     $('vista').appendChild($('impresion').firstChild.cloneNode(true));
-    $('prev-info').textContent = 'Hoja 1 de ' + Reglas.hojas(lista.length) + ' · ' + lista.length + (lista.length > 1 ? ' carteles' : ' cartel');
+    $('prev-info').textContent = 'Hoja 1 de ' + Reglas.hojas(lista.length, fr) + ' · ' + lista.length + (lista.length > 1 ? ' carteles' : ' cartel');
     $('prev').hidden = false;
     if (fallos.length) $('avisos').textContent = 'Atención: en ' + fallos.join(' y en ') + ' el texto no entra ni con el tamaño mínimo. Revisá la longitud de los datos.';
   }
@@ -132,14 +244,16 @@
 
   // ---- PNG del Bulto 1: A5 apaisado 210 x 148 mm a 150 dpi (1240 x 874 px), copiado al portapapeles ----
   function generarPNG() {
-    var c = document.querySelector('#vista .cartel:not(.vacio)');
+    var hojaFr = document.querySelector('#vista .hoja.fragil'); // con FRÁGIL el PNG es la hoja apaisada completa
+    var c = hojaFr || document.querySelector('#vista .cartel:not(.vacio)');
     if (!c) { modal({ tipo: 'info', titulo: 'Primero generá los carteles', texto: 'El PNG se crea a partir del Bulto 1 de tu envío.' }); return; }
     modal({ tipo: 'carga', titulo: 'Generando imagen…', texto: 'Preparando el Bulto 1.' });
-    var W = 210 * 96 / 25.4, H = 148 * 96 / 25.4;
+    var mmW = hojaFr ? 297 : 210, mmH = hojaFr ? 209 : 148, PW = Math.round(mmW * 5.905), PH = Math.round(mmH * 5.905); // ~150 ppp
+    var W = mmW * 96 / 25.4, H = mmH * 96 / 25.4;
     var clon = c.cloneNode(true);
-    clon.style.width = '210mm';
+    clon.style.width = mmW + 'mm';
     var css = $('estilos').textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="874" viewBox="0 0 ' + W + ' ' + H + '">' +
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + PW + '" height="' + PH + '" viewBox="0 0 ' + W + ' ' + H + '">' +
       '<foreignObject width="' + W + '" height="' + H + '"><div xmlns="http://www.w3.org/1999/xhtml"><style>' + css + '</style>' +
       new XMLSerializer().serializeToString(clon) + '</div></foreignObject></svg>';
 
@@ -149,10 +263,10 @@
       img.onload = function () {
         try {
           var cv = document.createElement('canvas');
-          cv.width = 1240; cv.height = 874;
+          cv.width = PW; cv.height = PH;
           var ctx = cv.getContext('2d');
-          ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 1240, 874);
-          ctx.drawImage(img, 0, 0, 1240, 874);
+          ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, PW, PH);
+          ctx.drawImage(img, 0, 0, PW, PH);
           cv.toBlob(function (b) { b ? resolve(b) : reject(new Error('no se obtuvo la imagen')); }, 'image/png');
         } catch (e) { reject(e); }
       };
@@ -208,7 +322,7 @@
       return { ok: true, valor: v };
     },
     bultos: function (cajas) { return Math.ceil(cajas / 3); },
-    hojas: function (bultos) { return Math.ceil(bultos / 2); },
+    hojas: function (bultos, fragil) { return fragil ? bultos : Math.ceil(bultos / 2); }, // FRÁGIL: un cartel por hoja
     // Solo para el resumen en pantalla; nunca se imprime en el cartel.
     agrupacion: function (cajas) {
       var g = Math.floor(cajas / 3), r = cajas % 3, p = [], i;
@@ -271,6 +385,7 @@
     eq('busca varias palabras', Reglas.buscar(L, 'almacen SOL').length, 1);
     eq('busca cuenta exacta primero', Reglas.buscar(L, '0456')[0].cuenta, '0456');
     eq('comienzo antes que resto', Reglas.buscar(L, 'sol')[0].cuenta, '0456');
+    eq('hojas sin frágil', Reglas.hojas(3, false), 2); eq('hojas con frágil', Reglas.hojas(3, true), 3);
     eq('misma razón social', Reglas.existentes(L, ' NUNEZ  hnos ').length, 1);
     eq('razón social distinta', Reglas.existentes(L, 'Nuñez').length, 0);
     eq('razón social vacía', Reglas.existentes(L, '  ').length, 0);
@@ -285,7 +400,7 @@
   var CAMPOS = { razon: 'f-razon', fantasia: 'f-fantasia', dir: 'f-dir', tel: 'f-tel', depto: 'f-depto' };
   var estado, sel = -1, sugerencias = [];
   function estadoVacio() {
-    return { origen: 'manual', cuenta: '', razon: '', fantasia: '', dir: '', tel: '', depto: '', cond: '', condActiva: false, condManual: false, factura: true, cajas: '' };
+    return { origen: 'manual', cuenta: '', razon: '', fantasia: '', dir: '', tel: '', depto: '', cond: '', condActiva: false, condManual: false, factura: true, cajas: '', formato: 'E', fragil: false };
   }
   function resumen() {
     var v = Reglas.validarCajas(estado.cajas), t = $('resumen-txt');
@@ -295,14 +410,20 @@
       t.textContent = v.mensaje;
       return;
     }
-    var b = Reglas.bultos(v.valor), h = Reglas.hojas(b);
+    var fr = estado.formato === 'E' && estado.fragil, b = Reglas.bultos(v.valor), h = Reglas.hojas(b, fr);
     $('s-cajas').textContent = v.valor; $('s-bultos').textContent = b; $('s-hojas').textContent = h;
-    t.textContent = 'Distribución: ' + Reglas.agrupacion(v.valor) + (b % 2 ? ' · la mitad inferior de la última hoja queda vacía.' : '.');
+    t.textContent = 'Distribución: ' + Reglas.agrupacion(v.valor) + (fr ? ' · FRÁGIL: un cartel por hoja A4 apaisada.' : (b % 2 ? ' · la mitad inferior de la última hoja queda vacía.' : '.'));
+  }
+  function sincronizarFragil() { // FRÁGIL solo existe con el formato E
+    $('c-fragil').checked = estado.fragil; $('c-fragil').disabled = estado.formato !== 'E';
+    $('c-fragil').closest('label').style.opacity = estado.formato !== 'E' ? '.5' : '';
+    $('nota-fragil').hidden = !estado.fragil;
   }
   function volcar() { // estado -> formulario
     for (var k in CAMPOS) $(CAMPOS[k]).value = estado[k];
     $('f-cond').value = estado.cond; $('c-cond').checked = estado.condActiva;
     $('c-factura').checked = estado.factura; $('f-cajas').value = estado.cajas;
+    $('f-formato').value = estado.formato; sincronizarFragil();
     $('origen').textContent = estado.origen === 'base'
       ? 'De la base · ' + (estado.cuenta ? 'cuenta ' + estado.cuenta : 'sin cuenta') + ' · cambios solo para este envío'
       : 'Cliente manual · aún no está en la base';
@@ -354,6 +475,11 @@
   });
   $('c-cond').addEventListener('change', function () { estado.condManual = true; estado.condActiva = this.checked; });
   $('c-factura').addEventListener('change', function () { estado.factura = this.checked; });
+  $('f-formato').addEventListener('change', function () {
+    estado.formato = this.value; if (estado.formato !== 'E') estado.fragil = false;
+    sincronizarFragil(); resumen();
+  });
+  $('c-fragil').addEventListener('change', function () { estado.fragil = this.checked; sincronizarFragil(); resumen(); });
   $('f-cajas').addEventListener('input', function () { estado.cajas = this.value; resumen(); });
   // Botones ▲/▼ y flechas del teclado: suman o restan 1 dentro del rango 1–999 reutilizando el evento 'input'.
   function pasoCajas(d) {
@@ -368,7 +494,8 @@
   });
   $('b-nuevo').onclick = function () {
     generado = false; clearTimeout(timer);
-    estado = estadoVacio();
+    var formato = estado.formato; // el formato elegido se mantiene; FRÁGIL vuelve a apagarse
+    estado = estadoVacio(); estado.formato = formato;
     $('f-buscar').value = ''; cerrarLista(); volcar();
     limpiarSalida();
   };
