@@ -169,7 +169,7 @@ Equivalente en JavaScript: `Math.ceil(cantidadCajas / 3)`.
 | 10 | 3 + 3 + 3 + 1 | 4 |
 | 999 | 333 grupos de 3 | 333 |
 
-**Importante:** no mostrar en los carteles la cantidad de cajas ni la cantidad de cajas agrupadas en cada bulto. Cada cartel muestra únicamente el número correlativo y el total: `BULTO n DE N`.
+**Importante:** no mostrar en los carteles la cantidad de cajas ni la cantidad de cajas agrupadas en cada bulto. Cada cartel muestra únicamente el número correlativo y el total: `n de N`.
 
 ## 8. Diseño y contenido del cartel
 
@@ -189,7 +189,7 @@ Las secciones 8.1 a 8.5 describen el **formato A (clásico)**. El **formato E (c
 
 Cada cartel debe presentar los elementos en este orden:
 
-1. **Identificador del bulto:** `BULTO n DE N`, en la parte superior, tamaño pequeño y negrita.
+1. **Identificador del bulto:** `n de N`, en la parte superior, tamaño pequeño y negrita.
 2. **Razón social:** en negrita, tamaño medio-grande.
 3. **Nombre fantasía:** siempre entre comillas.
 4. **Dirección.**
@@ -355,7 +355,7 @@ Registro de las decisiones tomadas durante el análisis y la implementación. Co
 
 ### 15.1 Generar PNG
 
-- Botón **«Generar PNG»**: crea una imagen solo del **Bulto 1**, con todos los datos del cartel («BULTO 1 DE N», cliente, departamento, «FACTURA EN CAJA» si está activa, condición especial si corresponde y remitente).
+- Botón **«Generar PNG»**: crea una imagen solo del **Bulto 1**, con todos los datos del cartel («1 de N», cliente, departamento, «FACTURA EN CAJA» si está activa, condición especial si corresponde y remitente).
 - Formato A5 apaisado (210 × 148 mm) a 150 dpi (1240 × 874 px), con el mismo diseño del cartel. Con FRÁGIL el PNG es la hoja A4 apaisada completa del Bulto 1 (297 × 209 mm, 1754 × 1234 px).
 - La imagen se **copia al portapapeles** para pegarla en WhatsApp o en un mail. Si el navegador bloquea la copia, se muestra la imagen para copiarla con el menú contextual.
 - Requiere una cantidad de cajas válida y se genera con el estado actual del formulario.
@@ -391,21 +391,22 @@ Registro de las decisiones tomadas durante el análisis y la implementación. Co
 
 ### 15.5 Formato E (cuadros)
 
-Aprobado por el usuario a partir de las maquetas de la sesión de diseño. Se elige con el selector «Formato de cartel»; el formato A sigue disponible y sin cambios.
+Aprobado por el usuario a partir de las maquetas de la sesión de diseño y ajustado en la sesión de ajustes (parte 1). Se elige con el selector «Formato de cartel»; el formato A sigue disponible.
 
 - **Formato por defecto:** E. El formato elegido se mantiene al pulsar «Nuevo envío»; no se guarda en ningún lado, así que al recargar la página vuelve a E.
-- **Estructura, de arriba abajo.** Todo va en recuadros de borde negro fino, sin superposición:
+- **Estructura, de arriba abajo.** Todo va en recuadros con la **misma línea simple** de borde negro (también el departamento), sin superposición:
   1. **Franja superior** (solo si hay condición especial o «FACTURA EN CAJA»): la condición a la izquierda y «FACTURA EN CAJA» (fondo amarillo, solo Bulto 1) a la derecha. El lado que no tiene dato queda **en blanco, sin recuadro**.
-  2. **Razón social** (negrita) y **nombre fantasía** entre comillas.
-  3. **Dirección y teléfono** («Tel: …») en dos celdas del mismo recuadro.
-  4. **Departamento**: recuadro de borde grueso, mayúsculas y negrita; ocupa todo el espacio restante.
-  5. **Franja inferior**: recuadro «BULTO n DE N» (grande) y recuadro del remitente.
-- **Sin condición especial ni factura:** la franja superior desaparece y el resto se acomoda para ocupar la media hoja, con letras de referencia más grandes.
+  2. **Nombre fantasía**, entre comillas y en negrita: es el **texto principal** del cartel, porque el servicio de cadetería se guía por él. Si no hay fantasía (o es igual a la razón social), la razón social ocupa este lugar como texto principal.
+  3. **Razón social**, más chica y sin negrita, debajo de la fantasía.
+  4. **Dirección y teléfono** («Tel: …») en dos celdas del mismo recuadro. El ancho de cada celda se reparte según el largo de su texto.
+  5. **Departamento**: mayúsculas y negrita, el recuadro más alto después del nombre principal.
+  6. **Franja inferior**: recuadro con el identificador del bulto, solo con números (`n de N`, por ejemplo `2 de 5`), y recuadro del remitente.
+- **Reparto de alturas.** Las franjas superior e inferior tienen alto fijo (18 mm y 22 mm; con FRÁGIL, 20,5 mm y 26 mm). El resto se reparte por pesos: fantasía (o razón social como principal) 2,6; razón social 1,5; dirección y teléfono 1,6; departamento 3,3. Si falta un recuadro, su espacio se reparte entre los demás.
+- **Sin condición especial ni factura:** la franja superior desaparece y el resto se agranda para ocupar la media hoja.
 - **Campos vacíos** (fantasía, dirección, teléfono): no se imprime su recuadro ni su línea.
-- **Remitente:** las mismas tres líneas de 8.4. El texto sigue en rojo (la especificación original) pero el recuadro es negro, porque las impresoras son blanco y negro.
+- **Remitente:** las mismas tres líneas de 8.4, con tamaño fijo. El texto sigue en rojo (la especificación original) pero el recuadro es negro, porque las impresoras son blanco y negro.
 - **Condición especial:** mayúsculas, negrita y centrada; se repite en todos los carteles.
-- **Identificador de bulto:** abajo, junto al remitente; sigue siendo solo `BULTO n DE N`.
-- **Tamaños máximos de referencia (px):** razón social 44, fantasía 28, dirección y teléfono 30, departamento 150, condición 30, factura 36, bulto 40. Sin franja superior: 54, 32, 34 y 170 respectivamente. Los mínimos legibles son: razón social 20, fantasía/dirección/teléfono/condición/bulto 14, factura 20, departamento 36.
+- **Identificador del bulto (ambos formatos):** solo los números, sin la palabra «BULTO»: `1 de 1`, `2 de 5`. En el formato E va abajo, junto al remitente.
 
 ### 15.6 FRÁGIL
 
@@ -418,11 +419,10 @@ Aprobado por el usuario a partir de las maquetas de la sesión de diseño. Se el
 
 ### 15.7 Regla de ajuste de texto (formato E)
 
-- Los tamaños de la sección 15.5 son **máximos de referencia**, no fijos.
-- Si un texto no entra en su recuadro, se **reduce hasta que entre** (si no entra en el ancho o en el alto del recuadro).
+- **No hay tamaños fijos de letra** (salvo el remitente). Todos los textos impresos (condición, factura, fantasía, razón social, dirección, teléfono, departamento e identificador del bulto) crecen hasta el **mayor tamaño que entra** en su recuadro, respetando un margen interno de 1 mm arriba y abajo y 2,5 mm a los lados.
 - **Una sola palabra:** una línea; solo se achica.
-- **Más de una palabra:** puede ocupar **hasta 2 líneas**; se achica solo si con 2 líneas no entra.
-- «BULTO n DE N» y «FACTURA EN CAJA» van siempre en una línea. El teléfono usa una línea si el número no tiene espacios.
-- Dentro de un recuadro con varios textos, el principal se agranda primero (razón social antes que fantasía; dirección antes que teléfono) y el departamento se ajusta al final con el espacio que queda.
-- Nunca se corta ni se abrevia un texto. Si no entra ni con el tamaño mínimo, se avisa en pantalla.
-- El ajuste se mide una vez por variante del envío (con y sin «FACTURA EN CAJA»), usando el último bulto, que tiene el número más largo.
+- **Más de una palabra:** puede ocupar **hasta 2 líneas**; se usa el mayor tamaño con el que no pasa de 2 líneas ni se sale del recuadro.
+- «FACTURA EN CAJA», el identificador del bulto y el teléfono van siempre en **una línea**. Un número de teléfono no se parte.
+- El identificador del bulto se mide con el número más largo del envío (el último bulto), así todos los carteles lo muestran con el mismo tamaño.
+- Nunca se corta ni se abrevia un texto. Los mínimos legibles son 14 px (factura 20 px, departamento 36 px); si no entra ni con el mínimo, se avisa en pantalla.
+- El ajuste se mide una vez por variante del envío (con y sin «FACTURA EN CAJA»). Si un bulto no tiene franja superior y otro sí, sus tamaños pueden diferir, porque el espacio disponible es distinto.

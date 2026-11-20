@@ -73,7 +73,7 @@ Validaciones negativas:
 - [ ] Rechaza 1000 y valores superiores.
 - [ ] No genera carteles si la cantidad no es válida.
 
-Comprobar que cada cartel diga solamente `BULTO n DE N` como identificación del bulto y que no aparezcan cantidades de cajas ni la distribución interna.
+Comprobar que cada cartel diga solamente `n de N` como identificación del bulto y que no aparezcan cantidades de cajas ni la distribución interna.
 
 ## 4. Condición especial
 
@@ -174,31 +174,33 @@ Probar cantidades de bultos pares e impares:
 
 ## 11. Formato E, FRÁGIL y ajuste de texto
 
-Las marcas [x] corresponden a pruebas automáticas hechas el 2026-11-19 con **Chromium sin interfaz (Playwright)**, que usa la tipografía Liberation Serif (compatible en medidas con Times New Roman). Esas pruebas **no reemplazan** la impresión real desde Chrome en las PC de uso (ver 11.4).
+Las marcas [x] corresponden a pruebas automáticas (la última el 2026-11-20, con las herramientas de `tools/pruebas/`) hechas con **Chromium sin interfaz (Playwright)**, que usa la tipografía Liberation Serif (compatible en medidas con Times New Roman). Esas pruebas **no reemplazan** la impresión real desde Chrome en las PC de uso (ver 11.4).
 
 ### 11.1 Ajuste de texto y contenido
 
-Casos probados (todos sin desbordes ni textos cortados):
+Resultados de la última corrida (2026-11-20, parte 1 de los ajustes). Todos los casos sin desbordes ni textos cortados. Tamaños del cartel 1:
 
 | Caso | Resultado |
 |---|---|
-| Datos cortos, con factura y condición, 7 cajas (3 bultos) | 2 hojas; departamento a 149 px |
-| Razón social y dirección largas, sin condición ni factura, 10 cajas | 2 hojas; razón social en 2 líneas (43 px), dirección en 2 líneas |
-| Una sola palabra muy larga en razón social y fantasía | una línea, razón social a 26 px |
-| Sin teléfono, sin fantasía, departamento «Río Negro» | el departamento ocupa el espacio y pasa a 2 líneas |
+| Datos cortos con factura y condición, 7 cajas | 2 hojas; fantasía 83 px, razón social 48 px, dirección y teléfono 44 px, departamento 105 px, bulto 70 px |
+| Razón social, fantasía y dirección largas, sin condición ni factura, 10 cajas | 2 hojas; fantasía 52 px en 2 líneas, razón social 29 px en 2 líneas, dirección 28 px en 2 líneas, teléfono 35 px en una línea |
+| Una sola palabra larguísima en razón social y fantasía | una línea; fantasía 34 px, razón social 28 px |
+| Sin teléfono y sin fantasía, departamento «Río Negro» | la razón social pasa a ser el texto principal (88 px); dirección 87 px |
 | 999 cajas | 333 carteles en 167 hojas, sin desbordes, ajuste inmediato (menos de 1 s) |
-| FRÁGIL con datos cortos y 7 cajas | 3 hojas apaisadas |
-| FRÁGIL con razón social larga, condición larga y «Treinta y Tres» | 2 hojas; condición en 2 líneas, departamento en 2 líneas |
+| FRÁGIL con datos cortos y 7 cajas | 3 hojas apaisadas; fantasía 87 px, departamento 158 px |
+| FRÁGIL con textos largos, condición larga y «Treinta y Tres» | 2 hojas; condición 18 px en 2 líneas, departamento 92 px |
 
-- [x] Una palabra: se achica y queda en una línea.
-- [x] Varias palabras: hasta 2 líneas y se achica solo si no entran.
-- [x] No hay textos cortados, abreviados ni superpuestos en los casos anteriores.
+- [x] Todos los textos (menos el remitente) usan el mayor tamaño que entra en su recuadro; las direcciones cortas ya no quedan chicas.
+- [x] El nombre fantasía es el texto principal y la razón social queda secundaria; sin fantasía, la razón social ocupa su lugar.
+- [x] El recuadro del departamento tiene línea simple, igual que los demás.
+- [x] El identificador del bulto dice solo `n de N` (`1 de 3`) en los formatos A y E.
+- [x] Una palabra: se achica y queda en una línea. Varias palabras: hasta 2 líneas. El teléfono siempre en una línea.
+- [x] No hay textos cortados, abreviados ni superpuestos, y el texto respeta el margen interno del recuadro.
 - [x] Sin condición ni factura, la franja superior desaparece y el resto se agranda.
 - [x] Con solo condición, o solo factura, el otro lado de la franja queda en blanco, sin recuadro.
-- [x] «BULTO n DE N» aparece abajo, junto al remitente; el remitente tiene borde negro y texto rojo.
 - [x] Campos vacíos no dejan recuadros ni huecos.
 - [ ] Probar más textos reales de la base (razones sociales y direcciones largas de clientes verdaderos).
-- [ ] Probar «BULTO 333 DE 333» en un envío de 999 cajas y revisar visualmente un cartel con tres cifras.
+- [ ] Revisar visualmente un cartel con tres cifras (`333 de 333`) impreso.
 
 ### 11.2 Selector de formato
 

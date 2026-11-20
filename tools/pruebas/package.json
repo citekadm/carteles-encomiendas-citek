@@ -1,0 +1,10 @@
+{
+  "name": "pruebas-carteles-citek",
+  "private": true,
+  "type": "module",
+  "description": "Pruebas automáticas de la interfaz y de la impresión en Chromium sin interfaz. Ver docs/CONTEXTO_DE_SESION.md.",
+  "devDependencies": {
+    "@sparticuz/chromium": "153.0.0",
+    "playwright-core": "1.65.1"
+  }
+}
