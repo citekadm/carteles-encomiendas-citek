@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <title>Carteles de encomiendas — Citek</title>
   <?!= include('Styles'); ?>
+  <style id="pagina"></style>
 </head>
 <body>
   <div class="app no-print">
@@ -52,6 +53,10 @@
               <button type="button" id="b-menos" class="btn-paso" aria-label="Restar una caja" title="Restar una caja">&#9660;</button>
             </div>
           </div>
+          <label class="f" for="f-formato">Formato de cartel</label>
+          <select id="f-formato"><option value="E">E · Cuadros</option><option value="A">A · Clásico</option></select>
+          <label class="sw"><span>Imprimir FRÁGIL</span><input type="checkbox" class="switch" id="c-fragil"></label>
+          <p id="nota-fragil" class="nota" hidden>Frágil: se imprime un cartel por hoja A4 apaisada, con «FRÁGIL» en los laterales. Elegí orientación horizontal si el navegador no la toma solo.</p>
           <label class="sw"><span>Imprimir FACTURA EN CAJA</span><input type="checkbox" class="switch" id="c-factura" checked></label>
           <label class="f" for="f-cond">Condición especial</label><input type="text" id="f-cond">
           <label class="sw"><span>Imprimir condición especial</span><input type="checkbox" class="switch" id="c-cond"></label>

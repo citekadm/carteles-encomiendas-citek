@@ -1,7 +1,7 @@
 # Plan de pruebas y aceptación
 
 **Proyecto:** Carteles de encomiendas — Citek  
-**Estado:** checklist pendiente de ejecución.  
+**Estado:** checklist en ejecución. La sección 11 (formato E y FRÁGIL) tiene resultados de pruebas automáticas en Chromium; el resto de las secciones sigue pendiente y falta la impresión real desde Chrome.  
 **Objetivo:** verificar reglas de negocio, integridad de datos, vista previa y resultado impreso.
 
 ## 1. Datos y protección de la hoja
@@ -117,6 +117,8 @@ Comprobar que cada cartel diga solamente `BULTO n DE N` como identificación del
 
 ## 7. Paginación e impresión
 
+Las secciones 6 y 7 se repiten para cada formato (A y E); el formato E y FRÁGIL tienen además la sección 11.
+
 Probar cantidades de bultos pares e impares:
 
 - [ ] 1 bulto: una hoja, cartel arriba y mitad inferior vacía.
@@ -156,7 +158,7 @@ Probar cantidades de bultos pares e impares:
 ## 9 bis. PNG y reglas posteriores (especificación, sección 15)
 
 - [ ] «Generar PNG» copia al portapapeles solo el Bulto 1; se pega en WhatsApp y en un mail.
-- [ ] Dimensiones 1240 × 874 px; el diseño coincide con el cartel impreso.
+- [ ] Dimensiones 1240 × 874 px (con FRÁGIL, 1754 × 1234 px); el diseño coincide con el cartel impreso.
 - [ ] PNG con y sin FACTURA EN CAJA, con y sin condición especial, y con textos largos.
 - [ ] Sin cantidad de cajas válida no se genera ni se copia nada.
 - [ ] Fantasía igual a razón social (con otras mayúsculas o tildes): no se imprime.
@@ -169,6 +171,59 @@ Probar cantidades de bultos pares e impares:
 - [ ] La casilla de condición sigue al texto hasta que se modifica a mano.
 - [ ] Tras «Generar carteles», los cambios del formulario actualizan la vista previa.
 - [ ] Autopruebas (`autopruebas()` en la consola): todas OK.
+
+## 11. Formato E, FRÁGIL y ajuste de texto
+
+Las marcas [x] corresponden a pruebas automáticas hechas el 2026-11-19 con **Chromium sin interfaz (Playwright)**, que usa la tipografía Liberation Serif (compatible en medidas con Times New Roman). Esas pruebas **no reemplazan** la impresión real desde Chrome en las PC de uso (ver 11.4).
+
+### 11.1 Ajuste de texto y contenido
+
+Casos probados (todos sin desbordes ni textos cortados):
+
+| Caso | Resultado |
+|---|---|
+| Datos cortos, con factura y condición, 7 cajas (3 bultos) | 2 hojas; departamento a 149 px |
+| Razón social y dirección largas, sin condición ni factura, 10 cajas | 2 hojas; razón social en 2 líneas (43 px), dirección en 2 líneas |
+| Una sola palabra muy larga en razón social y fantasía | una línea, razón social a 26 px |
+| Sin teléfono, sin fantasía, departamento «Río Negro» | el departamento ocupa el espacio y pasa a 2 líneas |
+| 999 cajas | 333 carteles en 167 hojas, sin desbordes, ajuste inmediato (menos de 1 s) |
+| FRÁGIL con datos cortos y 7 cajas | 3 hojas apaisadas |
+| FRÁGIL con razón social larga, condición larga y «Treinta y Tres» | 2 hojas; condición en 2 líneas, departamento en 2 líneas |
+
+- [x] Una palabra: se achica y queda en una línea.
+- [x] Varias palabras: hasta 2 líneas y se achica solo si no entran.
+- [x] No hay textos cortados, abreviados ni superpuestos en los casos anteriores.
+- [x] Sin condición ni factura, la franja superior desaparece y el resto se agranda.
+- [x] Con solo condición, o solo factura, el otro lado de la franja queda en blanco, sin recuadro.
+- [x] «BULTO n DE N» aparece abajo, junto al remitente; el remitente tiene borde negro y texto rojo.
+- [x] Campos vacíos no dejan recuadros ni huecos.
+- [ ] Probar más textos reales de la base (razones sociales y direcciones largas de clientes verdaderos).
+- [ ] Probar «BULTO 333 DE 333» en un envío de 999 cajas y revisar visualmente un cartel con tres cifras.
+
+### 11.2 Selector de formato
+
+- [x] Por defecto está el formato E.
+- [x] Cambiar a A muestra el cartel clásico; FRÁGIL se apaga y se deshabilita.
+- [x] «Nuevo envío» mantiene el formato elegido y apaga FRÁGIL.
+- [x] El resumen muestra una hoja por bulto con FRÁGIL.
+- [x] Autopruebas (`autopruebas()`): 60 comprobaciones OK.
+
+### 11.3 FRÁGIL y PNG
+
+- [x] Con FRÁGIL el PDF de Chromium sale en A4 apaisada (297 × 210 mm), una hoja por bulto.
+- [x] Sin FRÁGIL el PDF sale en A4 vertical.
+- [x] Las franjas «FRÁGIL» son solo contorno, a 6,35 mm del borde, con la palabra en vertical en cada lado.
+- [x] PNG de 1240 × 874 px en los formatos A y E, y de 1754 × 1234 px con FRÁGIL.
+- [ ] Revisar el PNG pegado en WhatsApp y en un mail.
+
+### 11.4 Pendiente: impresión real desde Chrome
+
+- [ ] Imprimir en papel formato E con 1, 2, 3 y 4 bultos: sin hojas extra, sin recortes, línea de corte en el centro.
+- [ ] Imprimir con FRÁGIL (apaisada): comprobar que Chrome toma la orientación sola y, si no, que la nota de pantalla alcanza.
+- [ ] Verificar que las franjas FRÁGIL no se recortan en la impresora real (margen no imprimible).
+- [ ] Verificar la legibilidad del texto rojo y del fondo amarillo en la impresora en blanco y negro.
+- [ ] Comparar la hoja impresa con la vista previa.
+- [ ] Probar con la tipografía Times New Roman real de las PC (las medidas pueden variar levemente respecto de Liberation Serif).
 
 ## 10. Criterio de aprobación
 

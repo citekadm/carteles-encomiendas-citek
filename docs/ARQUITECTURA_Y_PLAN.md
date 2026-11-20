@@ -1,7 +1,7 @@
 # Arquitectura prevista y plan de desarrollo
 
 **Proyecto:** Carteles de encomiendas — Citek  
-**Estado:** propuesta de organización; no hay implementación todavía.
+**Estado:** aplicación implementada (formatos A y E, FRÁGIL, alta de clientes); en pruebas, pendiente la impresión real desde Chrome.
 
 ## 1. Principios técnicos
 
@@ -51,7 +51,7 @@ Responsabilidad de servidor:
 ### `gas/Index.html`
 
 - Estructura principal de la interfaz.
-- Formulario y distribución de dos columnas.
+- Formulario y distribución de tres columnas (cliente; envío y acciones; vista previa reducida).
 - Contenedor de vista previa.
 - Inclusión de estilos y JavaScript mediante los mecanismos de plantillas de Apps Script.
 
@@ -61,6 +61,7 @@ Responsabilidad de servidor:
 - Estilos de los carteles.
 - Reglas de impresión A4.
 - Reglas de salto de página, dimensiones, corte y adaptación de texto.
+- Estilos de los formatos A y E y de las franjas FRÁGIL. La regla `@page` apaisada no está aquí: JavaScript la agrega en `<style id="pagina">` (de `Index.html`) solo con FRÁGIL.
 - Diferenciación entre pantalla y papel mediante `@media print`.
 
 ### `gas/JavaScript.html`
@@ -72,6 +73,8 @@ Responsabilidad de servidor:
 - Estado de casillas y datos del envío.
 - Generación de carteles y actualización de vista previa.
 - Acciones de imprimir y nuevo envío.
+- Formato E: creación del cartel, ajuste de texto por recuadro (`ajustarE`) y hoja FRÁGIL.
+- Alta de clientes nuevos y autocompletado en los campos de razón social y fantasía.
 
 La distribución final de funciones podrá detallarse durante el diseño técnico, pero debe conservar esta separación conceptual.
 
@@ -87,15 +90,15 @@ La distribución final de funciones podrá detallarse durante el diseño técnic
 
 Evitar duplicar estas reglas en distintos lugares del código.
 
-## 5. Flujo principal previsto
+## 5. Flujo principal
 
 1. Abrir la Web App.
 2. Cargar clientes desde `Hoja2`.
 3. Buscar por cuenta, razón social o nombre fantasía.
-4. Seleccionar un cliente o elegir la carga manual.
+4. Seleccionar un cliente o elegir la carga manual (opcionalmente guardarlo con «+ Nuevo cliente»).
 5. Revisar y ajustar temporalmente los datos.
 6. Ingresar cantidad de cajas.
-7. Revisar opciones de factura y condición especial.
+7. Elegir el formato de cartel (A o E) y revisar las opciones FRÁGIL, factura y condición especial.
 8. Generar carteles y vista previa.
 9. Comprobar el resumen y la distribución de bultos.
 10. Imprimir desde Chrome.
@@ -169,9 +172,9 @@ No subir:
 
 Los identificadores de proyecto o de hoja de cálculo deben tratarse con cuidado y configurarse según el mecanismo que se apruebe. No incluir secretos en el código ni en el repositorio.
 
-## 9. Decisiones técnicas pendientes de la etapa de análisis
+## 9. Decisiones técnicas planteadas en la etapa de análisis
 
-Estas cuestiones no alteran los requisitos funcionales y deben ser resueltas por la propuesta técnica antes de programar:
+Estas cuestiones no alteran los requisitos funcionales. **Todas están resueltas en la sección 10.** Se conserva la lista como registro:
 
 - Cómo se identificará el archivo de Sheets (ID configurado, propiedad del script u otro mecanismo seguro).
 - Cómo se refrescará la caché o los datos de clientes al usar «Recargar clientes».
@@ -179,7 +182,7 @@ Estas cuestiones no alteran los requisitos funcionales y deben ser resueltas por
 - Cómo se garantizará la paginación exacta en A4 en Chrome.
 - Qué opciones exactas de acceso estarán disponibles en el despliegue de Apps Script y cómo se autorizarán las PC/usuarios.
 
-No inventar valores ni asumir que estas decisiones ya fueron tomadas. Claude debe explicar ventajas, límites y recomendación, y esperar aprobación donde corresponda.
+Regla permanente: no inventar valores ni asumir decisiones no tomadas. Claude debe explicar ventajas, límites y recomendación, y esperar aprobación donde corresponda.
 
 ## 10. Decisiones resueltas en el análisis
 
@@ -190,3 +193,8 @@ No inventar valores ni asumir que estas decisiones ya fueron tomadas. Claude deb
 - **Acceso:** ejecutar como propietario, acceso «solo yo», misma cuenta en ambas PC.
 - **Alcance de permisos:** `spreadsheets` (ver sección 15.4 de la especificación).
 - **Lógica:** toda la lógica de negocio corre en el navegador como funciones puras (`Reglas`); el servidor solo entrega la interfaz y lee la hoja.
+- **Formato E:** cartel armado con recuadros; los tamaños de CSS son máximos y `ajustarE()` busca, por búsqueda binaria en píxeles enteros, el mayor tamaño que entra en el recuadro (una palabra: una línea; varias: hasta 2). Se mide en el DOM, fuera de pantalla y a tamaño real, una vez por variante del envío; los tamaños resultantes se aplican a todos los carteles (ver 15.7 de la especificación).
+- **FRÁGIL:** hoja de 297 × 209 mm con el cartel central de 217,7 mm y dos franjas de 33,3 mm. La regla `@page { size: A4 landscape }` se inyecta en `#pagina` al generar y se vacía en otro caso, para no alterar la hoja vertical.
+- **Hojas:** `Reglas.hojas(bultos, fragil)`: `ceil(bultos / 2)` o, con FRÁGIL, una por bulto.
+- **PNG:** mismo cartel (210 × 148 mm) o, con FRÁGIL, la hoja apaisada completa, a unos 150 ppp.
+- **Herramienta de prueba automática:** Chromium sin interfaz con Playwright, sobre una copia de la interfaz con `google.script.run` simulado. Los scripts no se versionan; sus resultados se registran en el plan de pruebas (sección 11).
