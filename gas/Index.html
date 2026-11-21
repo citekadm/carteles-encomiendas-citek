@@ -12,7 +12,7 @@
     <header class="top">
       <div class="brand">
         <div class="logo">C</div>
-        <div><h1>Carteles de encomiendas</h1><p>Citek</p></div>
+        <div><p class="eyebrow">Citek</p><h1>Carteles de <span class="acento">encomiendas</span></h1></div>
       </div>
       <div class="top-r">
         <div id="estado" class="estado">Iniciando…</div>
@@ -49,12 +49,16 @@
           <div class="stepper">
             <input type="text" id="f-cajas" inputmode="numeric" autocomplete="off">
             <div class="paso">
-              <button type="button" id="b-mas" class="btn-paso" aria-label="Sumar una caja" title="Sumar una caja">&#9650;</button>
-              <button type="button" id="b-menos" class="btn-paso" aria-label="Restar una caja" title="Restar una caja">&#9660;</button>
+              <button type="button" id="b-menos" class="btn-paso" aria-label="Restar una caja" title="Restar una caja">&minus;</button>
+              <button type="button" id="b-mas" class="btn-paso" aria-label="Sumar una caja" title="Sumar una caja">+</button>
             </div>
           </div>
           <label class="f" for="f-formato">Formato de cartel</label>
-          <select id="f-formato"><option value="E">E · Cuadros</option><option value="A">A · Clásico</option></select>
+          <div class="seg" id="seg-formato" role="radiogroup" aria-label="Formato de cartel">
+            <button type="button" role="radio" data-v="E">E · Cuadros</button>
+            <button type="button" role="radio" data-v="A">A · Clásico</button>
+          </div>
+          <select id="f-formato" class="oculto" tabindex="-1" aria-hidden="true"><option value="E">E · Cuadros</option><option value="A">A · Clásico</option></select>
           <label class="sw"><span>Imprimir FRÁGIL</span><input type="checkbox" class="switch" id="c-fragil"></label>
           <p id="nota-fragil" class="nota" hidden>Frágil: se imprime un cartel por hoja A4 apaisada, con «FRÁGIL» en los laterales. Elegí orientación horizontal si el navegador no la toma solo.</p>
           <label class="sw"><span>Imprimir FACTURA EN CAJA</span><input type="checkbox" class="switch" id="c-factura" checked></label>

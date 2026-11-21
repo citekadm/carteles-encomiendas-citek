@@ -178,19 +178,20 @@ Las marcas [x] corresponden a pruebas automáticas (la última el 2026-11-20, co
 
 ### 11.1 Ajuste de texto y contenido
 
-Resultados de la última corrida (2026-11-20, parte 1 de los ajustes). Todos los casos sin desbordes ni textos cortados. Tamaños del cartel 1:
+Resultados de la última corrida (2026-11-20, tras el margen de seguridad del 3 %). Todos los casos sin desbordes ni textos cortados. Tamaños del cartel 1:
 
 | Caso | Resultado |
 |---|---|
-| Datos cortos con factura y condición, 7 cajas | 2 hojas; fantasía 83 px, razón social 48 px, dirección y teléfono 44 px, departamento 105 px, bulto 70 px |
-| Razón social, fantasía y dirección largas, sin condición ni factura, 10 cajas | 2 hojas; fantasía 52 px en 2 líneas, razón social 29 px en 2 líneas, dirección 28 px en 2 líneas, teléfono 35 px en una línea |
-| Una sola palabra larguísima en razón social y fantasía | una línea; fantasía 34 px, razón social 28 px |
-| Sin teléfono y sin fantasía, departamento «Río Negro» | la razón social pasa a ser el texto principal (88 px); dirección 87 px |
+| Datos cortos con factura y condición, 7 cajas | 2 hojas; fantasía 80 px, razón social 46 px, dirección y teléfono 42 px, departamento 101 px, bulto 67 px |
+| Razón social, fantasía y dirección largas, sin condición ni factura, 10 cajas | 2 hojas; fantasía 50 px en 2 líneas, razón social 28 px en 2 líneas, dirección 27 px en 2 líneas, teléfono 33 px en una línea |
+| Una sola palabra larguísima en razón social y fantasía | una línea; fantasía 32 px, razón social 27 px |
+| Sin teléfono y sin fantasía, departamento «Río Negro» | la razón social pasa a ser el texto principal (85 px); dirección 84 px |
 | 999 cajas | 333 carteles en 167 hojas, sin desbordes, ajuste inmediato (menos de 1 s) |
-| FRÁGIL con datos cortos y 7 cajas | 3 hojas apaisadas; fantasía 87 px, departamento 158 px |
-| FRÁGIL con textos largos, condición larga y «Treinta y Tres» | 2 hojas; condición 18 px en 2 líneas, departamento 92 px |
+| FRÁGIL con datos cortos y 7 cajas | 3 hojas apaisadas; fantasía 84 px, departamento 153 px |
+| FRÁGIL con textos largos, condición larga y «Treinta y Tres» | 2 hojas; condición 17 px en 2 líneas, departamento 89 px en una línea |
 
-- [x] Todos los textos (menos el remitente) usan el mayor tamaño que entra en su recuadro; las direcciones cortas ya no quedan chicas.
+- [x] Todos los textos (menos el remitente) usan el mayor tamaño que entra en su recuadro (con un 3 % de margen); las direcciones cortas ya no quedan chicas.
+- [x] En el PDF de impresión de Chromium los textos no se parten ni se cortan (casos 1, 2 y 8 revisados mirando el PDF).
 - [x] El nombre fantasía es el texto principal y la razón social queda secundaria; sin fantasía, la razón social ocupa su lugar.
 - [x] El recuadro del departamento tiene línea simple, igual que los demás.
 - [x] El identificador del bulto dice solo `n de N` (`1 de 3`) en los formatos A y E.
@@ -226,6 +227,22 @@ Resultados de la última corrida (2026-11-20, parte 1 de los ajustes). Todos los
 - [ ] Verificar la legibilidad del texto rojo y del fondo amarillo en la impresora en blanco y negro.
 - [ ] Comparar la hoja impresa con la vista previa.
 - [ ] Probar con la tipografía Times New Roman real de las PC (las medidas pueden variar levemente respecto de Liberation Serif).
+
+## 12. Aspecto de la interfaz (parte 3)
+
+Verificado el 2026-11-20 con capturas de Chromium sin interfaz (ventana de 1180 px y de 420 px de ancho). No reemplaza la revisión en las PC de uso.
+
+- [x] Tema oscuro con tarjetas con relieve, campos hundidos y acento violeta en toda la pantalla.
+- [x] Interruptores con perilla luminosa; el de FRÁGIL se atenúa cuando está deshabilitado.
+- [x] Control segmentado de formato: el clic en E o A cambia el formato; FRÁGIL se apaga y se deshabilita con A y se habilita con E; «Nuevo envío» mantiene el formato elegido.
+- [x] Botones «−» y «+»: desde vacío ponen 1; respetan el mínimo 1 y el máximo 999.
+- [x] Los botones «Imprimir», «Generar PNG» y «Nuevo envío» entran cada uno en una línea.
+- [x] Ventana emergente de «¿Agregar número de cuenta?» y sugerencias de búsqueda con el estilo nuevo.
+- [x] Con ventana angosta (420 px) las columnas se apilan.
+- [x] La impresión no cambia: los PDF de los ocho casos mantienen páginas y orientación.
+- [ ] Revisar en las PC de la oficina: legibilidad de las letras claras sobre fondo oscuro con la luz del lugar.
+- [ ] Revisar en Chrome real el aspecto de las ventanas emergentes y del selector (el desenfoque de fondo depende del navegador).
+- [ ] Confirmar con el usuario que no hace falta un tema claro.
 
 ## 10. Criterio de aprobación
 

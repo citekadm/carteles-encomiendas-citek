@@ -117,8 +117,11 @@
       e.style.fontSize = m + 'px';
       if (entra(e)) { mejor = m; a = m + 1; } else { b = m - 1; }
     }
-    e.style.fontSize = (mejor === null ? min : mejor) + 'px';
-    return { px: mejor === null ? min : mejor, ok: mejor !== null };
+    // Margen de seguridad del 3 %: el ancho del texto varía unas décimas entre pantalla, vista previa reducida e impresión,
+    // y un texto justo en el límite podría pasar a 2 líneas y cortarse.
+    var px = mejor === null ? min : Math.max(min, Math.floor(mejor * 0.97));
+    e.style.fontSize = px + 'px';
+    return { px: px, ok: mejor !== null };
   }
   // Ajusta un cartel E ya insertado en el DOM. Devuelve {ok, sizes:{rol:px}}.
   function ajustarE(c) {
@@ -413,6 +416,15 @@
     $('s-cajas').textContent = v.valor; $('s-bultos').textContent = b; $('s-hojas').textContent = h;
     t.textContent = 'Distribución: ' + Reglas.agrupacion(v.valor) + (fr ? ' · FRÁGIL: un cartel por hoja A4 apaisada.' : (b % 2 ? ' · la mitad inferior de la última hoja queda vacía.' : '.'));
   }
+  function pintarFormato() { // el selector visual (E / A) refleja el formato elegido; el <select> oculto guarda el valor
+    Array.prototype.forEach.call(document.querySelectorAll('#seg-formato button'), function (b) {
+      var on = b.dataset.v === estado.formato;
+      b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#seg-formato button'), function (b) {
+    b.onclick = function () { var f = $('f-formato'); f.value = b.dataset.v; f.dispatchEvent(new Event('change', { bubbles: true })); };
+  });
   function sincronizarFragil() { // FRÁGIL solo existe con el formato E
     $('c-fragil').checked = estado.fragil; $('c-fragil').disabled = estado.formato !== 'E';
     $('c-fragil').closest('label').style.opacity = estado.formato !== 'E' ? '.5' : '';
@@ -422,7 +434,7 @@
     for (var k in CAMPOS) $(CAMPOS[k]).value = estado[k];
     $('f-cond').value = estado.cond; $('c-cond').checked = estado.condActiva;
     $('c-factura').checked = estado.factura; $('f-cajas').value = estado.cajas;
-    $('f-formato').value = estado.formato; sincronizarFragil();
+    $('f-formato').value = estado.formato; pintarFormato(); sincronizarFragil();
     $('origen').textContent = estado.origen === 'base'
       ? 'De la base · ' + (estado.cuenta ? 'cuenta ' + estado.cuenta : 'sin cuenta') + ' · cambios solo para este envío'
       : 'Cliente manual · aún no está en la base';
@@ -476,7 +488,7 @@
   $('c-factura').addEventListener('change', function () { estado.factura = this.checked; });
   $('f-formato').addEventListener('change', function () {
     estado.formato = this.value; if (estado.formato !== 'E') estado.fragil = false;
-    sincronizarFragil(); resumen();
+    pintarFormato(); sincronizarFragil(); resumen();
   });
   $('c-fragil').addEventListener('change', function () { estado.fragil = this.checked; sincronizarFragil(); resumen(); });
   $('f-cajas').addEventListener('input', function () { estado.cajas = this.value; resumen(); });

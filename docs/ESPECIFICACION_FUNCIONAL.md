@@ -282,14 +282,15 @@ La interfaz debe ser moderna, profesional y fácil de utilizar.
 Distribución prevista:
 
 - Pantalla principal en tres columnas: datos del cliente; envío, acciones y resumen; vista previa reducida (es solo una referencia).
+- **Estilo visual** (decisión del usuario, basada en `docs/referencias/Referencia_estetica_Obsidian_Home.png`): tema oscuro único; tarjetas grandes de esquinas muy redondeadas con relieve suave; campos hundidos; acento violeta; interruptores con perilla luminosa; botones circulares «−» y «+»; control segmentado para el formato; chips y puntos de color para los estados; ventanas emergentes oscuras con fondo desenfocado. El cartel de la vista previa se muestra siempre sobre fondo blanco y la impresión no cambia. No hay tema claro.
 
 Controles y acciones:
 
 - Búsqueda/selección de cliente.
 - Recargar clientes.
 - Campos editables para los datos del envío.
-- Cantidad de cajas, con botones ▲/▼ que suman o restan 1 entre 1 y 999.
-- Selector «Formato de cartel» (A o E).
+- Cantidad de cajas, con botones circulares «−» y «+» que restan o suman 1 entre 1 y 999.
+- Selector «Formato de cartel» (control segmentado: E · Cuadros / A · Clásico).
 - Casilla «Imprimir FRÁGIL» (solo con el formato E).
 - Casilla «Imprimir FACTURA EN CAJA».
 - Campo de condición especial.
@@ -420,6 +421,7 @@ Aprobado por el usuario a partir de las maquetas de la sesión de diseño y ajus
 ### 15.7 Regla de ajuste de texto (formato E)
 
 - **No hay tamaños fijos de letra** (salvo el remitente). Todos los textos impresos (condición, factura, fantasía, razón social, dirección, teléfono, departamento e identificador del bulto) crecen hasta el **mayor tamaño que entra** en su recuadro, respetando un margen interno de 1 mm arriba y abajo y 2,5 mm a los lados.
+- El tamaño final se reduce un 3 % respecto del máximo que entra, como margen de seguridad frente a diferencias mínimas de renderizado entre pantalla, vista previa reducida e impresión (un texto justo en el límite podría pasar a otra línea y cortarse).
 - **Una sola palabra:** una línea; solo se achica.
 - **Más de una palabra:** puede ocupar **hasta 2 líneas**; se usa el mayor tamaño con el que no pasa de 2 líneas ni se sale del recuadro.
 - «FACTURA EN CAJA», el identificador del bulto y el teléfono van siempre en **una línea**. Un número de teléfono no se parte.
