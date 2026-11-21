@@ -13,11 +13,8 @@ body { margin: 0; color: var(--txt); font: 15px/1.45 Inter, "Segoe UI", system-u
 .top { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 0; margin-bottom: 8px;
   background: color-mix(in srgb, var(--bg) 72%, transparent); -webkit-backdrop-filter: saturate(160%) blur(18px); backdrop-filter: saturate(160%) blur(18px); }
 .brand { display: flex; align-items: center; gap: 14px; }
-.logo { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: var(--tint); font-weight: 700; font-size: 21px; background: linear-gradient(150deg,#2c2d3a,#1a1b23);
-  box-shadow: 0 8px 20px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 1px rgba(167,139,250,.28), 0 0 18px rgba(124,92,240,.25); }
-.eyebrow { margin: 0 0 4px; font-size: 11px; font-weight: 600; letter-spacing: .34em; text-transform: uppercase; color: var(--sub); }
-h1 { margin: 0; font-size: 23px; letter-spacing: -.02em; line-height: 1.1; }
-h1 .acento { color: var(--tint); }
+.logo-citek { display: block; height: 42px; width: auto; filter: drop-shadow(0 0 14px rgba(167,139,250,.45)) drop-shadow(0 2px 4px rgba(0,0,0,.5)); user-select: none; }
+.solo-lector { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .top-r { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .estado { display: inline-flex; align-items: center; gap: 9px; max-width: 460px; padding: 7px 14px; border-radius: 999px; background: linear-gradient(150deg,var(--card2),var(--card)); box-shadow: var(--relieve); font-size: 13px; color: var(--sub); }
 .estado::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: #6b6c7e; }

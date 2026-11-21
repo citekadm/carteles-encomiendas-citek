@@ -21,7 +21,7 @@ La aplicación debe ser sencilla de utilizar, confiable y especialmente cuidados
 - Búsqueda y autocompletado de clientes.
 - Selección de un cliente o ingreso manual de uno nuevo para el envío actual.
 - Edición temporal de los datos que se imprimirán.
-- Cálculo automático de bultos a partir de la cantidad de cajas.
+- Cálculo automático de bultos a partir de la cantidad de cajas y de las cajas por bulto elegidas (1, 2 o 3).
 - Condición especial opcional.
 - Opción para imprimir «FACTURA EN CAJA».
 - Vista previa de los carteles.
@@ -149,13 +149,19 @@ Validaciones:
 
 Cada cartel representa **un bulto**, nunca una caja individual.
 
-Cada bulto agrupa hasta 3 cajas. La agrupación se realiza consecutivamente en grupos de 3 y el último bulto contiene el resto, si lo hubiera.
+**Cajas por bulto (decisión del usuario):** antes de generar, el usuario elige cuántas cajas lleva como máximo cada bulto: **1, 2 o 3**. El valor por defecto es **3** (cajas apilables de a 3, el caso habitual). Las opciones 1 y 2 sirven para cajas que no se pueden apilar de a 3 y que por eso deben agruparse obligatoriamente de esa manera.
+
+Cada bulto agrupa hasta *k* cajas, donde *k* es la opción elegida. La agrupación se realiza consecutivamente en grupos de *k* y el último bulto contiene el resto, si lo hubiera.
 
 Fórmula:
 
-`Cantidad de bultos = techo(cantidad de cajas / 3)`
+`Cantidad de bultos = techo(cantidad de cajas / k)`
 
-Equivalente en JavaScript: `Math.ceil(cantidadCajas / 3)`.
+Equivalente en JavaScript: `Math.ceil(cantidadCajas / porBulto)`, con `porBulto` igual a 1, 2 o 3. Cualquier otro valor se toma como 3.
+
+La opción es del envío: «Nuevo envío» la vuelve a 3. Cambiarla con los carteles ya generados actualiza la vista previa y el resumen. El límite de cajas (1 a 999) no cambia: con 1 caja por bulto, 999 cajas son 999 bultos (500 hojas con dos carteles por hoja).
+
+**Con 3 cajas por bulto:**
 
 | Cajas ingresadas | Distribución interna | Carteles/bultos |
 |---:|---|---:|
@@ -168,6 +174,21 @@ Equivalente en JavaScript: `Math.ceil(cantidadCajas / 3)`.
 | 7 | 3 + 3 + 1 | 3 |
 | 10 | 3 + 3 + 3 + 1 | 4 |
 | 999 | 333 grupos de 3 | 333 |
+
+**Con 2 cajas por bulto:**
+
+| Cajas ingresadas | Distribución interna | Carteles/bultos |
+|---:|---|---:|
+| 1 | 1 | 1 |
+| 2 | 2 | 1 |
+| 3 | 2 + 1 | 2 |
+| 4 | 2 + 2 | 2 |
+| 5 | 2 + 2 + 1 | 3 |
+| 7 | 2 + 2 + 2 + 1 | 4 |
+| 10 | 2 + 2 + 2 + 2 + 2 | 5 |
+| 999 | 499 grupos de 2 + 1 | 500 |
+
+**Con 1 caja por bulto:** cada caja es un bulto (carteles = cajas): 1 → 1, 2 → 2, 5 → 5, 10 → 10, 999 → 999.
 
 **Importante:** no mostrar en los carteles la cantidad de cajas ni la cantidad de cajas agrupadas en cada bulto. Cada cartel muestra únicamente el número correlativo y el total: `n de N`.
 
@@ -282,6 +303,7 @@ La interfaz debe ser moderna, profesional y fácil de utilizar.
 Distribución prevista:
 
 - Pantalla principal en tres columnas: datos del cliente; envío, acciones y resumen; vista previa reducida (es solo una referencia).
+- **Encabezado:** el logo de CITEK en blanco (`docs/referencias/Logo_Citek_blanco.png`, derivado de `Logo_Citek.png`) reemplaza al título visible, con un leve resplandor violeta para destacar sobre el fondo oscuro. El título «Carteles de encomiendas» queda solo para lectores de pantalla y para la pestaña del navegador.
 - **Estilo visual** (decisión del usuario, basada en `docs/referencias/Referencia_estetica_Obsidian_Home.png`): tema oscuro único; tarjetas grandes de esquinas muy redondeadas con relieve suave; campos hundidos; acento violeta; interruptores con perilla luminosa; botones circulares «−» y «+»; control segmentado para el formato; chips y puntos de color para los estados; ventanas emergentes oscuras con fondo desenfocado. El cartel de la vista previa se muestra siempre sobre fondo blanco y la impresión no cambia. No hay tema claro.
 
 Controles y acciones:
@@ -290,6 +312,7 @@ Controles y acciones:
 - Recargar clientes.
 - Campos editables para los datos del envío.
 - Cantidad de cajas, con botones circulares «−» y «+» que restan o suman 1 entre 1 y 999.
+- Selector «Cajas por bulto» (control segmentado: 1 / 2 / 3; 3 por defecto).
 - Selector «Formato de cartel» (control segmentado: E · Cuadros / A · Clásico).
 - Casilla «Imprimir FRÁGIL» (solo con el formato E).
 - Casilla «Imprimir FACTURA EN CAJA».

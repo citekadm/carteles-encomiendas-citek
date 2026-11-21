@@ -10,7 +10,8 @@
   "cond": "enviar por nuñez",
   "factura": true,
   "paginas": 2,
-  "orientacion": "v"
+  "orientacion": "v",
+  "bultos": 3
  },
  {
   "id": "c2_largo_sin_extras",
@@ -23,7 +24,8 @@
   "cond": "",
   "factura": false,
   "paginas": 2,
-  "orientacion": "v"
+  "orientacion": "v",
+  "bultos": 4
  },
  {
   "id": "c3_una_palabra_larga",
@@ -36,7 +38,8 @@
   "cond": "",
   "factura": true,
   "paginas": 1,
-  "orientacion": "v"
+  "orientacion": "v",
+  "bultos": 2
  },
  {
   "id": "c4_fragil",
@@ -50,7 +53,8 @@
   "factura": true,
   "fragil": true,
   "paginas": 3,
-  "orientacion": "h"
+  "orientacion": "h",
+  "bultos": 3
  },
  {
   "id": "c5_sin_tel_fant",
@@ -63,7 +67,8 @@
   "cond": "",
   "factura": false,
   "paginas": 1,
-  "orientacion": "v"
+  "orientacion": "v",
+  "bultos": 1
  },
  {
   "id": "c6_formatoA",
@@ -77,7 +82,8 @@
   "cond": "ENVIAR POR NUÑEZ",
   "factura": true,
   "paginas": 1,
-  "orientacion": "v"
+  "orientacion": "v",
+  "bultos": 1
  },
  {
   "id": "c7_999",
@@ -90,7 +96,8 @@
   "cond": "",
   "factura": true,
   "paginas": 167,
-  "orientacion": "v"
+  "orientacion": "v",
+  "bultos": 333
  },
  {
   "id": "c8_fragil_largo",
@@ -104,6 +111,68 @@
   "factura": true,
   "fragil": true,
   "paginas": 2,
-  "orientacion": "h"
+  "orientacion": "h",
+  "bultos": 2
+ },
+ {
+  "id": "c9_de_a_2",
+  "cajas": 7,
+  "porBulto": 2,
+  "paginas": 2,
+  "orientacion": "v",
+  "razon": "RUTA DOCE SAS",
+  "fant": "ANCAP RUTA 12",
+  "dir": "Ruta 12 km 4",
+  "tel": "4544 8888",
+  "depto": "Colonia",
+  "cond": "",
+  "factura": true,
+  "bultos": 4
+ },
+ {
+  "id": "c10_de_a_1",
+  "cajas": 5,
+  "porBulto": 1,
+  "paginas": 3,
+  "orientacion": "v",
+  "razon": "RUTA DOCE SAS",
+  "fant": "ANCAP RUTA 12",
+  "dir": "Ruta 12 km 4",
+  "tel": "4544 8888",
+  "depto": "Colonia",
+  "cond": "ENVIAR POR NUÑEZ",
+  "factura": true,
+  "bultos": 5
+ },
+ {
+  "id": "c11_999_de_a_1",
+  "cajas": 999,
+  "porBulto": 1,
+  "paginas": 500,
+  "orientacion": "v",
+  "razon": "RUTA DOCE SAS",
+  "fant": "ANCAP RUTA 12",
+  "dir": "Ruta 12 km 4",
+  "tel": "4544 8888",
+  "depto": "Colonia",
+  "cond": "",
+  "factura": true,
+  "bultos": 999
+ },
+ {
+  "id": "c12_fragil_de_a_2",
+  "cajas": 5,
+  "porBulto": 2,
+  "fragil": true,
+  "paginas": 3,
+  "orientacion": "h",
+  "razon": "RUTA DOCE SAS",
+  "fant": "ANCAP RUTA 12",
+  "dir": "Ruta 12 km 4",
+  "tel": "4544 8888",
+  "depto": "Colonia",
+  "cond": "",
+  "factura": true,
+  "bultos": 3
  }
 ]
