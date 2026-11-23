@@ -20,9 +20,9 @@ body { margin: 0; color: var(--txt); font: 15px/1.45 Inter, "Segoe UI", system-u
 .estado::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: #6b6c7e; }
 .estado.ok { color: var(--txt); } .estado.ok::before { background: var(--ok); box-shadow: 0 0 10px var(--ok); }
 .estado.error { color: var(--err); } .estado.error::before { background: var(--err); box-shadow: 0 0 10px var(--err); }
-.grid { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr) 224px; gap: 22px; align-items: start; }
+.grid { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr); gap: 22px; align-items: start; }
 .col, .col2, .col3 { display: flex; flex-direction: column; gap: 22px; }
-@media (max-width: 1000px) { .grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } .col3 { grid-column: 1 / -1; align-items: center; } }
+@media (max-width: 1000px) { .grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } .col3 { grid-column: 1 / -1; } #prev { max-width: 440px; width: 100%; align-self: center; } }
 @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
 .card { background: linear-gradient(150deg, var(--card2), var(--card) 55%); border: 1px solid rgba(255,255,255,.035); border-radius: 28px; padding: 22px; box-shadow: var(--relieve); }
 .card h2 { margin: 0 0 4px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .18em; color: var(--sub); }
@@ -56,7 +56,7 @@ input.switch:focus-visible, .btn:focus-visible, .btn-paso:focus-visible, .seg bu
 #resumen.error #resumen-txt { color: var(--err); font-weight: 600; }
 .acciones { display: grid; grid-template-columns: 1fr 1.3fr 1.15fr; gap: 10px; }
 .acciones .btn.prim { grid-column: 1 / -1; }
-.acciones .btn { padding: 0 8px; font-size: 14px; white-space: nowrap; }
+.acciones .btn { padding: 0 6px; font-size: 13px; white-space: nowrap; }
 .acciones .btn.prim { font-size: 15px; }
 .btn { font: inherit; font-weight: 600; height: 48px; padding: 0 16px; border: 1px solid rgba(255,255,255,.05); border-radius: 16px; cursor: pointer; color: #cfc2ff;
   background: linear-gradient(150deg,#2b2c38,#1e1f28); box-shadow: 0 8px 18px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07); transition: transform .12s, filter .12s, box-shadow .12s; }
@@ -68,13 +68,6 @@ input.switch:focus-visible, .btn:focus-visible, .btn-paso:focus-visible, .seg bu
 .btn.nuevo-cli .mas { font-size: 22px; font-weight: 500; line-height: 1; margin-top: -2px; }
 .avisos { color: var(--err); font-weight: 600; font-size: 14px; }
 .avisos:empty { display: none; }
-details.card { padding: 0; overflow: hidden; }
-details.card summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; cursor: pointer; font-weight: 600; }
-details.card summary::-webkit-details-marker { display: none; }
-details.card summary small { margin-left: auto; font-weight: 400; color: var(--sub); }
-details.card summary::after { content: ""; width: 9px; height: 9px; border: solid var(--sub); border-width: 0 2px 2px 0; transform: rotate(45deg); transition: transform .2s; margin: -4px 4px 0 6px; }
-details.card[open] summary::after { transform: rotate(-135deg); margin-top: 4px; }
-.prev-body { padding: 4px 20px 20px; display: grid; justify-content: center; animation: sube .2s ease-out; }
 .modal-card .btn + .btn { margin-top: 0; }
 .m-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .modal-card label.f { text-align: left; margin: 4px 0 7px; }
@@ -86,16 +79,34 @@ details.card[open] summary::after { transform: rotate(-135deg); margin-top: 4px;
 .btn-paso { width: 46px; height: 46px; padding: 0; border: 1px solid rgba(255,255,255,.05); border-radius: 50%; cursor: pointer; display: grid; place-items: center; font-size: 26px; font-weight: 400; line-height: 1; color: var(--tint);
   background: linear-gradient(150deg,#2b2c38,#1e1f28); box-shadow: 0 8px 16px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.07); transition: transform .12s, filter .12s, box-shadow .12s; }
 .btn-paso:hover { filter: brightness(1.2); } .btn-paso:active { transform: scale(.93); box-shadow: var(--hundido); }
+/* Selector tipo dial (cajas por bulto: 1, 2 o 3): arco de 240° con marcas, como el dial de la referencia */
+.dial { position: relative; width: 190px; margin: 4px auto 6px; aspect-ratio: 160 / 124; touch-action: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent; }
+.dial svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.dial .base { fill: none; stroke: rgba(255,255,255,.05); stroke-width: 12; stroke-linecap: round; }
+.dial .pista { fill: none; stroke: #12131a; stroke-width: 9; stroke-linecap: round; }
+.dial .prog { fill: none; stroke: var(--tint); stroke-width: 9; stroke-linecap: round; filter: drop-shadow(0 0 6px rgba(167,139,250,.7)); }
+.dial .marca { stroke: #4a4b5a; stroke-width: 1.4; stroke-linecap: round; }
+.dial .marca.on { stroke: #cdbdff; }
+.dial .marca.fuerte { stroke-width: 2.2; }
+.dial .perilla { fill: #e9e0ff; stroke: var(--tint); stroke-width: 3.5; filter: drop-shadow(0 0 7px rgba(167,139,250,.9)); }
+.dial-centro { position: absolute; left: 50%; top: 61.3%; width: 38%; aspect-ratio: 1; transform: translate(-50%,-50%); border-radius: 50%; display: grid; place-items: center;
+  background: linear-gradient(150deg,#2b2c38,#191a22); box-shadow: 0 8px 18px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08); pointer-events: none; }
+.dial-centro b { font-size: 34px; line-height: 1; font-weight: 700; color: #fff; }
+.dial-pos { position: absolute; width: 30px; height: 30px; padding: 0; transform: translate(-50%,-50%); border: 0; border-radius: 50%; background: transparent; color: var(--sub); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: color .15s; }
+.dial-pos:hover, .dial-pos.on { color: #fff; }
+.dial-pos[data-v="1"] { left: 13.2%; top: 87.9%; } .dial-pos[data-v="2"] { left: 50%; top: 8%; } .dial-pos[data-v="3"] { left: 86.8%; top: 87.9%; }
+.dial:focus-visible { outline: 3px solid rgba(167,139,250,.5); outline-offset: 6px; border-radius: 24px; }
 .seg { display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: var(--fill); box-shadow: var(--hundido); }
 .seg button { flex: 1; height: 38px; border: 0; border-radius: 999px; background: transparent; color: var(--sub); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .2s, color .2s, box-shadow .2s; }
 .seg button.on { color: #fff; background: linear-gradient(135deg, var(--tint2), var(--tint)); box-shadow: 0 4px 14px rgba(124,92,240,.45); }
 .oculto { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 /* Vista previa reducida: es solo una referencia (la impresión usa las hojas a tamaño real) */
+#prev { min-height: 300px; }
+.prev-info { margin: 0 0 12px; font-size: 12px; color: var(--sub); }
+.prev-info:empty { display: none; }
+.prev-body { display: grid; justify-content: center; animation: sube .2s ease-out; }
 .col3 { position: sticky; top: 84px; }
-.col3 details.card summary { padding: 14px 16px; font-size: 13px; flex-wrap: wrap; gap: 2px 8px; }
-.col3 details.card summary small { margin-left: 0; font-size: 11px; flex-basis: 100%; order: 3; }
-.col3 .prev-body { padding: 0 14px 16px; }
-.vista { zoom: .24; } .vista .hoja { box-shadow: 0 6px 24px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.1); }
+.col3 .col3 .vista { zoom: .3; } /* el zoom real lo calcula escalarVista() según el ancho de la tarjeta */ .vista .hoja { box-shadow: 0 6px 24px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.1); }
 @media (max-width: 520px) { .acciones { grid-template-columns: 1fr 1fr; } }
 #impresion { display: none; }
 .modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(6,6,10,.62); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: 0; transition: opacity .18s; }
@@ -146,7 +157,6 @@ details.card[open] summary::after { transform: rotate(-135deg); margin-top: 4px;
 .e-top, .e-foot { display: flex; gap: 2mm; flex: none; }
 .e-top { height: 18mm; } .e-foot { height: 22mm; }
 .e-top > *, .e-foot > * { flex: 1 1 0; min-width: 0; }
-.e-vacio { border: 0; background: none; } /* lado sin dato: queda en blanco, sin recuadro */
 .e-factura { background: #ff0; }
 .e-fant, .e-prim { flex: 2.6 1 0; min-height: 0; }   /* nombre fantasía: el texto principal del cartel */
 .e-razon { flex: 1.5 1 0; min-height: 0; }
@@ -168,7 +178,6 @@ details.card[open] summary::after { transform: rotate(-135deg); margin-top: 4px;
 .cartel.cartel-e.ancha { width: 217.7mm; height: 209mm; padding: 6.35mm; border-bottom: 0; flex: none; }
 .ancha .e-top { height: 20.5mm; } .ancha .e-foot { height: 26mm; }
 .ancha .e-rte .rte1 { font-size: 30px; } .ancha .e-rte .rte2 { font-size: 20px; }
-.vista.fragil { zoom: .17; }
 .nota { margin: -2px 0 6px; font-size: 12px; color: var(--sub); }
 
 /* ===== Impresión A4 vertical (con FRÁGIL, JavaScript.html agrega @page apaisada en #pagina) ===== */

@@ -1,14 +1,14 @@
 # Contexto de sesión y próximos pasos
 
 **Proyecto:** Carteles de encomiendas — Citek  
-**Última actualización:** 2026-11-21 (partes 1 y 3 terminadas más los últimos cambios de logo y cajas por bulto; la parte 2, la marca de agua en el cartel impreso, sigue pendiente a pedido del usuario).  
+**Última actualización:** 2026-11-23 (partes 1 y 3 terminadas más los últimos cambios de logo y cajas por bulto; la parte 2, la marca de agua en el cartel impreso, sigue pendiente a pedido del usuario).  
 **Para qué sirve este documento:** que otra sesión (con Claude u otra persona) retome el trabajo sin repetir preguntas ni perder decisiones.
 
 ## 1. Cómo retomar
 
 1. Leer `README.md`, este documento y `docs/ESPECIFICACION_FUNCIONAL.md` (en especial las secciones 4.1, 15.5, 15.6 y 15.7).
 2. Verificar el estado real del repositorio antes de tocar nada (`git ls-remote --heads`), porque el usuario también edita desde la web de GitHub.
-3. Trabajar en una rama nueva a partir de `logo-y-bultos` (ver sección 2) y no sobre `main`.
+3. Trabajar en una rama nueva a partir de `ajustes-detalles-4` (ver sección 2) y no sobre `main`.
 4. No hacer todo a la vez: dividir el pedido en partes, terminar una, probarla y dejar contexto antes de seguir (preferencia expresa del usuario).
 5. Todo cambio funcional se registra en la especificación y en el plan de pruebas en el mismo cambio. Ante contradicciones, consultar al usuario antes de implementar.
 
@@ -24,7 +24,8 @@ Repositorio: `citekadm/carteles-encomiendas-citek`. Las ramas de trabajo están 
 | `formato-e-fragil` | Formato E (cuadros), selector de formato, opción FRÁGIL (A4 apaisada), regla de ajuste de texto. |
 | `ajustes-cartel-parte-1` | Parte 1: fantasía como texto principal, tamaños máximos, departamento con línea simple, bulto solo con números (sección 3). |
 | `estetica-parte-3` | Parte 3: nuevo aspecto de la aplicación (sección 4). |
-| `logo-y-bultos` | Logo de CITEK en el encabezado y selector «Cajas por bulto» 1 / 2 / 3 (sección 5). **La más reciente.** |
+| `logo-y-bultos` | Logo de CITEK en el encabezado y selector «Cajas por bulto» 1 / 2 / 3 (sección 5). Ya integrada en `main`. |
+| `ajustes-detalles-4` | Ronda de detalles: franja superior a todo el ancho, dial de cajas por bulto y nueva disposición (sección 6). **La más reciente.** |
 
 - `main` está más atrás: todavía no tiene nada de lo anterior. Nada se integró aún; falta que el usuario revise y haga los pull requests (de la rama más reciente contra `etapa-5-6-carteles`).
 - Existen además `citekadm-patch-1` y `citekadm-patch-2`, ediciones hechas por el usuario desde la web que **no se revisaron**.
@@ -75,7 +76,15 @@ Pedido del usuario y resultado:
 
 Detalles técnicos: `Reglas.porBultoValido`, `Reglas.bultos(cajas, porBulto)`, `Reglas.agrupacion(cajas, porBulto)` y `Reglas.descriptores(cajas, {porBulto, ...})` en `gas/JavaScript.html`; el estado tiene el campo `porBulto`; `pintarPorBulto()` refleja la opción en pantalla. Las autopruebas pasaron de 60 a 100 comprobaciones.
 
-## 6. Decisiones del desarrollador que el usuario aún no confirmó
+## 6. Ronda de detalles (2026-11-23)
+
+Pedido del usuario, con una captura de la nueva disposición, y resultado:
+
+1. **Franja superior del cartel (formato E):** si hay solo «FACTURA EN CAJA» o solo condición especial, esa ocupa todo el ancho; si hay las dos, van lado a lado; si no hay ninguna, el resto se acomoda como antes. Esto reemplaza el pedido anterior de dejar un lado en blanco (`crearCartelE` en `gas/JavaScript.html`; se quitó `.e-vacio`).
+2. **Selector de cajas por bulto como dial** (como el de la imagen de referencia), sin textos explicativos. Arco de 240° con marcas, perilla violeta y el valor en el centro; se elige con clic o arrastre sobre el arco, con los números o con el teclado. Funciones: `pintarPorBulto`, `elegirPorBulto` y el bloque del dial en `gas/JavaScript.html`; estilos `.dial*` en `gas/Styles.html`. Los botones con los números (`.dial-pos`) también sirven para las pruebas automáticas.
+3. **Nueva disposición:** columna izquierda = cliente (ahora incluye «Condición especial») y «+ Nuevo cliente»; centro = envío y resumen; derecha = acciones y vista previa. La condición escrita al crear un cliente nuevo se guarda en la columna G (la ventana de confirmación la muestra). La vista previa dejó de ser un `<details>` plegable: es una tarjeta siempre visible y `escalarVista()` ajusta su zoom al ancho de la tarjeta (tope 360 px).
+
+## 7. Decisiones del desarrollador que el usuario aún no confirmó
 
 - Frágil se aplica a todos los bultos del envío (no por bulto) y no está disponible con el formato A.
 - Las franjas FRÁGIL quedan a 6,35 mm del borde de la hoja.
@@ -87,8 +96,9 @@ Detalles técnicos: `Reglas.porBultoValido`, `Reglas.bultos(cajas, porBulto)`, `
 - Margen de seguridad del 3 % en los tamaños de letra: los textos quedan un poco más chicos que el máximo que entra.
 - **Cajas por bulto:** se interpretó como «máximo de cajas por bulto» (1, 2 o 3), agrupadas de a *k* con el resto en el último bulto, y la opción es de todo el envío (no por bulto). Si se quisiera mezclar bultos de distinto tamaño en un mismo envío, habría que cambiar el diseño.
 - El título visible «Carteles de encomiendas» se quitó por completo a favor del logo.
+- Dial: el centro no responde a clics, y los números 1, 2 y 3 alrededor del arco son clicables. La vista previa nunca supera los 360 px de ancho aunque la columna sea más ancha.
 
-## 7. Pendiente — Parte 2: logo como marca de agua (provisional)
+## 8. Pendiente — Parte 2: logo como marca de agua (provisional)
 
 Pedido del usuario: **provisional, a definir tras probar la impresión**. Implementar las dos opciones para poder compararlas:
 
@@ -107,11 +117,11 @@ Consideraciones técnicas para quien lo implemente:
 - Probable diseño: un selector «Logo de fondo» con «Sin logo / En remitente / En todo el cartel». Decidir si aplica también al formato A y a FRÁGIL, y si el PNG lo incluye.
 - Actualizar especificación (nueva sección), plan de pruebas y verificar que el ajuste de texto no cambia.
 
-## 8. Parte 3 hecha: ideas por si se quiere seguir afinando la estética
+## 9. Parte 3 hecha: ideas por si se quiere seguir afinando la estética
 
 La parte 3 se considera terminada. Si el usuario quiere afinarla, algunas ideas que no se hicieron: un tema claro opcional, íconos lineales en los títulos de las tarjetas, un indicador circular para la cantidad de cajas, y revisar el contraste con la luz de la oficina.
 
-## 9. Otras tareas abiertas
+## 10. Otras tareas abiertas
 
 - Impresión real desde Chrome en las PC de uso (formato A, E y FRÁGIL), con la impresora en blanco y negro (plan de pruebas 11.4).
 - Pruebas de acceso y publicación del Apps Script (sección 9 del plan de pruebas).
@@ -119,7 +129,7 @@ La parte 3 se considera terminada. Si el usuario quiere afinarla, algunas ideas 
 - Probar con la hoja `Hoja2` real, incluido el alta de clientes (en una copia primero).
 - Revisar `citekadm-patch-1` y `citekadm-patch-2`.
 
-## 10. Cómo probar
+## 11. Cómo probar
 
 Carpeta `tools/pruebas/` (usa Chromium sin interfaz; no reemplaza la impresión real):
 
@@ -137,7 +147,7 @@ python3 verificar_pdf.py         # compara páginas y orientación (requiere: pi
 - El navegador de prueba usa Liberation Serif, de medidas equivalentes a Times New Roman; las medidas reales pueden variar levemente.
 - Mirar las capturas de `salida/` después de cualquier cambio de diseño: los números solos no detectan todo.
 
-## 11. Mapa rápido del código
+## 12. Mapa rápido del código
 
 | Archivo | Qué contiene |
 |---|---|
@@ -146,7 +156,7 @@ python3 verificar_pdf.py         # compara páginas y orientación (requiere: pi
 | `gas/Styles.html` | Estilos de la interfaz, del formato A, del formato E (bloque «Formato E») y de FRÁGIL; reglas de impresión. |
 | `gas/JavaScript.html` | `Reglas` (lógica pura con `autopruebas()`), formato A (`crearCartel`, `medir`), formato E (`crearCartelE`, `entra`, `fijarTam`, `ajustarE`, `medirE`, `crearHojaFragil`), `renderCarteles`, PNG, alta de clientes y eventos. |
 
-## 12. Notas de trabajo
+## 13. Notas de trabajo
 
 - El usuario escribe en español rioplatense; las respuestas deben ir en español claro y concreto.
 - Subir cambios requiere un token de GitHub que el usuario pega en la conversación; el token nunca se guarda en el repositorio y debe revocarse al terminar. Subir siempre a una rama nueva.

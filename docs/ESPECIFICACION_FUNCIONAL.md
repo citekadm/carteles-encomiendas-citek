@@ -91,7 +91,7 @@ Decisión aprobada por el usuario. Es la **única** escritura permitida sobre `H
 - Botón **«+ Nuevo cliente»** al final de los campos de datos del cliente (símbolo + y texto).
 - Solo guarda al tocar el botón y confirmar; nunca al editar campos ni de forma silenciosa.
 - Obligatorio: razón social. Los demás campos son opcionales.
-- Guarda razón social, nombre fantasía, dirección, teléfono, departamento y condición especial tal como están en el formulario.
+- Guarda razón social, nombre fantasía, dirección, teléfono, departamento y condición especial tal como están en el formulario. El campo «Condición especial» está dentro de los datos del cliente: lo que se escriba allí al crear un cliente nuevo queda guardado en la columna G, y la ventana de confirmación muestra la condición que se va a guardar.
 - Al tocar el botón aparece una ventana «¿Agregar número de cuenta?» con un campo opcional. Si se deja vacío, el cliente se guarda sin cuenta.
 - Si ya existe un cliente con la misma razón social, se avisa y se permite agregar igual (caso de otra dirección: la operativa es crear otro registro).
 - Una cuenta que ya existe se rechaza (en el cliente y en el servidor).
@@ -302,7 +302,7 @@ La interfaz debe ser moderna, profesional y fácil de utilizar.
 
 Distribución prevista:
 
-- Pantalla principal en tres columnas: datos del cliente; envío, acciones y resumen; vista previa reducida (es solo una referencia).
+- Pantalla principal en tres columnas: **cliente** (con su condición especial y el botón «+ Nuevo cliente»); **envío** (cajas, cajas por bulto, formato y opciones) y **resumen**; **acciones** (Generar carteles, Imprimir, Generar PNG, Nuevo envío) y **vista previa**. La vista previa está siempre visible, se escala al ancho de su tarjeta (hasta 360 px) y es solo una referencia.
 - **Encabezado:** el logo de CITEK en blanco (`docs/referencias/Logo_Citek_blanco.png`, derivado de `Logo_Citek.png`) reemplaza al título visible, con un leve resplandor violeta para destacar sobre el fondo oscuro. El título «Carteles de encomiendas» queda solo para lectores de pantalla y para la pestaña del navegador.
 - **Estilo visual** (decisión del usuario, basada en `docs/referencias/Referencia_estetica_Obsidian_Home.png`): tema oscuro único; tarjetas grandes de esquinas muy redondeadas con relieve suave; campos hundidos; acento violeta; interruptores con perilla luminosa; botones circulares «−» y «+»; control segmentado para el formato; chips y puntos de color para los estados; ventanas emergentes oscuras con fondo desenfocado. El cartel de la vista previa se muestra siempre sobre fondo blanco y la impresión no cambia. No hay tema claro.
 
@@ -312,11 +312,11 @@ Controles y acciones:
 - Recargar clientes.
 - Campos editables para los datos del envío.
 - Cantidad de cajas, con botones circulares «−» y «+» que restan o suman 1 entre 1 y 999.
-- Selector «Cajas por bulto» (control segmentado: 1 / 2 / 3; 3 por defecto).
+- Selector «Cajas por bulto»: **dial circular** con arco de 240°, marcas finas y perilla, como el dial de la referencia (1 / 2 / 3; 3 por defecto). Se elige con un clic o arrastre sobre el arco, con los números 1, 2 y 3 o con las flechas del teclado; el centro muestra el valor y no lleva textos explicativos.
 - Selector «Formato de cartel» (control segmentado: E · Cuadros / A · Clásico).
 - Casilla «Imprimir FRÁGIL» (solo con el formato E).
 - Casilla «Imprimir FACTURA EN CAJA».
-- Campo de condición especial.
+- Campo de condición especial (dentro de los datos del cliente).
 - Casilla «Imprimir condición especial».
 - Botón **«Generar carteles»**.
 - Botón **«Imprimir»**.
@@ -419,7 +419,7 @@ Aprobado por el usuario a partir de las maquetas de la sesión de diseño y ajus
 
 - **Formato por defecto:** E. El formato elegido se mantiene al pulsar «Nuevo envío»; no se guarda en ningún lado, así que al recargar la página vuelve a E.
 - **Estructura, de arriba abajo.** Todo va en recuadros con la **misma línea simple** de borde negro (también el departamento), sin superposición:
-  1. **Franja superior** (solo si hay condición especial o «FACTURA EN CAJA»): la condición a la izquierda y «FACTURA EN CAJA» (fondo amarillo, solo Bulto 1) a la derecha. El lado que no tiene dato queda **en blanco, sin recuadro**.
+  1. **Franja superior** (solo si hay condición especial o «FACTURA EN CAJA»): si hay **ambas**, la condición va a la izquierda y «FACTURA EN CAJA» (fondo amarillo, solo Bulto 1) a la derecha; si hay **solo una**, esa ocupa **todo el ancho** de la franja (por ejemplo, «FACTURA EN CAJA» sola en el Bulto 1 y la condición sola en los demás carteles).
   2. **Nombre fantasía**, entre comillas y en negrita: es el **texto principal** del cartel, porque el servicio de cadetería se guía por él. Si no hay fantasía (o es igual a la razón social), la razón social ocupa este lugar como texto principal.
   3. **Razón social**, más chica y sin negrita, debajo de la fantasía.
   4. **Dirección y teléfono** («Tel: …») en dos celdas del mismo recuadro. El ancho de cada celda se reparte según el largo de su texto.
