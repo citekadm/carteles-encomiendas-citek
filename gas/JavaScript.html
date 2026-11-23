@@ -20,7 +20,7 @@
   function crearCartel(d) {
     var c = el('div', 'cartel');
     c.dataset.v = d.factura && d.n === 1 ? 'a' : 'b'; // variante de ajuste: con o sin FACTURA EN CAJA
-    c.appendChild(el('div', 'bulto', 'BULTO ' + d.n + ' DE ' + d.total));
+    c.appendChild(el('div', 'bulto', d.n + ' de ' + d.total));
     if (d.razon) c.appendChild(el('div', 'razon', d.razon));
     if (d.fantasia && norm(d.fantasia) !== norm(d.razon)) c.appendChild(el('div', 'fant', '\u201C' + d.fantasia + '\u201D'));
     if (d.dir) c.appendChild(el('div', 'dir', d.dir));
@@ -63,12 +63,11 @@
   // ---- Cartel formato E (cuadros) ----
   // Regla de texto: los tamaños de CSS son máximos. Cada texto se achica hasta entrar en su recuadro:
   // una palabra -> una sola línea; varias palabras -> hasta 2 líneas. Nunca se corta ni se abrevia.
-  var MIN_E = { razon: 20, fant: 14, dir: 14, tel: 14, cond: 14, factura: 20, bulto: 14, depto: 36 }; // px, mínimo legible
+  var MIN_E = { razon: 14, fant: 14, dir: 14, tel: 14, cond: 14, factura: 20, bulto: 14, depto: 36 }; // px, mínimo legible
   function crearCartelE(d, ancha) {
     var c = el('div', 'cartel cartel-e' + (ancha ? ' ancha' : ''));
     var hayTop = !!(d.factura || d.cond);
     c.dataset.v = d.factura ? 'a' : 'b'; // variante de ajuste: con o sin FACTURA EN CAJA
-    if (!hayTop) c.classList.add('sin-top');
     function fit(rol, txt, lineas) {
       var e = el('div', 'fit f-' + rol + (lineas === 1 ? ' uno' : ''), txt);
       e.dataset.r = rol; e.dataset.l = lineas;
@@ -81,36 +80,35 @@
       if (d.factura) der.appendChild(fit('factura', 'FACTURA EN CAJA', 1));
       top.appendChild(izq); top.appendChild(der); c.appendChild(top);
     }
+    // Nombre fantasía = texto principal (lo que ve el cadete). Si no hay, la razón social pasa a ser la principal.
     var fant = d.fantasia && norm(d.fantasia) !== norm(d.razon) ? '\u201C' + d.fantasia + '\u201D' : '';
-    if (d.razon || fant) {
-      var dest = el('div', 'e-box e-dest');
-      if (d.razon) dest.appendChild(fit('razon', d.razon, varias(d.razon)));
-      if (fant) dest.appendChild(fit('fant', fant, varias(fant)));
-      c.appendChild(dest);
-    }
+    if (fant) { var bf = el('div', 'e-box e-fant'); bf.appendChild(fit('fant', fant, varias(fant))); c.appendChild(bf); }
+    if (d.razon) { var br = el('div', 'e-box e-razon' + (fant ? '' : ' e-prim')); br.appendChild(fit('razon', d.razon, varias(d.razon))); c.appendChild(br); }
     if (d.dir || d.tel) {
-      var dt = el('div', 'e-box e-dt');
-      if (d.dir) { var a = el('div', 'e-celda e-dir'); var dir = d.dir.replace(/\s*\n\s*/g, ' '); a.appendChild(fit('dir', dir, varias(dir))); dt.appendChild(a); }
-      if (d.tel) { var t = el('div', 'e-celda e-tel'); t.appendChild(fit('tel', 'Tel: ' + d.tel, varias(d.tel))); dt.appendChild(t); }
+      var dt = el('div', 'e-box e-dt'), dir = d.dir.replace(/\s*\n\s*/g, ' '), tel = d.tel ? 'Tel: ' + d.tel : '';
+      // El ancho de cada celda se reparte según el largo de su texto, para que ambos crezcan parejo.
+      // Una dirección larga ocupa 2 líneas, así que necesita la mitad de ancho; el teléfono va siempre en una línea.
+      if (dir) { var a = el('div', 'e-celda'); a.style.flexGrow = Math.max(6, dir.length > 24 ? dir.length / 2 : dir.length); a.appendChild(fit('dir', dir, varias(dir))); dt.appendChild(a); }
+      if (tel) { var t = el('div', 'e-celda'); t.style.flexGrow = Math.max(6, tel.length); t.appendChild(fit('tel', tel, 1)); dt.appendChild(t); }
       c.appendChild(dt);
     }
     var dp = el('div', 'e-box e-depto');
     if (d.depto) dp.appendChild(fit('depto', d.depto, varias(d.depto)));
     c.appendChild(dp);
     var foot = el('div', 'e-foot'), b = el('div', 'e-box e-bulto'), r = el('div', 'e-box e-rte');
-    b.appendChild(fit('bulto', 'BULTO ' + d.n + ' DE ' + d.total, 1));
+    b.appendChild(fit('bulto', d.n + ' de ' + d.total, 1)); // solo los números: 1 de 5
     r.appendChild(el('div', 'rte1', 'Rte.: Citek Ltda.'));
     r.appendChild(el('div', 'rte2', 'Cerrito 282 bis - Tel.: 2915 5380'));
     r.appendChild(el('div', 'rte2', 'MONTEVIDEO'));
     foot.appendChild(b); foot.appendChild(r); c.appendChild(foot);
     return c;
   }
-  function entra(e) { // el texto cabe: sin desborde horizontal, dentro de las líneas permitidas y dentro de su recuadro
+  function entra(e) { // el texto cabe: sin desborde horizontal, dentro de las líneas permitidas y dentro del margen interno de su recuadro
     if (e.scrollWidth > e.clientWidth + 1) return false;
-    var lh = parseFloat(getComputedStyle(e).lineHeight), caja = e.closest('.e-box');
-    // Alto real del bloque (no scrollHeight: incluye unos px de holgura propios de la tipografía).
-    if (e.getBoundingClientRect().height > lh * (+e.dataset.l) + 2) return false;
-    return caja.scrollHeight <= caja.clientHeight + 3 && caja.scrollWidth <= caja.clientWidth + 1;
+    var lh = parseFloat(getComputedStyle(e).lineHeight), alto = e.getBoundingClientRect().height; // alto real del bloque
+    if (alto > lh * (+e.dataset.l) + 2) return false;
+    var p = e.parentElement, cs = getComputedStyle(p);
+    return alto <= p.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) + 0.5;
   }
   function fijarTam(e) { // mayor tamaño (px entero) entre el mínimo y el máximo de referencia que entra; devuelve {px, ok}
     var max = +e.dataset.max, min = Math.min(MIN_E[e.dataset.r], max), a = min, b = max, mejor = null;
@@ -148,7 +146,8 @@
     var caja = el('div');
     caja.style.cssText = 'position:absolute;left:-10000px;top:0;width:210mm;';
     document.body.appendChild(caja);
-    var c = crearCartelE(d, ancha);
+    var peor = {}; for (var k in d) peor[k] = d[k]; peor.n = d.total; // número más largo: todos los bultos comparten tamaño
+    var c = crearCartelE(peor, ancha);
     caja.appendChild(c);
     var r = ajustarE(c);
     document.body.removeChild(caja);
