@@ -48,7 +48,7 @@
 
 ## 3. Cantidad de cajas y bultos
 
-Probar todos estos valores y comprobar la cantidad de carteles:
+Probar todos estos valores **con 3 cajas por bulto (valor por defecto)** y comprobar la cantidad de carteles:
 
 | Cajas | Distribución | Bultos/carteles esperados |
 |---:|---|---:|
@@ -63,6 +63,25 @@ Probar todos estos valores y comprobar la cantidad de carteles:
 | 9 | 3 + 3 + 3 | 3 |
 | 10 | 3 + 3 + 3 + 1 | 4 |
 | 999 | 333 grupos de 3 | 333 |
+
+Con la opción «Cajas por bulto» (especificación 7.1). Verificado el 2026-11-21 con las autopruebas y la batería de `tools/pruebas/`:
+
+| Cajas | Por bulto | Bultos/carteles esperados | Hojas (2 por hoja) |
+|---:|---:|---:|---:|
+| 7 | 2 | 4 | 2 |
+| 5 | 1 | 5 | 3 |
+| 999 | 1 | 999 | 500 |
+| 5 | 2 | 3 | 3 (Frágil: una por hoja) |
+
+- [x] Con 2 cajas por bulto: 1→1, 2→1, 3→2, 4→2, 5→3, 7→4, 10→5, 999→500 bultos.
+- [x] Con 1 caja por bulto: los bultos son iguales a las cajas (1, 2, 5, 10 y 999).
+- [x] Un valor inválido de cajas por bulto se toma como 3.
+- [x] La numeración sigue siendo correlativa (`1 de 3`, `2 de 3`, `3 de 3`) y «FACTURA EN CAJA» sale solo en el primer cartel con cualquiera de las opciones.
+- [x] Cambiar la opción con los carteles ya generados actualiza la vista previa, el resumen y la distribución (por ejemplo «2+2+2+1 (2 cajas por bulto)»).
+- [x] «Nuevo envío» vuelve la opción a 3.
+- [x] 999 cajas de a 1: 999 carteles en 500 hojas, sin desbordes y con 500 páginas en el PDF.
+- [ ] Imprimir en papel un envío de cajas de a 1 y de a 2 y comprobar las hojas y la numeración.
+- [ ] Confirmar con el usuario que las opciones 1 y 2 se entienden como «máximo de cajas por bulto», agrupadas de a 1 o de a 2.
 
 Validaciones negativas:
 
@@ -178,19 +197,20 @@ Las marcas [x] corresponden a pruebas automáticas (la última el 2026-11-20, co
 
 ### 11.1 Ajuste de texto y contenido
 
-Resultados de la última corrida (2026-11-20, parte 1 de los ajustes). Todos los casos sin desbordes ni textos cortados. Tamaños del cartel 1:
+Resultados de la última corrida (2026-11-20, tras el margen de seguridad del 3 %). Todos los casos sin desbordes ni textos cortados. Tamaños del cartel 1:
 
 | Caso | Resultado |
 |---|---|
-| Datos cortos con factura y condición, 7 cajas | 2 hojas; fantasía 83 px, razón social 48 px, dirección y teléfono 44 px, departamento 105 px, bulto 70 px |
-| Razón social, fantasía y dirección largas, sin condición ni factura, 10 cajas | 2 hojas; fantasía 52 px en 2 líneas, razón social 29 px en 2 líneas, dirección 28 px en 2 líneas, teléfono 35 px en una línea |
-| Una sola palabra larguísima en razón social y fantasía | una línea; fantasía 34 px, razón social 28 px |
-| Sin teléfono y sin fantasía, departamento «Río Negro» | la razón social pasa a ser el texto principal (88 px); dirección 87 px |
+| Datos cortos con factura y condición, 7 cajas | 2 hojas; fantasía 80 px, razón social 46 px, dirección y teléfono 42 px, departamento 101 px, bulto 67 px |
+| Razón social, fantasía y dirección largas, sin condición ni factura, 10 cajas | 2 hojas; fantasía 50 px en 2 líneas, razón social 28 px en 2 líneas, dirección 27 px en 2 líneas, teléfono 33 px en una línea |
+| Una sola palabra larguísima en razón social y fantasía | una línea; fantasía 32 px, razón social 27 px |
+| Sin teléfono y sin fantasía, departamento «Río Negro» | la razón social pasa a ser el texto principal (85 px); dirección 84 px |
 | 999 cajas | 333 carteles en 167 hojas, sin desbordes, ajuste inmediato (menos de 1 s) |
-| FRÁGIL con datos cortos y 7 cajas | 3 hojas apaisadas; fantasía 87 px, departamento 158 px |
-| FRÁGIL con textos largos, condición larga y «Treinta y Tres» | 2 hojas; condición 18 px en 2 líneas, departamento 92 px |
+| FRÁGIL con datos cortos y 7 cajas | 3 hojas apaisadas; fantasía 84 px, departamento 153 px |
+| FRÁGIL con textos largos, condición larga y «Treinta y Tres» | 2 hojas; condición 17 px en 2 líneas, departamento 89 px en una línea |
 
-- [x] Todos los textos (menos el remitente) usan el mayor tamaño que entra en su recuadro; las direcciones cortas ya no quedan chicas.
+- [x] Todos los textos (menos el remitente) usan el mayor tamaño que entra en su recuadro (con un 3 % de margen); las direcciones cortas ya no quedan chicas.
+- [x] En el PDF de impresión de Chromium los textos no se parten ni se cortan (casos 1, 2 y 8 revisados mirando el PDF).
 - [x] El nombre fantasía es el texto principal y la razón social queda secundaria; sin fantasía, la razón social ocupa su lugar.
 - [x] El recuadro del departamento tiene línea simple, igual que los demás.
 - [x] El identificador del bulto dice solo `n de N` (`1 de 3`) en los formatos A y E.
@@ -208,7 +228,7 @@ Resultados de la última corrida (2026-11-20, parte 1 de los ajustes). Todos los
 - [x] Cambiar a A muestra el cartel clásico; FRÁGIL se apaga y se deshabilita.
 - [x] «Nuevo envío» mantiene el formato elegido y apaga FRÁGIL.
 - [x] El resumen muestra una hoja por bulto con FRÁGIL.
-- [x] Autopruebas (`autopruebas()`): 60 comprobaciones OK.
+- [x] Autopruebas (`autopruebas()`): 100 comprobaciones OK.
 
 ### 11.3 FRÁGIL y PNG
 
@@ -226,6 +246,24 @@ Resultados de la última corrida (2026-11-20, parte 1 de los ajustes). Todos los
 - [ ] Verificar la legibilidad del texto rojo y del fondo amarillo en la impresora en blanco y negro.
 - [ ] Comparar la hoja impresa con la vista previa.
 - [ ] Probar con la tipografía Times New Roman real de las PC (las medidas pueden variar levemente respecto de Liberation Serif).
+
+## 12. Aspecto de la interfaz (parte 3)
+
+Verificado el 2026-11-20 con capturas de Chromium sin interfaz (ventana de 1180 px y de 420 px de ancho). No reemplaza la revisión en las PC de uso.
+
+- [x] Tema oscuro con tarjetas con relieve, campos hundidos y acento violeta en toda la pantalla.
+- [x] El encabezado muestra el logo de CITEK en blanco, con un leve resplandor violeta, en lugar del título.
+- [ ] Revisar el logo en las PC de uso (nitidez y tamaño) y en una ventana angosta.
+- [x] Interruptores con perilla luminosa; el de FRÁGIL se atenúa cuando está deshabilitado.
+- [x] Control segmentado de formato: el clic en E o A cambia el formato; FRÁGIL se apaga y se deshabilita con A y se habilita con E; «Nuevo envío» mantiene el formato elegido.
+- [x] Botones «−» y «+»: desde vacío ponen 1; respetan el mínimo 1 y el máximo 999.
+- [x] Los botones «Imprimir», «Generar PNG» y «Nuevo envío» entran cada uno en una línea.
+- [x] Ventana emergente de «¿Agregar número de cuenta?» y sugerencias de búsqueda con el estilo nuevo.
+- [x] Con ventana angosta (420 px) las columnas se apilan.
+- [x] La impresión no cambia: los PDF de los ocho casos mantienen páginas y orientación.
+- [ ] Revisar en las PC de la oficina: legibilidad de las letras claras sobre fondo oscuro con la luz del lugar.
+- [ ] Revisar en Chrome real el aspecto de las ventanas emergentes y del selector (el desenfoque de fondo depende del navegador).
+- [ ] Confirmar con el usuario que no hace falta un tema claro.
 
 ## 10. Criterio de aprobación
 

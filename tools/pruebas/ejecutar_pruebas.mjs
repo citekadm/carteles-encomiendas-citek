@@ -22,6 +22,7 @@ for (const c of casos) {
   if ((await p.isChecked('#c-cond')) !== !!c.cond) await p.click('#c-cond', { force: true });
   if ((await p.isChecked('#c-factura')) !== !!c.factura) await p.click('#c-factura', { force: true });
   if (c.fragil) await p.click('#c-fragil', { force: true });
+  if (c.porBulto && c.porBulto !== 3) await p.click('#seg-porbulto button[data-v="' + c.porBulto + '"]'); // cajas por bulto (3 por defecto)
   const t0 = Date.now();
   await p.click('#b-generar');
   await p.waitForTimeout(400);
@@ -42,9 +43,10 @@ for (const c of casos) {
     out.aviso = document.getElementById('avisos').textContent;
     return out;
   });
+  if (c.bultos !== undefined && r.carteles !== c.bultos) r.mal.push('BULTOS: esperaba ' + c.bultos + ' y hay ' + r.carteles);
   console.log(c.id, '|', ms + ' ms | hojas', r.hojas, '| carteles', r.carteles, '| desbordes:', r.mal.length ? r.mal.slice(0, 5).join(', ') : 'ninguno', r.aviso ? '| AVISO: ' + r.aviso : '');
   console.log('   tamaños del cartel 1:', JSON.stringify(r.tam));
-  await p.screenshot({ path: path.join(salida, c.id + '.png'), fullPage: true });
+  await p.screenshot({ path: path.join(salida, c.id + '.png'), fullPage: r.hojas <= 20 }); // con cientos de hojas la captura completa excede la memoria del navegador
   await p.pdf({ path: path.join(salida, c.id + '.pdf'), preferCSSPageSize: true, printBackground: true });
   await p.emulateMedia({ media: 'screen' });
 }

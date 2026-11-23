@@ -117,8 +117,11 @@
       e.style.fontSize = m + 'px';
       if (entra(e)) { mejor = m; a = m + 1; } else { b = m - 1; }
     }
-    e.style.fontSize = (mejor === null ? min : mejor) + 'px';
-    return { px: mejor === null ? min : mejor, ok: mejor !== null };
+    // Margen de seguridad del 3 %: el ancho del texto varía unas décimas entre pantalla, vista previa reducida e impresión,
+    // y un texto justo en el límite podría pasar a 2 líneas y cortarse.
+    var px = mejor === null ? min : Math.max(min, Math.floor(mejor * 0.97));
+    e.style.fontSize = px + 'px';
+    return { px: px, ok: mejor !== null };
   }
   // Ajusta un cartel E ya insertado en el DOM. Devuelve {ok, sizes:{rol:px}}.
   function ajustarE(c) {
@@ -174,7 +177,7 @@
     var v = Reglas.validarCajas(estado.cajas);
     limpiarSalida();
     if (!v.ok) return; // sin cantidad válida no se genera nada; el resumen muestra el motivo
-    var lista = Reglas.descriptores(v.valor, { factura: estado.factura, condActiva: estado.condActiva, condTexto: estado.cond })
+    var lista = Reglas.descriptores(v.valor, { porBulto: estado.porBulto, factura: estado.factura, condActiva: estado.condActiva, condTexto: estado.cond })
       .map(function (d) { return datosCartel(estado, d); });
     // Un solo ajuste por variante (con factura / sin factura): 333 carteles no implican 333 mediciones.
     var E = estado.formato === 'E', fr = E && estado.fragil;
@@ -320,13 +323,15 @@
       if (v < 1 || v > 999) return { ok: false, mensaje: 'La cantidad de cajas debe estar entre 1 y 999.' };
       return { ok: true, valor: v };
     },
-    bultos: function (cajas) { return Math.ceil(cajas / 3); },
+    // Cajas por bulto: 3 (apilables, el caso habitual) o 1 / 2 (cajas que no se pueden apilar de a 3). Cualquier otro valor se toma como 3.
+    porBultoValido: function (n) { n = Number(n); return n === 1 || n === 2 ? n : 3; },
+    bultos: function (cajas, porBulto) { return Math.ceil(cajas / Reglas.porBultoValido(porBulto)); },
     hojas: function (bultos, fragil) { return fragil ? bultos : Math.ceil(bultos / 2); }, // FRÁGIL: un cartel por hoja
     // Solo para el resumen en pantalla; nunca se imprime en el cartel.
-    agrupacion: function (cajas) {
-      var g = Math.floor(cajas / 3), r = cajas % 3, p = [], i;
-      if (g <= 4) { for (i = 0; i < g; i++) p.push('3'); if (r) p.push(String(r)); return p.join('+'); }
-      return g + ' × 3' + (r ? ' + ' + r : '');
+    agrupacion: function (cajas, porBulto) {
+      var k = Reglas.porBultoValido(porBulto), g = Math.floor(cajas / k), r = cajas % k, p = [], i;
+      if (g <= 4) { for (i = 0; i < g; i++) p.push(String(k)); if (r) p.push(String(r)); return p.join('+'); }
+      return g + ' × ' + k + (r ? ' + ' + r : '');
     },
     // Clientes de la base con la misma razón social (sin distinguir mayúsculas ni tildes).
     existentes: function (lista, razon) {
@@ -336,7 +341,7 @@
     condPorDefecto: function (t) { return String(t || '').trim() !== ''; },
     // Un descriptor por bulto: numeración correlativa, factura solo en el 1, condición en todos.
     descriptores: function (cajas, o) {
-      var total = Reglas.bultos(cajas), texto = String(o.condTexto || '').trim(), out = [];
+      var total = Reglas.bultos(cajas, o.porBulto), texto = String(o.condTexto || '').trim(), out = [];
       for (var n = 1; n <= total; n++) {
         out.push({ n: n, total: total, factura: !!o.factura && n === 1, cond: o.condActiva && texto ? texto : '' });
       }
@@ -369,6 +374,18 @@
     });
     ['0', '-1', '1.5', 'abc', '1000', '1e2', ' ', '2 3', '', '+5'].forEach(function (t) { eq('rechaza "' + t + '"', Reglas.validarCajas(t).ok, false); });
     [['1', 1], ['999', 999], [' 7 ', 7]].forEach(function (p) { eq('acepta "' + p[0] + '"', Reglas.validarCajas(p[0]).valor, p[1]); });
+    // cajas por bulto 1 y 2 (cajas que no se apilan de a 3)
+    [[1, 2, 1], [2, 2, 1], [3, 2, 2], [4, 2, 2], [5, 2, 3], [7, 2, 4], [10, 2, 5], [999, 2, 500],
+     [1, 1, 1], [2, 1, 2], [5, 1, 5], [10, 1, 10], [999, 1, 999], [7, 3, 3], [999, 3, 333]].forEach(function (p) {
+      eq('bultos(' + p[0] + ' cajas, ' + p[1] + ' por bulto)', Reglas.bultos(p[0], p[1]), p[2]);
+      eq('descriptores(' + p[0] + ', ' + p[1] + ')', Reglas.descriptores(p[0], { porBulto: p[1] }).length, p[2]);
+    });
+    eq('por bulto inválido -> 3', Reglas.bultos(7, 5), 3); eq('por bulto 0 -> 3', Reglas.bultos(7, 0), 3); eq('por bulto texto -> 3', Reglas.bultos(7, 'x'), 3);
+    eq('por bulto "2" (texto)', Reglas.bultos(7, '2'), 4);
+    eq('agrupa 7 de a 2', Reglas.agrupacion(7, 2), '2+2+2+1'); eq('agrupa 4 de a 1', Reglas.agrupacion(4, 1), '1+1+1+1');
+    eq('agrupa 10 de a 1', Reglas.agrupacion(10, 1), '10 × 1'); eq('agrupa 11 de a 2', Reglas.agrupacion(11, 2), '5 × 2 + 1');
+    eq('numeración con 2 por bulto', Reglas.descriptores(5, { porBulto: 2 }).map(function (d) { return d.n + '/' + d.total; }).join(' '), '1/3 2/3 3/3');
+    eq('factura solo en el 1 (1 por bulto)', Reglas.descriptores(3, { porBulto: 1, factura: true }).map(function (d) { return d.factura; }).join(), 'true,false,false');
     eq('agrupa 4', Reglas.agrupacion(4), '3+1'); eq('agrupa 7', Reglas.agrupacion(7), '3+3+1');
     eq('agrupa 10', Reglas.agrupacion(10), '3+3+3+1'); eq('agrupa 999', Reglas.agrupacion(999), '333 × 3');
     var d = Reglas.descriptores(7, { factura: true, condActiva: true, condTexto: ' Enviar por Nuñez ' });
@@ -399,7 +416,7 @@
   var CAMPOS = { razon: 'f-razon', fantasia: 'f-fantasia', dir: 'f-dir', tel: 'f-tel', depto: 'f-depto' };
   var estado, sel = -1, sugerencias = [];
   function estadoVacio() {
-    return { origen: 'manual', cuenta: '', razon: '', fantasia: '', dir: '', tel: '', depto: '', cond: '', condActiva: false, condManual: false, factura: true, cajas: '', formato: 'E', fragil: false };
+    return { origen: 'manual', cuenta: '', razon: '', fantasia: '', dir: '', tel: '', depto: '', cond: '', condActiva: false, condManual: false, factura: true, cajas: '', porBulto: 3, formato: 'E', fragil: false };
   }
   function resumen() {
     var v = Reglas.validarCajas(estado.cajas), t = $('resumen-txt');
@@ -409,10 +426,30 @@
       t.textContent = v.mensaje;
       return;
     }
-    var fr = estado.formato === 'E' && estado.fragil, b = Reglas.bultos(v.valor), h = Reglas.hojas(b, fr);
+    var fr = estado.formato === 'E' && estado.fragil, b = Reglas.bultos(v.valor, estado.porBulto), h = Reglas.hojas(b, fr);
     $('s-cajas').textContent = v.valor; $('s-bultos').textContent = b; $('s-hojas').textContent = h;
-    t.textContent = 'Distribución: ' + Reglas.agrupacion(v.valor) + (fr ? ' · FRÁGIL: un cartel por hoja A4 apaisada.' : (b % 2 ? ' · la mitad inferior de la última hoja queda vacía.' : '.'));
+    t.textContent = 'Distribución: ' + Reglas.agrupacion(v.valor, estado.porBulto) + (estado.porBulto !== 3 ? ' (' + estado.porBulto + (estado.porBulto === 1 ? ' caja' : ' cajas') + ' por bulto)' : '') + (fr ? ' · FRÁGIL: un cartel por hoja A4 apaisada.' : (b % 2 ? ' · la mitad inferior de la última hoja queda vacía.' : '.'));
   }
+  function pintarFormato() { // el selector visual (E / A) refleja el formato elegido; el <select> oculto guarda el valor
+    Array.prototype.forEach.call(document.querySelectorAll('#seg-formato button'), function (b) {
+      var on = b.dataset.v === estado.formato;
+      b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#seg-formato button'), function (b) {
+    b.onclick = function () { var f = $('f-formato'); f.value = b.dataset.v; f.dispatchEvent(new Event('change', { bubbles: true })); };
+  });
+  function pintarPorBulto() { // selector 1 / 2 / 3 cajas por bulto
+    Array.prototype.forEach.call(document.querySelectorAll('#seg-porbulto button'), function (b) {
+      var on = Number(b.dataset.v) === estado.porBulto;
+      b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+    $('nota-porbulto').hidden = estado.porBulto === 3;
+    $('nota-porbulto').textContent = 'Cada bulto lleva como máximo ' + estado.porBulto + (estado.porBulto === 1 ? ' caja' : ' cajas') + ': para cajas que no se pueden apilar de a 3.';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#seg-porbulto button'), function (b) {
+    b.onclick = function () { estado.porBulto = Reglas.porBultoValido(b.dataset.v); pintarPorBulto(); resumen(); actualizar(); };
+  });
   function sincronizarFragil() { // FRÁGIL solo existe con el formato E
     $('c-fragil').checked = estado.fragil; $('c-fragil').disabled = estado.formato !== 'E';
     $('c-fragil').closest('label').style.opacity = estado.formato !== 'E' ? '.5' : '';
@@ -422,7 +459,7 @@
     for (var k in CAMPOS) $(CAMPOS[k]).value = estado[k];
     $('f-cond').value = estado.cond; $('c-cond').checked = estado.condActiva;
     $('c-factura').checked = estado.factura; $('f-cajas').value = estado.cajas;
-    $('f-formato').value = estado.formato; sincronizarFragil();
+    $('f-formato').value = estado.formato; pintarFormato(); pintarPorBulto(); sincronizarFragil();
     $('origen').textContent = estado.origen === 'base'
       ? 'De la base · ' + (estado.cuenta ? 'cuenta ' + estado.cuenta : 'sin cuenta') + ' · cambios solo para este envío'
       : 'Cliente manual · aún no está en la base';
@@ -476,7 +513,7 @@
   $('c-factura').addEventListener('change', function () { estado.factura = this.checked; });
   $('f-formato').addEventListener('change', function () {
     estado.formato = this.value; if (estado.formato !== 'E') estado.fragil = false;
-    sincronizarFragil(); resumen();
+    pintarFormato(); sincronizarFragil(); resumen();
   });
   $('c-fragil').addEventListener('change', function () { estado.fragil = this.checked; sincronizarFragil(); resumen(); });
   $('f-cajas').addEventListener('input', function () { estado.cajas = this.value; resumen(); });
