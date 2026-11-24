@@ -1,14 +1,14 @@
 # Contexto de sesión y próximos pasos
 
 **Proyecto:** Carteles de encomiendas — Citek  
-**Última actualización:** 2026-11-23 (partes 1 y 3 terminadas más los últimos cambios de logo y cajas por bulto; la parte 2, la marca de agua en el cartel impreso, sigue pendiente a pedido del usuario).  
+**Última actualización:** 2026-11-24 (partes 1, 2 y 3 hechas; la marca de agua del logo es provisional hasta probarla impresa).  
 **Para qué sirve este documento:** que otra sesión (con Claude u otra persona) retome el trabajo sin repetir preguntas ni perder decisiones.
 
 ## 1. Cómo retomar
 
 1. Leer `README.md`, este documento y `docs/ESPECIFICACION_FUNCIONAL.md` (en especial las secciones 4.1, 15.5, 15.6 y 15.7).
 2. Verificar el estado real del repositorio antes de tocar nada (`git ls-remote --heads`), porque el usuario también edita desde la web de GitHub.
-3. Trabajar en una rama nueva a partir de `ajustes-detalles-4` (ver sección 2) y no sobre `main`.
+3. Trabajar en una rama nueva a partir de `logo-marca-de-agua` (o de `main` si ya se integró) (ver sección 2) y no sobre `main`.
 4. No hacer todo a la vez: dividir el pedido en partes, terminar una, probarla y dejar contexto antes de seguir (preferencia expresa del usuario).
 5. Todo cambio funcional se registra en la especificación y en el plan de pruebas en el mismo cambio. Ante contradicciones, consultar al usuario antes de implementar.
 
@@ -25,7 +25,8 @@ Repositorio: `citekadm/carteles-encomiendas-citek`. Las ramas de trabajo están 
 | `ajustes-cartel-parte-1` | Parte 1: fantasía como texto principal, tamaños máximos, departamento con línea simple, bulto solo con números (sección 3). |
 | `estetica-parte-3` | Parte 3: nuevo aspecto de la aplicación (sección 4). |
 | `logo-y-bultos` | Logo de CITEK en el encabezado y selector «Cajas por bulto» 1 / 2 / 3 (sección 5). Ya integrada en `main`. |
-| `ajustes-detalles-4` | Ronda de detalles: franja superior a todo el ancho, dial de cajas por bulto y nueva disposición (sección 6). **La más reciente.** |
+| `ajustes-detalles-4` | Ronda de detalles: franja superior a todo el ancho, dial de cajas por bulto y nueva disposición (sección 6). Ya integrada en `main`. |
+| `logo-marca-de-agua` | Parte 2: logo de CITEK como marca de agua, con selector (sección 8). **La más reciente.** |
 
 - `main` está más atrás: todavía no tiene nada de lo anterior. Nada se integró aún; falta que el usuario revise y haga los pull requests (de la rama más reciente contra `etapa-5-6-carteles`).
 - Existen además `citekadm-patch-1` y `citekadm-patch-2`, ediciones hechas por el usuario desde la web que **no se revisaron**.
@@ -96,26 +97,19 @@ Pedido del usuario, con una captura de la nueva disposición, y resultado:
 - Margen de seguridad del 3 % en los tamaños de letra: los textos quedan un poco más chicos que el máximo que entra.
 - **Cajas por bulto:** se interpretó como «máximo de cajas por bulto» (1, 2 o 3), agrupadas de a *k* con el resto en el último bulto, y la opción es de todo el envío (no por bulto). Si se quisiera mezclar bultos de distinto tamaño en un mismo envío, habría que cambiar el diseño.
 - El título visible «Carteles de encomiendas» se quitó por completo a favor del logo.
+- Marca de agua: se aplicó también al formato A y a FRÁGIL, y se dejó «Sin logo» como valor por defecto para no alterar los carteles actuales.
 - Dial: el centro no responde a clics, y los números 1, 2 y 3 alrededor del arco son clicables. La vista previa nunca supera los 360 px de ancho aunque la columna sea más ancha.
 
-## 8. Pendiente — Parte 2: logo como marca de agua (provisional)
+## 8. Parte 2 hecha (provisional): logo como marca de agua
 
-Pedido del usuario: **provisional, a definir tras probar la impresión**. Implementar las dos opciones para poder compararlas:
+Pedido del usuario: probar cómo quedaría el logo como marca de agua, con dos opciones: **1) solo en el remitente** y **2) en toda la hoja, centrado, por debajo de todo el texto**. La decisión final se toma después de imprimir las muestras.
 
-- **Opción a:** logo como marca de agua en la zona del remitente.
-- **Opción b:** logo como marca de agua en toda la media hoja A4.
-
-Nota: ya existe `docs/referencias/Logo_Citek_blanco.png`, pero está hecha para la pantalla (blanca, sobre fondo oscuro). Para la marca de agua impresa hay que preparar una versión gris clara a partir del original.
-
-Archivo original: `docs/referencias/Logo_Citek.png` (logo rojo «CITEK» con sombra gris, fondo blanco, 1080 × 490 px).
-
-Consideraciones técnicas para quien lo implemente:
-
-- Las impresoras son en blanco y negro: la marca debe ser **muy clara** (gris suave) para no perjudicar la lectura. Conviene preparar una versión en escala de grises y con transparencia, embebida en el HTML (Apps Script no sirve archivos sueltos).
-- Usar un elemento `<img>` (no `background-image`) para que Chrome lo imprima aunque «Gráficos de fondo» esté desactivado.
-- En la opción b los recuadros hoy tienen fondo blanco (`.e-box`): habría que hacerlos transparentes, salvo el amarillo de la factura.
-- Probable diseño: un selector «Logo de fondo» con «Sin logo / En remitente / En todo el cartel». Decidir si aplica también al formato A y a FRÁGIL, y si el PNG lo incluye.
-- Actualizar especificación (nueva sección), plan de pruebas y verificar que el ajuste de texto no cambia.
+- **Selector «Logo de fondo»** en la tarjeta de envío: Sin logo (por defecto) / Remitente / Cartel. Se mantiene al pulsar «Nuevo envío». Vale para el formato A, el E, FRÁGIL y el PNG. Detalle en la especificación 15.8.
+- **Imagen:** `docs/referencias/Logo_Citek_marca_de_agua.png` (negra con transparencia, 640 × 228 px), derivada del logo original. Dentro de la aplicación está incrustada como constante `LOGO_MARCA` en `gas/JavaScript.html` (unos 12 KB en base64). Es un `<img>`, no un fondo de CSS, para que se imprima con «Gráficos de fondo» desactivado.
+- **Intensidad:** opacidad 12 % (remitente) y 9 % (cartel), en `gas/Styles.html` (`.marca-rte`, `.marca-rte-a`, `.marca-todo`). En la opción «Cartel» los recuadros del formato E pasan a fondo transparente (`.logo-todo .e-box`).
+- **Funciones:** `marca()`, y el parámetro `logo` de `crearCartel` y `crearCartelE`; `pintarLogo()` refleja la opción en pantalla. El logo no entra en la medición de textos, así que no cambia los tamaños.
+- **Muestras para imprimir:** se generaron dos PDF de tres hojas (sin logo, remitente, cartel), uno por formato.
+- **Pendiente:** imprimirlas en la impresora de la oficina, elegir la opción final, afinar la intensidad y decidir si el selector queda o pasa a ser fijo.
 
 ## 9. Parte 3 hecha: ideas por si se quiere seguir afinando la estética
 

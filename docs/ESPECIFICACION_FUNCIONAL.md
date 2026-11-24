@@ -314,6 +314,7 @@ Controles y acciones:
 - Cantidad de cajas, con botones circulares «−» y «+» que restan o suman 1 entre 1 y 999.
 - Selector «Cajas por bulto»: **dial circular** con arco de 240°, marcas finas y perilla, como el dial de la referencia (1 / 2 / 3; 3 por defecto). Se elige con un clic o arrastre sobre el arco, con los números 1, 2 y 3 o con las flechas del teclado; el centro muestra el valor y no lleva textos explicativos.
 - Selector «Formato de cartel» (control segmentado: E · Cuadros / A · Clásico).
+- Selector «Logo de fondo» (control segmentado: Sin logo / Remitente / Cartel), provisional (sección 15.8).
 - Casilla «Imprimir FRÁGIL» (solo con el formato E).
 - Casilla «Imprimir FACTURA EN CAJA».
 - Campo de condición especial (dentro de los datos del cliente).
@@ -451,3 +452,16 @@ Aprobado por el usuario a partir de las maquetas de la sesión de diseño y ajus
 - El identificador del bulto se mide con el número más largo del envío (el último bulto), así todos los carteles lo muestran con el mismo tamaño.
 - Nunca se corta ni se abrevia un texto. Los mínimos legibles son 14 px (factura 20 px, departamento 36 px); si no entra ni con el mínimo, se avisa en pantalla.
 - El ajuste se mide una vez por variante del envío (con y sin «FACTURA EN CAJA»). Si un bulto no tiene franja superior y otro sí, sus tamaños pueden diferir, porque el espacio disponible es distinto.
+
+### 15.8 Logo de CITEK como marca de agua (provisional)
+
+Se implementaron dos opciones para compararlas impresas; la decisión final se toma después de probar en papel.
+
+- **Selector «Logo de fondo»:** «Sin logo» (valor por defecto, el cartel no cambia), «Remitente» o «Cartel».
+- **Opción «Remitente»:** el logo va centrado detrás del texto del remitente (en el formato E, dentro de su recuadro; en el formato A, detrás de las tres líneas del remitente).
+- **Opción «Cartel»:** el logo va centrado detrás de todo el cartel, al 60 % del ancho. En el formato E los recuadros pasan a fondo transparente (excepto el amarillo de «FACTURA EN CAJA») para que el logo se vea por debajo del texto.
+- **Aplicación:** vale para los dos formatos (A y E), para FRÁGIL y para el PNG. No afecta al ajuste de tamaños de texto.
+- **Intensidad:** el logo es una imagen negra con transparencia y se muestra con una opacidad baja (remitente 12 %, cartel 9 %), de modo que en impresoras en blanco y negro sale como una trama gris clara y no perjudica la lectura. Los valores están en `gas/Styles.html` (`.marca-rte`, `.marca-rte-a`, `.marca-todo`).
+- **Impresión:** el logo es una imagen del documento, no un fondo de CSS, por lo que Chrome la imprime aunque «Gráficos de fondo» esté desactivado.
+- El formato y el logo elegidos se mantienen al pulsar «Nuevo envío».
+- **Decisión pendiente:** cuál de las opciones se conserva (si alguna), con qué intensidad y si el selector queda o pasa a ser una opción fija.

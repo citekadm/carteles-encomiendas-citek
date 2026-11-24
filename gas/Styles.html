@@ -169,6 +169,19 @@ input.switch:focus-visible, .btn:focus-visible, .btn-paso:focus-visible, .seg bu
 .e-rte .rte2 { color: #f00; font-size: 17px; line-height: 1.05; }
 .e-fant .fit, .e-prim .fit, .e-depto .fit, .e-cond .fit, .e-factura .fit, .e-bulto .fit { font-weight: 700; }
 .e-depto .fit, .e-cond .fit, .e-factura .fit { text-transform: uppercase; }
+/* Marca de agua del logo (provisional). «rte»: detrás del remitente. «todo»: centrado detrás de todo el cartel.
+   Es una imagen negra con transparencia: la opacidad la vuelve un gris suave (en impresoras en blanco y negro sale como trama clara). */
+.cartel { position: relative; }
+.marca { position: absolute; z-index: 0; pointer-events: none; user-select: none; }
+.cartel > :not(.marca) { position: relative; z-index: 1; }
+.cartel-e .e-box { position: relative; z-index: 1; }
+.marca-todo { left: 50%; top: 50%; width: 60%; height: auto; transform: translate(-50%,-50%); opacity: .09; }
+.logo-todo .e-box:not(.e-factura) { background: transparent; }
+.logo-todo .cond { background: transparent; } /* para que se vea el logo por detrás de los recuadros */
+.e-rte { position: relative; }
+.e-rte > :not(.marca) { position: relative; z-index: 1; }
+.marca-rte { left: 50%; top: 50%; height: 80%; width: auto; transform: translate(-50%,-50%); opacity: .12; }
+.marca-rte-a { left: 50%; bottom: 4mm; height: 23mm; width: auto; transform: translateX(-50%); opacity: .12; }
 /* FRÁGIL: una hoja A4 apaisada por bulto; cartel al centro y dos franjas laterales solo con contorno (sin relleno, para ahorrar tinta) */
 .hoja.fragil { width: 297mm; height: 209mm; display: flex; align-items: stretch; }
 .barra-fragil { flex: none; width: 33.3mm; margin: 6.35mm 0 6.35mm 6.35mm; border: 1.3mm solid #000; background: #fff; color: #000; display: flex; align-items: center; justify-content: center;

@@ -279,6 +279,21 @@ Verificado el 2026-11-23 con Chromium sin interfaz (pantallas de 1180 × 900 y d
 - [ ] Revisar el dial con pantalla táctil y en las PC de la oficina.
 - [ ] Revisar la vista previa en una ventana angosta (menos de 1000 px) y en una pantalla muy ancha.
 
+## 14. Logo de fondo (marca de agua, provisional)
+
+Verificado el 2026-11-24 con Chromium sin interfaz: batería de `tools/pruebas/` (16 casos, 100 autopruebas, sin desbordes, páginas correctas en los PDF) y capturas de las tres variantes.
+
+- [x] «Sin logo» (por defecto): el cartel es idéntico al de antes.
+- [x] «Remitente»: el logo aparece detrás del texto del remitente, en los formatos E y A.
+- [x] «Cartel»: el logo aparece centrado detrás de todo el texto; en el formato E los recuadros dejan ver el logo y el amarillo de la factura se mantiene.
+- [x] Con FRÁGIL y con el formato A también se muestra el logo, sin desbordes.
+- [x] El PNG exportado incluye el logo (1240 × 874 px).
+- [x] El logo no cambia los tamaños de letra ni la paginación.
+- [x] Se generaron PDFs de muestra (tres hojas cada uno: sin logo, remitente, cartel) para los formatos E y A.
+- [ ] Imprimir las muestras en la impresora de la oficina (blanco y negro) y comprobar que el texto se lee bien, sobre todo las líneas pequeñas del remitente.
+- [ ] Decidir la opción final y su intensidad (hoy 12 % en el remitente y 9 % en todo el cartel); ajustar si hace falta.
+- [ ] Probar la impresión con la opción «Cartel» y «Gráficos de fondo» desactivado.
+
 ## 10. Criterio de aprobación
 
 La versión solo se acepta cuando todos los puntos críticos están verificados, especialmente:

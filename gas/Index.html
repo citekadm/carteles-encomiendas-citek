@@ -68,6 +68,12 @@
             <button type="button" role="radio" data-v="A">A · Clásico</button>
           </div>
           <select id="f-formato" class="oculto" tabindex="-1" aria-hidden="true"><option value="E">E · Cuadros</option><option value="A">A · Clásico</option></select>
+          <label class="f" id="l-logo">Logo de fondo</label>
+          <div class="seg" id="seg-logo" role="radiogroup" aria-labelledby="l-logo">
+            <button type="button" role="radio" data-v="no">Sin logo</button>
+            <button type="button" role="radio" data-v="rte">Remitente</button>
+            <button type="button" role="radio" data-v="todo">Cartel</button>
+          </div>
           <label class="sw"><span>Imprimir FRÁGIL</span><input type="checkbox" class="switch" id="c-fragil"></label>
           <p id="nota-fragil" class="nota" hidden>Frágil: se imprime un cartel por hoja A4 apaisada, con «FRÁGIL» en los laterales. Elegí orientación horizontal si el navegador no la toma solo.</p>
           <label class="sw"><span>Imprimir FACTURA EN CAJA</span><input type="checkbox" class="switch" id="c-factura" checked></label>
