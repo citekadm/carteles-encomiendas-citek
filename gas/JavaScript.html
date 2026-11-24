@@ -74,11 +74,11 @@
       return e;
     }
     var varias = function (t) { return /\s/.test(String(t).trim()) ? 2 : 1; };
-    if (hayTop) { // condición y factura comparten la franja superior; el lado sin dato queda en blanco
-      var top = el('div', 'e-top'), izq = el('div', d.cond ? 'e-box e-cond' : 'e-vacio'), der = el('div', d.factura ? 'e-box e-factura' : 'e-vacio');
-      if (d.cond) izq.appendChild(fit('cond', d.cond, varias(d.cond)));
-      if (d.factura) der.appendChild(fit('factura', 'FACTURA EN CAJA', 1));
-      top.appendChild(izq); top.appendChild(der); c.appendChild(top);
+    if (hayTop) { // condición y factura comparten la franja superior; si hay solo una, ocupa todo el ancho
+      var top = el('div', 'e-top');
+      if (d.cond) { var bc = el('div', 'e-box e-cond'); bc.appendChild(fit('cond', d.cond, varias(d.cond))); top.appendChild(bc); }
+      if (d.factura) { var bfa = el('div', 'e-box e-factura'); bfa.appendChild(fit('factura', 'FACTURA EN CAJA', 1)); top.appendChild(bfa); }
+      c.appendChild(top);
     }
     // Nombre fantasía = texto principal (lo que ve el cadete). Si no hay, la razón social pasa a ser la principal.
     var fant = d.fantasia && norm(d.fantasia) !== norm(d.razon) ? '\u201C' + d.fantasia + '\u201D' : '';
@@ -164,6 +164,14 @@
     return h;
   }
 
+  function escalarVista() { // ajusta el zoom de la vista previa al ancho disponible de su tarjeta (con un tope para pantallas anchas)
+    var v = $('vista'), h = v.firstChild;
+    if (!h) return;
+    var ancho = Math.min($('prev').clientWidth - 44, 360), base = h.classList.contains('fragil') ? 1123 : 794;
+    if (ancho > 40) v.style.zoom = (ancho / base).toFixed(4);
+  }
+  window.addEventListener('resize', escalarVista);
+
   // ---- Generación de carteles y vista previa (misma estructura que la impresión) ----
   var generado = false, timer = null;
   function datosCartel(e, d) { // datos del formulario + descriptor del bulto
@@ -171,7 +179,7 @@
       dir: e.dir.trim(), tel: e.tel.trim(), depto: e.depto.trim() };
   }
   function limpiarSalida() {
-    $('vista').textContent = ''; $('impresion').textContent = ''; $('avisos').textContent = ''; $('prev').hidden = true;
+    $('vista').textContent = ''; $('impresion').textContent = ''; $('avisos').textContent = ''; $('prev-info').textContent = '';
   }
   function renderCarteles() {
     var v = Reglas.validarCajas(estado.cajas);
@@ -183,7 +191,6 @@
     var E = estado.formato === 'E', fr = E && estado.fragil;
     // Con FRÁGIL la hoja es apaisada: la regla @page se agrega aparte para no afectar al resto de los formatos.
     $('pagina').textContent = fr ? '@page { size: A4 landscape; margin: 0; }' : '';
-    $('vista').className = 'vista' + (fr ? ' fragil' : '');
     var ks = {}, fallos = [];
     var med = E ? function (d) { return medirE(d, fr); } : medir;
     if (lista[0].factura) { ks.a = med(lista[0]); if (!ks.a.ok) fallos.push('el bulto 1 (con FACTURA EN CAJA)'); }
@@ -208,7 +215,7 @@
     $('impresion').appendChild(frag);
     $('vista').appendChild($('impresion').firstChild.cloneNode(true));
     $('prev-info').textContent = 'Hoja 1 de ' + Reglas.hojas(lista.length, fr) + ' · ' + lista.length + (lista.length > 1 ? ' carteles' : ' cartel');
-    $('prev').hidden = false;
+    escalarVista();
     if (fallos.length) $('avisos').textContent = 'Atención: en ' + fallos.join(' y en ') + ' el texto no entra ni con el tamaño mínimo. Revisá la longitud de los datos.';
   }
   // Una vez generados, cualquier cambio del formulario actualiza la vista previa.
@@ -439,17 +446,59 @@
   Array.prototype.forEach.call(document.querySelectorAll('#seg-formato button'), function (b) {
     b.onclick = function () { var f = $('f-formato'); f.value = b.dataset.v; f.dispatchEvent(new Event('change', { bubbles: true })); };
   });
-  function pintarPorBulto() { // selector 1 / 2 / 3 cajas por bulto
-    Array.prototype.forEach.call(document.querySelectorAll('#seg-porbulto button'), function (b) {
-      var on = Number(b.dataset.v) === estado.porBulto;
-      b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
-    });
-    $('nota-porbulto').hidden = estado.porBulto === 3;
-    $('nota-porbulto').textContent = 'Cada bulto lleva como máximo ' + estado.porBulto + (estado.porBulto === 1 ? ' caja' : ' cajas') + ': para cajas que no se pueden apilar de a 3.';
+  // Dial de cajas por bulto (1, 2 o 3): arco de 240° con tres posiciones (-120°, 0° y +120°, medidos desde arriba hacia la derecha).
+  var DIAL = { cx: 80, cy: 76, r: 52, ang: { 1: -120, 2: 0, 3: 120 } };
+  function dialPol(a, r) { var t = a * Math.PI / 180; return [DIAL.cx + r * Math.sin(t), DIAL.cy - r * Math.cos(t)]; }
+  function dialArco(a1, a2, r) {
+    var p = dialPol(a1, r), q = dialPol(a2, r);
+    return 'M' + p[0].toFixed(2) + ' ' + p[1].toFixed(2) + ' A' + r + ' ' + r + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 1 ' + q[0].toFixed(2) + ' ' + q[1].toFixed(2);
   }
-  Array.prototype.forEach.call(document.querySelectorAll('#seg-porbulto button'), function (b) {
-    b.onclick = function () { estado.porBulto = Reglas.porBultoValido(b.dataset.v); pintarPorBulto(); resumen(); actualizar(); };
-  });
+  function pintarPorBulto() {
+    var v = estado.porBulto, ang = DIAL.ang[v], svg = '', a, p, q;
+    svg += '<path class="base" d="' + dialArco(-120, 120, DIAL.r) + '"/><path class="pista" d="' + dialArco(-120, 120, DIAL.r) + '"/>';
+    for (a = -120; a <= 120; a += 8) { // marcas finas; las tres posiciones, más largas
+      var fuerte = a === -120 || a === 0 || a === 120;
+      p = dialPol(a, fuerte ? 36 : 39); q = dialPol(a, 44);
+      svg += '<line class="marca' + (a <= ang ? ' on' : '') + (fuerte ? ' fuerte' : '') + '" x1="' + p[0].toFixed(2) + '" y1="' + p[1].toFixed(2) + '" x2="' + q[0].toFixed(2) + '" y2="' + q[1].toFixed(2) + '"/>';
+    }
+    if (ang > -120) svg += '<path class="prog" d="' + dialArco(-120, ang, DIAL.r) + '"/>';
+    p = dialPol(ang, DIAL.r);
+    svg += '<circle class="perilla" cx="' + p[0].toFixed(2) + '" cy="' + p[1].toFixed(2) + '" r="7"/>';
+    $('dial-porbulto').querySelector('svg').innerHTML = svg;
+    $('dial-num').textContent = v;
+    var d = $('dial-porbulto');
+    d.setAttribute('aria-valuenow', v); d.setAttribute('aria-valuetext', v + (v === 1 ? ' caja por bulto' : ' cajas por bulto'));
+    Array.prototype.forEach.call(d.querySelectorAll('.dial-pos'), function (b) { b.classList.toggle('on', Number(b.dataset.v) === v); });
+  }
+  function elegirPorBulto(n) {
+    n = Reglas.porBultoValido(n);
+    if (n === estado.porBulto) return;
+    estado.porBulto = n; pintarPorBulto(); resumen(); actualizar();
+  }
+  (function () {
+    var d = $('dial-porbulto'), arrastrando = false;
+    function desdePuntero(e) { // posición del puntero -> 1, 2 o 3 (la más cercana); el centro no responde
+      var r = d.getBoundingClientRect(), x = e.clientX - (r.left + r.width * DIAL.cx / 160), y = e.clientY - (r.top + r.height * DIAL.cy / 124);
+      if (Math.sqrt(x * x + y * y) < r.width * 0.19) return null;
+      var ang = Math.atan2(x, -y) * 180 / Math.PI;
+      return ang < -60 ? 1 : ang > 60 ? 3 : 2;
+    }
+    d.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('.dial-pos')) return; // los números tienen su propio clic
+      var n = desdePuntero(e); if (n === null) return;
+      arrastrando = true; try { d.setPointerCapture(e.pointerId); } catch (x) { /* sin captura: se sigue igual */ }
+      elegirPorBulto(n); e.preventDefault();
+    });
+    d.addEventListener('pointermove', function (e) { if (!arrastrando) return; var n = desdePuntero(e); if (n !== null) elegirPorBulto(n); });
+    d.addEventListener('pointerup', function () { arrastrando = false; });
+    d.addEventListener('pointercancel', function () { arrastrando = false; });
+    Array.prototype.forEach.call(d.querySelectorAll('.dial-pos'), function (b) { b.onclick = function () { elegirPorBulto(b.dataset.v); d.focus(); }; });
+    d.addEventListener('keydown', function (e) {
+      var k = e.key, n = estado.porBulto;
+      if (k === 'ArrowRight' || k === 'ArrowUp') n++; else if (k === 'ArrowLeft' || k === 'ArrowDown') n--; else if (k === 'Home') n = 1; else if (k === 'End') n = 3; else return;
+      e.preventDefault(); elegirPorBulto(Math.min(3, Math.max(1, n)));
+    });
+  })();
   function sincronizarFragil() { // FRÁGIL solo existe con el formato E
     $('c-fragil').checked = estado.fragil; $('c-fragil').disabled = estado.formato !== 'E';
     $('c-fragil').closest('label').style.opacity = estado.formato !== 'E' ? '.5' : '';
@@ -600,7 +649,7 @@
     function pedirCuenta() {
       modalConfirmar({
         titulo: '¿Agregar número de cuenta?',
-        texto: 'Se guardará «' + datos.razonSocial + '» en la base. Si no escribís cuenta, queda sin cuenta.',
+        texto: 'Se guardará «' + datos.razonSocial + '» en la base' + (datos.condicion ? ' con la condición especial «' + datos.condicion + '».' : '.') + ' Si no escribís cuenta, queda sin cuenta.',
         campo: { etiqueta: 'Número de cuenta (opcional)' }, ok: 'Guardar cliente',
         alOk: function (cuenta) {
           if (cuenta && clientes.some(function (c) { return norm(c.cuenta) === norm(cuenta); })) {

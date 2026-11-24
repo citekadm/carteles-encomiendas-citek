@@ -217,7 +217,7 @@ Resultados de la última corrida (2026-11-20, tras el margen de seguridad del 3 
 - [x] Una palabra: se achica y queda en una línea. Varias palabras: hasta 2 líneas. El teléfono siempre en una línea.
 - [x] No hay textos cortados, abreviados ni superpuestos, y el texto respeta el margen interno del recuadro.
 - [x] Sin condición ni factura, la franja superior desaparece y el resto se agranda.
-- [x] Con solo condición, o solo factura, el otro lado de la franja queda en blanco, sin recuadro.
+- [x] Con solo condición, o solo factura, esa ocupa todo el ancho de la franja superior (actualizado en la ronda de detalles; antes quedaba un lado en blanco).
 - [x] Campos vacíos no dejan recuadros ni huecos.
 - [ ] Probar más textos reales de la base (razones sociales y direcciones largas de clientes verdaderos).
 - [ ] Revisar visualmente un cartel con tres cifras (`333 de 333`) impreso.
@@ -264,6 +264,20 @@ Verificado el 2026-11-20 con capturas de Chromium sin interfaz (ventana de 1180 
 - [ ] Revisar en las PC de la oficina: legibilidad de las letras claras sobre fondo oscuro con la luz del lugar.
 - [ ] Revisar en Chrome real el aspecto de las ventanas emergentes y del selector (el desenfoque de fondo depende del navegador).
 - [ ] Confirmar con el usuario que no hace falta un tema claro.
+
+## 13. Ajustes de detalle: disposición, dial y franja superior
+
+Verificado el 2026-11-23 con Chromium sin interfaz (pantallas de 1180 × 900 y de 1366 × 768) y la batería de `tools/pruebas/` (12 casos, 100 autopruebas, todos sin desbordes y con las páginas esperadas en los PDF).
+
+- [x] Franja superior: con condición y factura van lado a lado; con solo factura (Bulto 1) o solo condición (demás bultos) ocupa todo el ancho; sin ninguna, desaparece y el resto se agranda.
+- [x] Dial de cajas por bulto: un clic sobre el arco o sobre los números elige 1, 2 o 3; arrastrar sobre el arco cambia la opción; el centro no responde; las flechas, Inicio y Fin del teclado funcionan y respetan el mínimo 1 y el máximo 3; «Nuevo envío» vuelve a 3; cambiar la opción actualiza el resumen y los carteles ya generados.
+- [x] No hay textos explicativos junto al dial.
+- [x] Nueva disposición: cliente (con la condición especial) a la izquierda; envío y resumen al centro; acciones y vista previa a la derecha, con la vista previa siempre visible y más grande.
+- [x] Los botones «Imprimir», «Generar PNG» y «Nuevo envío» entran en una línea en 1180 y en 1366 px de ancho.
+- [x] Al crear un cliente nuevo, la condición especial escrita en su campo se envía junto con los demás datos (columna G), y la ventana de confirmación la muestra.
+- [ ] Confirmar en la hoja real que la condición queda guardada en la columna G del cliente nuevo.
+- [ ] Revisar el dial con pantalla táctil y en las PC de la oficina.
+- [ ] Revisar la vista previa en una ventana angosta (menos de 1000 px) y en una pantalla muy ancha.
 
 ## 10. Criterio de aprobación
 

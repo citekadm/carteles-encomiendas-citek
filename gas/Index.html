@@ -38,6 +38,7 @@
             <div><label class="f" for="f-tel">Teléfono</label><input type="text" id="f-tel"></div>
             <div><label class="f" for="f-depto">Departamento</label><input type="text" id="f-depto"></div>
           </div>
+          <label class="f" for="f-cond">Condición especial</label><input type="text" id="f-cond" autocomplete="off">
           <button type="button" id="b-nuevo-cli" class="btn nuevo-cli"><span class="mas">+</span> Nuevo cliente</button>
         </section>
       </div>
@@ -54,12 +55,13 @@
             </div>
           </div>
           <label class="f" id="l-porbulto">Cajas por bulto</label>
-          <div class="seg" id="seg-porbulto" role="radiogroup" aria-labelledby="l-porbulto">
-            <button type="button" role="radio" data-v="1">1</button>
-            <button type="button" role="radio" data-v="2">2</button>
-            <button type="button" role="radio" data-v="3">3</button>
+          <div class="dial" id="dial-porbulto" role="slider" tabindex="0" aria-labelledby="l-porbulto" aria-valuemin="1" aria-valuemax="3" aria-valuenow="3" aria-valuetext="3 cajas por bulto">
+            <svg viewBox="0 0 160 124" aria-hidden="true"></svg>
+            <div class="dial-centro"><b id="dial-num">3</b></div>
+            <button type="button" class="dial-pos" data-v="1" tabindex="-1" aria-label="1 caja por bulto">1</button>
+            <button type="button" class="dial-pos" data-v="2" tabindex="-1" aria-label="2 cajas por bulto">2</button>
+            <button type="button" class="dial-pos" data-v="3" tabindex="-1" aria-label="3 cajas por bulto">3</button>
           </div>
-          <p id="nota-porbulto" class="nota" hidden></p>
           <label class="f" for="f-formato">Formato de cartel</label>
           <div class="seg" id="seg-formato" role="radiogroup" aria-label="Formato de cartel">
             <button type="button" role="radio" data-v="E">E · Cuadros</button>
@@ -69,14 +71,7 @@
           <label class="sw"><span>Imprimir FRÁGIL</span><input type="checkbox" class="switch" id="c-fragil"></label>
           <p id="nota-fragil" class="nota" hidden>Frágil: se imprime un cartel por hoja A4 apaisada, con «FRÁGIL» en los laterales. Elegí orientación horizontal si el navegador no la toma solo.</p>
           <label class="sw"><span>Imprimir FACTURA EN CAJA</span><input type="checkbox" class="switch" id="c-factura" checked></label>
-          <label class="f" for="f-cond">Condición especial</label><input type="text" id="f-cond">
           <label class="sw"><span>Imprimir condición especial</span><input type="checkbox" class="switch" id="c-cond"></label>
-        </section>
-        <section class="card acciones">
-          <button id="b-generar" class="btn prim">Generar carteles</button>
-          <button id="b-imprimir" class="btn">Imprimir</button>
-          <button id="b-png" class="btn">Generar PNG</button>
-          <button id="b-nuevo" class="btn fuera">Nuevo envío</button>
         </section>
         <section class="card" id="resumen">
           <h2>Resumen</h2>
@@ -92,10 +87,17 @@
       </div>
 
       <div class="col3">
-        <details id="prev" class="card" open hidden>
-          <summary>Vista previa <small id="prev-info"></small></summary>
+        <section class="card acciones">
+          <button id="b-generar" class="btn prim">Generar carteles</button>
+          <button id="b-imprimir" class="btn">Imprimir</button>
+          <button id="b-png" class="btn">Generar PNG</button>
+          <button id="b-nuevo" class="btn fuera">Nuevo envío</button>
+        </section>
+        <section class="card" id="prev">
+          <h2>Vista previa</h2>
+          <p id="prev-info" class="prev-info"></p>
           <div class="prev-body"><div id="vista" class="vista"></div></div>
-        </details>
+        </section>
       </div>
     </main>
   </div>

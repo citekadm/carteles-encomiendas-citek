@@ -22,7 +22,7 @@ for (const c of casos) {
   if ((await p.isChecked('#c-cond')) !== !!c.cond) await p.click('#c-cond', { force: true });
   if ((await p.isChecked('#c-factura')) !== !!c.factura) await p.click('#c-factura', { force: true });
   if (c.fragil) await p.click('#c-fragil', { force: true });
-  if (c.porBulto && c.porBulto !== 3) await p.click('#seg-porbulto button[data-v="' + c.porBulto + '"]'); // cajas por bulto (3 por defecto)
+  if (c.porBulto && c.porBulto !== 3) await p.click('#dial-porbulto .dial-pos[data-v="' + c.porBulto + '"]'); // cajas por bulto (3 por defecto)
   const t0 = Date.now();
   await p.click('#b-generar');
   await p.waitForTimeout(400);
