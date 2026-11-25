@@ -4,7 +4,7 @@ Aplicación web para generar e imprimir carteles de encomiendas a partir de los 
 
 ## Estado del proyecto
 
-**Fase actual: implementación y pruebas.** La aplicación está implementada en `gas/`: lectura de `Hoja2`, búsqueda con autocompletado, alta explícita de clientes nuevos, formulario, dos formatos de cartel (A clásico y E cuadros), opción FRÁGIL (A4 apaisada), vista previa, impresión A4 y PNG, con dial de cajas por bulto (1, 2 o 3), logo de fondo opcional (provisional) y una interfaz de tema oscuro con el logo de CITEK (referencia en `docs/referencias/`). Faltan la impresión real desde Chrome (formato E y FRÁGIL incluidos), las pruebas de acceso y publicación, y la guía final de entrega. Para retomar el trabajo en otra sesión, empezar por [docs/CONTEXTO_DE_SESION.md](docs/CONTEXTO_DE_SESION.md): resume lo hecho, lo pendiente y cómo probar. Las decisiones posteriores a la especificación están en la sección 15 de `docs/ESPECIFICACION_FUNCIONAL.md`, que incluye decisiones del desarrollador pendientes de confirmar (15.6).
+**Fase actual: implementación y pruebas.** La aplicación está implementada en `gas/`: lectura de `Hoja2`, búsqueda con autocompletado, alta explícita de clientes nuevos, formulario, un único formato de cartel en recuadros con el logo de CITEK como marca de agua, selector de cajas por bulto (1, 2 o 3), opción FRÁGIL (A4 apaisada), vista previa, impresión A4 y PNG. La interfaz tiene estética neumórfica clara (referencia en `docs/referencias/`). Faltan la impresión real desde Chrome (incluidos FRÁGIL y el logo de fondo), las pruebas de acceso y publicación, y la guía final de entrega. Para retomar el trabajo en otra sesión, empezar por [docs/CONTEXTO_DE_SESION.md](docs/CONTEXTO_DE_SESION.md): resume lo hecho, lo pendiente y cómo probar. Las decisiones posteriores a la especificación están en la sección 15 de `docs/ESPECIFICACION_FUNCIONAL.md`, que incluye decisiones del desarrollador pendientes de confirmar (15.6 y 15.9).
 
 ## Documentación principal
 
@@ -22,7 +22,11 @@ Aplicación web para generar e imprimir carteles de encomiendas a partir de los 
 ├── docs/
 │   ├── ESPECIFICACION_FUNCIONAL.md
 │   ├── ARQUITECTURA_Y_PLAN.md
-│   └── PLAN_DE_PRUEBAS.md
+│   ├── PLAN_DE_PRUEBAS.md
+│   ├── CONTEXTO_DE_SESION.md
+│   └── referencias/        (logos y capturas de referencia de diseño)
+├── tools/
+│   └── pruebas/            (pruebas automáticas con Chromium sin interfaz)
 └── gas/
     ├── appsscript.json
     ├── Code.gs

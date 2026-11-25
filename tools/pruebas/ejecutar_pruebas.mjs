@@ -17,12 +17,10 @@ const auto = await p.evaluate(() => { const r = window.autopruebas(); return { t
 console.log('autopruebas:', JSON.stringify(auto));
 for (const c of casos) {
   await p.click('#b-nuevo');
-  await p.selectOption('#f-formato', c.formato || 'E');
   for (const [id, v] of [['#f-razon', c.razon], ['#f-fantasia', c.fant], ['#f-dir', c.dir], ['#f-tel', c.tel], ['#f-depto', c.depto], ['#f-cajas', String(c.cajas)], ['#f-cond', c.cond]]) await p.fill(id, v || '');
   if ((await p.isChecked('#c-cond')) !== !!c.cond) await p.click('#c-cond', { force: true });
   if ((await p.isChecked('#c-factura')) !== !!c.factura) await p.click('#c-factura', { force: true });
   if (c.fragil) await p.click('#c-fragil', { force: true });
-  if (c.logo) await p.click('#seg-logo button[data-v="' + c.logo + '"]'); // logo de fondo: rte o todo (sin logo por defecto)
   if (c.porBulto && c.porBulto !== 3) await p.click('#dial-porbulto .dial-pos[data-v="' + c.porBulto + '"]'); // cajas por bulto (3 por defecto)
   const t0 = Date.now();
   await p.click('#b-generar');

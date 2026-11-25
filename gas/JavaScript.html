@@ -16,62 +16,17 @@
     return e;
   }
 
-  // ---- Cartel (prototipo: tamaños de referencia como máximos) ----
-  // Marca de agua del logo (provisional): imagen negra con transparencia; la intensidad se regula con la opacidad (CSS .marca).
+  // ---- Marca de agua fija ----
+  // Logo de CITEK (imagen negra con transparencia) centrado detrás de todo el cartel; la intensidad se regula con la opacidad (CSS .marca-todo).
   var LOGO_MARCA = 'data:image/png;base64,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';
   function marca(clase) { var i = el('img', 'marca ' + clase); i.src = LOGO_MARCA; i.alt = ''; i.setAttribute('aria-hidden', 'true'); return i; }
 
-  function crearCartel(d, logo) {
-    var c = el('div', 'cartel' + (logo === 'todo' ? ' logo-todo' : ''));
-    c.dataset.v = d.factura && d.n === 1 ? 'a' : 'b'; // variante de ajuste: con o sin FACTURA EN CAJA
-    c.appendChild(el('div', 'bulto', d.n + ' de ' + d.total));
-    if (d.razon) c.appendChild(el('div', 'razon', d.razon));
-    if (d.fantasia && norm(d.fantasia) !== norm(d.razon)) c.appendChild(el('div', 'fant', '\u201C' + d.fantasia + '\u201D'));
-    if (d.dir) c.appendChild(el('div', 'dir', d.dir));
-    if (d.tel) c.appendChild(el('div', 'tel', 'Tel: ' + d.tel));
-    var z = el('div', 'zona-depto');
-    z.appendChild(el('div', 'depto', d.depto));
-    c.appendChild(z);
-    if (d.factura && d.n === 1) c.appendChild(el('div', 'factura', 'FACTURA EN CAJA'));
-    if (d.cond) c.appendChild(el('div', 'cond', d.cond));
-    c.appendChild(el('div', 'rte1', 'Rte.: Citek Ltda.'));
-    c.appendChild(el('div', 'rte2', 'Cerrito 282 bis - Tel.: 2915 5380'));
-    c.appendChild(el('div', 'rte2', 'MONTEVIDEO'));
-    if (logo === 'todo') c.appendChild(marca('marca-todo'));      // logo centrado detrás de todo el cartel
-    else if (logo === 'rte') c.appendChild(marca('marca-rte-a')); // logo detrás del remitente
-    return c;
-  }
-
-  // Reducción en cascada: todos los textos escalan con --k hasta que el cartel entra en media hoja A4;
-  // cada elemento tiene un tamaño mínimo legible (ver Styles.html). Devuelve {ok, k}.
-  function ajustar(c) {
-    var k = 1;
-    c.style.setProperty('--k', k);
-    while (c.scrollHeight > c.clientHeight + 1 && k > 0.3) {
-      k -= 0.03;
-      c.style.setProperty('--k', k.toFixed(2));
-    }
-    return { ok: c.scrollHeight <= c.clientHeight + 1, k: k };
-  }
-  // Medición fuera de pantalla y a tamaño real (210 mm), sin depender del zoom de la vista previa.
-  function medir(d) {
-    var caja = el('div');
-    caja.style.cssText = 'position:absolute;left:-10000px;top:0;width:210mm;';
-    document.body.appendChild(caja);
-    var c = crearCartel(d);
-    caja.appendChild(c);
-    var r = ajustar(c);
-    document.body.removeChild(caja);
-    return r;
-  }
-
-
-  // ---- Cartel formato E (cuadros) ----
+  // ---- Cartel (cuadros) ----
   // Regla de texto: los tamaños de CSS son máximos. Cada texto se achica hasta entrar en su recuadro:
   // una palabra -> una sola línea; varias palabras -> hasta 2 líneas. Nunca se corta ni se abrevia.
   var MIN_E = { razon: 14, fant: 14, dir: 14, tel: 14, cond: 14, factura: 20, bulto: 14, depto: 36 }; // px, mínimo legible
-  function crearCartelE(d, ancha, logo) {
-    var c = el('div', 'cartel cartel-e' + (ancha ? ' ancha' : '') + (logo === 'todo' ? ' logo-todo' : ''));
+  function crearCartelE(d, ancha) {
+    var c = el('div', 'cartel cartel-e' + (ancha ? ' ancha' : ''));
     var hayTop = !!(d.factura || d.cond);
     c.dataset.v = d.factura ? 'a' : 'b'; // variante de ajuste: con o sin FACTURA EN CAJA
     function fit(rol, txt, lineas) {
@@ -106,9 +61,8 @@
     r.appendChild(el('div', 'rte1', 'Rte.: Citek Ltda.'));
     r.appendChild(el('div', 'rte2', 'Cerrito 282 bis - Tel.: 2915 5380'));
     r.appendChild(el('div', 'rte2', 'MONTEVIDEO'));
-    if (logo === 'rte') r.appendChild(marca('marca-rte'));         // logo detrás del texto del remitente
     foot.appendChild(b); foot.appendChild(r); c.appendChild(foot);
-    if (logo === 'todo') c.insertBefore(marca('marca-todo'), c.firstChild); // logo centrado detrás de todo el cartel
+    c.insertBefore(marca('marca-todo'), c.firstChild); // logo de CITEK centrado detrás de todo el cartel
     return c;
   }
   function entra(e) { // el texto cabe: sin desborde horizontal, dentro de las líneas permitidas y dentro del margen interno de su recuadro
@@ -196,16 +150,16 @@
     var lista = Reglas.descriptores(v.valor, { porBulto: estado.porBulto, factura: estado.factura, condActiva: estado.condActiva, condTexto: estado.cond })
       .map(function (d) { return datosCartel(estado, d); });
     // Un solo ajuste por variante (con factura / sin factura): 333 carteles no implican 333 mediciones.
-    var E = estado.formato === 'E', fr = E && estado.fragil;
-    // Con FRÁGIL la hoja es apaisada: la regla @page se agrega aparte para no afectar al resto de los formatos.
+    var fr = estado.fragil;
+    // Con FRÁGIL la hoja es apaisada: la regla @page se agrega solo en ese caso para no alterar la hoja vertical.
     $('pagina').textContent = fr ? '@page { size: A4 landscape; margin: 0; }' : '';
     var ks = {}, fallos = [];
-    var med = E ? function (d) { return medirE(d, fr); } : medir;
+    var med = function (d) { return medirE(d, fr); };
     if (lista[0].factura) { ks.a = med(lista[0]); if (!ks.a.ok) fallos.push('el bulto 1 (con FACTURA EN CAJA)'); }
     if (lista.length > 1 || !lista[0].factura) { ks.b = med(lista[lista.length - 1]); if (!ks.b.ok) fallos.push('los demás bultos'); }
     function armar(d) {
-      var c = E ? crearCartelE(d, fr, estado.logo) : crearCartel(d, estado.logo), r = ks[c.dataset.v];
-      if (E) aplicarE(c, r.sizes); else c.style.setProperty('--k', r.k.toFixed(2));
+      var c = crearCartelE(d, fr), r = ks[c.dataset.v];
+      aplicarE(c, r.sizes);
       return c;
     }
     // Todas las hojas van a #impresion (oculto en pantalla, visible al imprimir); la vista previa muestra solo la primera.
@@ -431,7 +385,7 @@
   var CAMPOS = { razon: 'f-razon', fantasia: 'f-fantasia', dir: 'f-dir', tel: 'f-tel', depto: 'f-depto' };
   var estado, sel = -1, sugerencias = [];
   function estadoVacio() {
-    return { origen: 'manual', cuenta: '', razon: '', fantasia: '', dir: '', tel: '', depto: '', cond: '', condActiva: false, condManual: false, factura: true, cajas: '', porBulto: 3, formato: 'E', logo: 'no', fragil: false };
+    return { origen: 'manual', cuenta: '', razon: '', fantasia: '', dir: '', tel: '', depto: '', cond: '', condActiva: false, condManual: false, factura: true, cajas: '', porBulto: 3, fragil: false };
   }
   function resumen() {
     var v = Reglas.validarCajas(estado.cajas), t = $('resumen-txt');
@@ -441,40 +395,24 @@
       t.textContent = v.mensaje;
       return;
     }
-    var fr = estado.formato === 'E' && estado.fragil, b = Reglas.bultos(v.valor, estado.porBulto), h = Reglas.hojas(b, fr);
+    var fr = estado.fragil, b = Reglas.bultos(v.valor, estado.porBulto), h = Reglas.hojas(b, fr);
     $('s-cajas').textContent = v.valor; $('s-bultos').textContent = b; $('s-hojas').textContent = h;
     t.textContent = 'Distribución: ' + Reglas.agrupacion(v.valor, estado.porBulto) + (estado.porBulto !== 3 ? ' (' + estado.porBulto + (estado.porBulto === 1 ? ' caja' : ' cajas') + ' por bulto)' : '') + (fr ? ' · FRÁGIL: un cartel por hoja A4 apaisada.' : (b % 2 ? ' · la mitad inferior de la última hoja queda vacía.' : '.'));
   }
-  function pintarFormato() { // el selector visual (E / A) refleja el formato elegido; el <select> oculto guarda el valor
-    Array.prototype.forEach.call(document.querySelectorAll('#seg-formato button'), function (b) {
-      var on = b.dataset.v === estado.formato;
-      b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
-    });
-  }
-  Array.prototype.forEach.call(document.querySelectorAll('#seg-formato button'), function (b) {
-    b.onclick = function () { var f = $('f-formato'); f.value = b.dataset.v; f.dispatchEvent(new Event('change', { bubbles: true })); };
-  });
-  // Dial de cajas por bulto (1, 2 o 3): arco de 240° con tres posiciones (-120°, 0° y +120°, medidos desde arriba hacia la derecha).
-  var DIAL = { cx: 80, cy: 76, r: 52, ang: { 1: -120, 2: 0, 3: 120 } };
+  // Selector «knob» de cajas por bulto (1, 2 o 3): perilla con puntos alrededor, en un arco de 240° con tres posiciones
+  // (-120°, 0° y +120°, medidos desde arriba hacia la derecha). La perilla gira hacia la opción elegida y su punto se pinta de azul.
+  var DIAL = { cx: 100, cy: 98, r: 74, ancho: 200, alto: 172, ang: { 1: -120, 2: 0, 3: 120 } };
   function dialPol(a, r) { var t = a * Math.PI / 180; return [DIAL.cx + r * Math.sin(t), DIAL.cy - r * Math.cos(t)]; }
-  function dialArco(a1, a2, r) {
-    var p = dialPol(a1, r), q = dialPol(a2, r);
-    return 'M' + p[0].toFixed(2) + ' ' + p[1].toFixed(2) + ' A' + r + ' ' + r + ' 0 ' + (a2 - a1 > 180 ? 1 : 0) + ' 1 ' + q[0].toFixed(2) + ' ' + q[1].toFixed(2);
-  }
   function pintarPorBulto() {
-    var v = estado.porBulto, ang = DIAL.ang[v], svg = '', a, p, q;
-    svg += '<path class="base" d="' + dialArco(-120, 120, DIAL.r) + '"/><path class="pista" d="' + dialArco(-120, 120, DIAL.r) + '"/>';
-    for (a = -120; a <= 120; a += 8) { // marcas finas; las tres posiciones, más largas
-      var fuerte = a === -120 || a === 0 || a === 120;
-      p = dialPol(a, fuerte ? 36 : 39); q = dialPol(a, 44);
-      svg += '<line class="marca' + (a <= ang ? ' on' : '') + (fuerte ? ' fuerte' : '') + '" x1="' + p[0].toFixed(2) + '" y1="' + p[1].toFixed(2) + '" x2="' + q[0].toFixed(2) + '" y2="' + q[1].toFixed(2) + '"/>';
+    var v = estado.porBulto, ang = DIAL.ang[v], svg = '', a, p, fuerte;
+    for (a = -120; a <= 120; a += 20) { // 13 puntos; los tres de las opciones, más grandes; el elegido, azul
+      fuerte = a === -120 || a === 0 || a === 120; p = dialPol(a, DIAL.r);
+      svg += '<circle class="punto' + (fuerte ? ' fuerte' : '') + (a === ang ? ' act' : '') + '" cx="' + p[0].toFixed(2) + '" cy="' + p[1].toFixed(2) + '" r="' + (a === ang ? 5.6 : fuerte ? 4.4 : 2.6) + '"/>';
     }
-    if (ang > -120) svg += '<path class="prog" d="' + dialArco(-120, ang, DIAL.r) + '"/>';
-    p = dialPol(ang, DIAL.r);
-    svg += '<circle class="perilla" cx="' + p[0].toFixed(2) + '" cy="' + p[1].toFixed(2) + '" r="7"/>';
-    $('dial-porbulto').querySelector('svg').innerHTML = svg;
-    $('dial-num').textContent = v;
     var d = $('dial-porbulto');
+    d.querySelector('svg').innerHTML = svg;
+    $('dial-giro').style.setProperty('--ang', ang + 'deg');
+    $('dial-num').textContent = v;
     d.setAttribute('aria-valuenow', v); d.setAttribute('aria-valuetext', v + (v === 1 ? ' caja por bulto' : ' cajas por bulto'));
     Array.prototype.forEach.call(d.querySelectorAll('.dial-pos'), function (b) { b.classList.toggle('on', Number(b.dataset.v) === v); });
   }
@@ -486,8 +424,8 @@
   (function () {
     var d = $('dial-porbulto'), arrastrando = false;
     function desdePuntero(e) { // posición del puntero -> 1, 2 o 3 (la más cercana); el centro no responde
-      var r = d.getBoundingClientRect(), x = e.clientX - (r.left + r.width * DIAL.cx / 160), y = e.clientY - (r.top + r.height * DIAL.cy / 124);
-      if (Math.sqrt(x * x + y * y) < r.width * 0.19) return null;
+      var r = d.getBoundingClientRect(), x = e.clientX - (r.left + r.width * DIAL.cx / DIAL.ancho), y = e.clientY - (r.top + r.height * DIAL.cy / DIAL.alto);
+      if (Math.sqrt(x * x + y * y) < r.width * 0.27) return null; // sobre la perilla no responde
       var ang = Math.atan2(x, -y) * 180 / Math.PI;
       return ang < -60 ? 1 : ang > 60 ? 3 : 2;
     }
@@ -507,25 +445,15 @@
       e.preventDefault(); elegirPorBulto(Math.min(3, Math.max(1, n)));
     });
   })();
-  function pintarLogo() { // selector «Logo de fondo»: Sin logo / Remitente / Cartel
-    Array.prototype.forEach.call(document.querySelectorAll('#seg-logo button'), function (b) {
-      var on = b.dataset.v === estado.logo;
-      b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
-    });
-  }
-  Array.prototype.forEach.call(document.querySelectorAll('#seg-logo button'), function (b) {
-    b.onclick = function () { if (estado.logo === b.dataset.v) return; estado.logo = b.dataset.v; pintarLogo(); actualizar(); };
-  });
-  function sincronizarFragil() { // FRÁGIL solo existe con el formato E
-    $('c-fragil').checked = estado.fragil; $('c-fragil').disabled = estado.formato !== 'E';
-    $('c-fragil').closest('label').style.opacity = estado.formato !== 'E' ? '.5' : '';
+  function sincronizarFragil() { // FRÁGIL: una hoja A4 apaisada por bulto
+    $('c-fragil').checked = estado.fragil;
     $('nota-fragil').hidden = !estado.fragil;
   }
   function volcar() { // estado -> formulario
     for (var k in CAMPOS) $(CAMPOS[k]).value = estado[k];
     $('f-cond').value = estado.cond; $('c-cond').checked = estado.condActiva;
     $('c-factura').checked = estado.factura; $('f-cajas').value = estado.cajas;
-    $('f-formato').value = estado.formato; pintarFormato(); pintarPorBulto(); pintarLogo(); sincronizarFragil();
+    pintarPorBulto(); sincronizarFragil();
     $('origen').textContent = estado.origen === 'base'
       ? 'De la base · ' + (estado.cuenta ? 'cuenta ' + estado.cuenta : 'sin cuenta') + ' · cambios solo para este envío'
       : 'Cliente manual · aún no está en la base';
@@ -577,13 +505,9 @@
   });
   $('c-cond').addEventListener('change', function () { estado.condManual = true; estado.condActiva = this.checked; });
   $('c-factura').addEventListener('change', function () { estado.factura = this.checked; });
-  $('f-formato').addEventListener('change', function () {
-    estado.formato = this.value; if (estado.formato !== 'E') estado.fragil = false;
-    pintarFormato(); sincronizarFragil(); resumen();
-  });
   $('c-fragil').addEventListener('change', function () { estado.fragil = this.checked; sincronizarFragil(); resumen(); });
   $('f-cajas').addEventListener('input', function () { estado.cajas = this.value; resumen(); });
-  // Botones ▲/▼ y flechas del teclado: suman o restan 1 dentro del rango 1–999 reutilizando el evento 'input'.
+  // Botones − / + y flechas del teclado: suman o restan 1 dentro del rango 1–999 reutilizando el evento 'input'.
   function pasoCajas(d) {
     var f = $('f-cajas'), v = Reglas.validarCajas(f.value), n = v.ok ? v.valor + d : 1;
     f.value = String(Math.min(999, Math.max(1, n)));
@@ -596,8 +520,7 @@
   });
   $('b-nuevo').onclick = function () {
     generado = false; clearTimeout(timer);
-    var formato = estado.formato, logo = estado.logo; // el formato y el logo elegidos se mantienen; FRÁGIL vuelve a apagarse
-    estado = estadoVacio(); estado.formato = formato; estado.logo = logo;
+    estado = estadoVacio(); // FRÁGIL y las cajas por bulto vuelven a sus valores por defecto
     $('f-buscar').value = ''; cerrarLista(); volcar();
     limpiarSalida();
   };
