@@ -61,7 +61,7 @@ Responsabilidad de servidor:
 - Estilos de los carteles.
 - Reglas de impresión A4.
 - Reglas de salto de página, dimensiones, corte y adaptación de texto.
-- Estilos de la interfaz (neumorfismo claro), del cartel, de la marca de agua y de las franjas FRÁGIL. La regla `@page` apaisada no está aquí: JavaScript la agrega en `<style id="pagina">` (de `Index.html`) solo con FRÁGIL.
+- Estilos de la interfaz (estética oscura), del cartel, de la marca de agua y de las franjas FRÁGIL. La regla `@page` apaisada no está aquí: JavaScript la agrega en `<style id="pagina">` (de `Index.html`) solo con FRÁGIL.
 - Diferenciación entre pantalla y papel mediante `@media print`.
 
 ### `gas/JavaScript.html`
@@ -200,4 +200,4 @@ Regla permanente: no inventar valores ni asumir decisiones no tomadas. Claude de
 - **Herramienta de prueba automática:** Chromium sin interfaz con Playwright, sobre una copia de la interfaz con `google.script.run` simulado. Los scripts no se versionan; sus resultados se registran en el plan de pruebas (sección 11).
 - **Marca de agua:** el logo se incrusta como constante `LOGO_MARCA` (imagen en base64) y se inserta en cada cartel como `<img class="marca marca-todo">` centrada, con opacidad del 9 %. Es una imagen y no un fondo de CSS para que se imprima aunque «Gráficos de fondo» esté desactivado. No entra en la medición de textos.
 - **Un solo formato:** el 2026-11-25 se eliminó el cartel clásico (formato A) y los selectores de formato y de logo; se borraron `crearCartel`, `ajustar`, `medir` y los estilos asociados.
-- **Interfaz:** neumorfismo claro con variables CSS en `:root` de `gas/Styles.html` (`--bg`, `--luz`, `--som`, `--ac`…) y sombras compartidas (`--relieve`, `--relieve-s`, `--hundido`). El selector de cajas por bulto es un «knob»: puntos en un SVG y una perilla HTML que gira con la variable CSS `--ang`.
+- **Interfaz:** estética oscura con variables CSS en `:root` de `gas/Styles.html` (`--bg`, `--az`, `--oro`, `--brillo`, `--sombra1/2/3`, `--r1…--r4`…). Las opciones FRÁGIL, factura y condición son toasts: una casilla real oculta (`.toast-in`) seguida de una tarjeta (`.toast-box`) que cambia con `:checked`, por lo que el JavaScript sigue usando los mismos `id` y eventos `change`. El selector de cajas por bulto es un `<input type="range" id="r-porbulto">` con marcas numeradas; la variable CSS `--p` (0, .5 o 1) mueve el relleno del riel.

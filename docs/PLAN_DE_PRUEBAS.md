@@ -246,26 +246,27 @@ Resultados de la última corrida (2026-11-20, tras el margen de seguridad del 3 
 - [ ] Comparar la hoja impresa con la vista previa.
 - [ ] Probar con la tipografía Times New Roman real de las PC (las medidas pueden variar levemente respecto de Liberation Serif).
 
-## 12. Aspecto de la interfaz (neumorfismo claro)
+## 12. Aspecto de la interfaz (estética oscura, slider y toasts)
 
-Verificado el 2026-11-25 con capturas de Chromium sin interfaz (ventanas de 1180, 1366 y 420 px de ancho). No reemplaza la revisión en las PC de uso.
+Reemplaza al estilo neumórfico claro del 2026-11-25 (especificación 15.10). Verificado el 2026-11-26 con capturas de Chromium sin interfaz (1280 × 900 px) y la batería de `tools/pruebas/`. No reemplaza la revisión en las PC de uso.
 
-- [x] Estética neumórfica clara: fondo gris azulado, tarjetas, botones y casilleros en relieve, campos hundidos, acento azul.
-- [x] Interruptores con riel y perilla en relieve; el activado se pinta de azul.
-- [x] Botón principal azul y botones secundarios en relieve; «Imprimir», «Generar PNG» y «Nuevo envío» entran cada uno en una línea.
-- [x] Casillero de búsqueda con lupa; ventana emergente de «¿Agregar número de cuenta?» y sugerencias con el estilo nuevo.
-- [x] Encabezado con el logo de CITEK en rojo; los textos de los interruptores no se parten.
-- [x] Con ventana angosta (420 px) las columnas se apilan.
-- [x] La impresión no cambia: los PDF de los 11 casos mantienen páginas y orientación.
-- [ ] Revisar el contraste de las letras grises sobre el fondo claro en las pantallas de la oficina (el neumorfismo tiene poco contraste por naturaleza).
-- [ ] Revisar en Chrome real el desenfoque de fondo de las ventanas emergentes.
+- [x] Fondo oscuro con textura, tarjetas con borde fino, campos hundidos, azul acero y dorado como acentos.
+- [x] «Imprimir FRÁGIL», «Imprimir FACTURA EN CAJA» e «Imprimir condición especial» son toasts: activo = tarjeta clara con tilde verde y «Se imprime»; inactivo = tarjeta oscura con círculo vacío y «No se imprime».
+- [x] Un clic real sobre el toast cambia la opción y el resumen (FRÁGIL probado); el foco por teclado se ve con un contorno azul.
+- [x] FACTURA EN CAJA aparece activa por defecto; FRÁGIL y condición, apagados; «Nuevo envío» y la selección de un cliente actualizan el estado de los toasts.
+- [x] Slider de cajas por bulto: un clic en un número elige 1, 2 o 3, el relleno azul y el valor visible siguen la elección y el resumen se actualiza (probado con 7 cajas de a 2: «2+2+2+1»).
+- [x] Casillero de búsqueda con lupa y foco con brillo; sugerencias, ventana emergente y chips con el estilo nuevo.
+- [x] La impresión no cambia: los 12 casos de `tools/pruebas/` siguen sin desbordes y con las páginas esperadas.
+- [ ] Probar el slider con flechas, Inicio y Fin del teclado y con arrastre táctil en Chrome real.
+- [ ] Revisar contraste, brillos y desenfoque de fondo de las ventanas emergentes en las pantallas de la oficina.
+- [ ] Confirmar con el usuario los textos «Se imprime» / «No se imprime» de los toasts.
 
 ## 13. Ajustes de detalle: disposición, selector de cajas por bulto y franja superior
 
 Verificado el 2026-11-23 con Chromium sin interfaz (pantallas de 1180 × 900 y de 1366 × 768) y la batería de `tools/pruebas/` (12 casos, 100 autopruebas, todos sin desbordes y con las páginas esperadas en los PDF).
 
 - [x] Franja superior: con condición y factura van lado a lado; con solo factura (Bulto 1) o solo condición (demás bultos) ocupa todo el ancho; sin ninguna, desaparece y el resto se agranda.
-- [x] Selector «knob» de cajas por bulto (ver 12 y 15.9): un clic sobre el arco o sobre los números elige 1, 2 o 3 y la perilla gira hacia el punto azul; arrastrar sobre el arco cambia la opción; sobre la perilla no responde; las flechas, Inicio y Fin del teclado funcionan y respetan el mínimo 1 y el máximo 3; «Nuevo envío» vuelve a 3; cambiar la opción actualiza el resumen y los carteles ya generados.
+- [x] Selector de cajas por bulto (ahora slider, ver 12 y 15.10): elige 1, 2 o 3; «Nuevo envío» vuelve a 3; cambiar la opción actualiza el resumen y los carteles.
 - [x] No hay textos explicativos junto al selector.
 - [x] Nueva disposición: cliente (con la condición especial) a la izquierda; envío y resumen al centro; acciones y vista previa a la derecha, con la vista previa siempre visible y más grande.
 - [x] Los botones «Imprimir», «Generar PNG» y «Nuevo envío» entran en una línea en 1180 y en 1366 px de ancho.

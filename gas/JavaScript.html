@@ -399,52 +399,24 @@
     $('s-cajas').textContent = v.valor; $('s-bultos').textContent = b; $('s-hojas').textContent = h;
     t.textContent = 'Distribución: ' + Reglas.agrupacion(v.valor, estado.porBulto) + (estado.porBulto !== 3 ? ' (' + estado.porBulto + (estado.porBulto === 1 ? ' caja' : ' cajas') + ' por bulto)' : '') + (fr ? ' · FRÁGIL: un cartel por hoja A4 apaisada.' : (b % 2 ? ' · la mitad inferior de la última hoja queda vacía.' : '.'));
   }
-  // Selector «knob» de cajas por bulto (1, 2 o 3): perilla con puntos alrededor, en un arco de 240° con tres posiciones
-  // (-120°, 0° y +120°, medidos desde arriba hacia la derecha). La perilla gira hacia la opción elegida y su punto se pinta de azul.
-  var DIAL = { cx: 100, cy: 98, r: 74, ancho: 200, alto: 172, ang: { 1: -120, 2: 0, 3: 120 } };
-  function dialPol(a, r) { var t = a * Math.PI / 180; return [DIAL.cx + r * Math.sin(t), DIAL.cy - r * Math.cos(t)]; }
+  // Slider de cajas por bulto (1, 2 o 3). El control real es un <input type="range">: ya responde a arrastre, clic en el riel y teclado
+  // (flechas, Inicio y Fin). Los números de abajo también son clicables. --p (0, .5 o 1) mueve el relleno azul del riel.
   function pintarPorBulto() {
-    var v = estado.porBulto, ang = DIAL.ang[v], svg = '', a, p, fuerte;
-    for (a = -120; a <= 120; a += 20) { // 13 puntos; los tres de las opciones, más grandes; el elegido, azul
-      fuerte = a === -120 || a === 0 || a === 120; p = dialPol(a, DIAL.r);
-      svg += '<circle class="punto' + (fuerte ? ' fuerte' : '') + (a === ang ? ' act' : '') + '" cx="' + p[0].toFixed(2) + '" cy="' + p[1].toFixed(2) + '" r="' + (a === ang ? 5.6 : fuerte ? 4.4 : 2.6) + '"/>';
-    }
-    var d = $('dial-porbulto');
-    d.querySelector('svg').innerHTML = svg;
-    $('dial-giro').style.setProperty('--ang', ang + 'deg');
-    $('dial-num').textContent = v;
-    d.setAttribute('aria-valuenow', v); d.setAttribute('aria-valuetext', v + (v === 1 ? ' caja por bulto' : ' cajas por bulto'));
-    Array.prototype.forEach.call(d.querySelectorAll('.dial-pos'), function (b) { b.classList.toggle('on', Number(b.dataset.v) === v); });
+    var v = estado.porBulto, r = $('r-porbulto');
+    r.value = v; r.style.setProperty('--p', (v - 1) / 2);
+    r.parentNode.style.setProperty('--p', (v - 1) / 2);
+    var txt = v + (v === 1 ? ' caja por bulto' : ' cajas por bulto');
+    r.setAttribute('aria-valuetext', txt);
+    $('o-porbulto').textContent = v;
+    Array.prototype.forEach.call(document.querySelectorAll('.marca-n'), function (b) { b.classList.toggle('on', Number(b.dataset.v) === v); });
   }
   function elegirPorBulto(n) {
     n = Reglas.porBultoValido(n);
     if (n === estado.porBulto) return;
     estado.porBulto = n; pintarPorBulto(); resumen(); actualizar();
   }
-  (function () {
-    var d = $('dial-porbulto'), arrastrando = false;
-    function desdePuntero(e) { // posición del puntero -> 1, 2 o 3 (la más cercana); el centro no responde
-      var r = d.getBoundingClientRect(), x = e.clientX - (r.left + r.width * DIAL.cx / DIAL.ancho), y = e.clientY - (r.top + r.height * DIAL.cy / DIAL.alto);
-      if (Math.sqrt(x * x + y * y) < r.width * 0.27) return null; // sobre la perilla no responde
-      var ang = Math.atan2(x, -y) * 180 / Math.PI;
-      return ang < -60 ? 1 : ang > 60 ? 3 : 2;
-    }
-    d.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('.dial-pos')) return; // los números tienen su propio clic
-      var n = desdePuntero(e); if (n === null) return;
-      arrastrando = true; try { d.setPointerCapture(e.pointerId); } catch (x) { /* sin captura: se sigue igual */ }
-      elegirPorBulto(n); e.preventDefault();
-    });
-    d.addEventListener('pointermove', function (e) { if (!arrastrando) return; var n = desdePuntero(e); if (n !== null) elegirPorBulto(n); });
-    d.addEventListener('pointerup', function () { arrastrando = false; });
-    d.addEventListener('pointercancel', function () { arrastrando = false; });
-    Array.prototype.forEach.call(d.querySelectorAll('.dial-pos'), function (b) { b.onclick = function () { elegirPorBulto(b.dataset.v); d.focus(); }; });
-    d.addEventListener('keydown', function (e) {
-      var k = e.key, n = estado.porBulto;
-      if (k === 'ArrowRight' || k === 'ArrowUp') n++; else if (k === 'ArrowLeft' || k === 'ArrowDown') n--; else if (k === 'Home') n = 1; else if (k === 'End') n = 3; else return;
-      e.preventDefault(); elegirPorBulto(Math.min(3, Math.max(1, n)));
-    });
-  })();
+  $('r-porbulto').addEventListener('input', function () { elegirPorBulto(this.value); });
+  Array.prototype.forEach.call(document.querySelectorAll('.marca-n'), function (b) { b.onclick = function () { elegirPorBulto(b.dataset.v); $('r-porbulto').focus(); }; });
   function sincronizarFragil() { // FRÁGIL: una hoja A4 apaisada por bulto
     $('c-fragil').checked = estado.fragil;
     $('nota-fragil').hidden = !estado.fragil;

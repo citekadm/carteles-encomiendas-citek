@@ -1,7 +1,7 @@
 # Contexto de sesión y próximos pasos
 
 **Proyecto:** Carteles de encomiendas — Citek  
-**Última actualización:** 2026-11-25 (formato único con logo fijo y estética neumórfica clara).  
+**Última actualización:** 2026-11-26 (estética oscura con toasts y slider de cajas por bulto).  
 **Para qué sirve este documento:** que otra sesión (con Claude u otra persona) retome el trabajo sin repetir preguntas ni perder decisiones.
 
 ## 1. Cómo retomar
@@ -32,9 +32,13 @@ Pedido del usuario y resultado:
 4. El logo del encabezado pasó a su **color rojo de marca** (`docs/referencias/Logo_Citek_rojo.png`), porque el blanco no se vería sobre fondo claro.
 5. Se quitó el logo blanco del repositorio y se actualizaron la especificación (secciones 2, 8, 10 y 15.5 a 15.9), el plan de pruebas (secciones 11 a 15), la arquitectura, el README y las herramientas de prueba (11 casos).
 
+## 3 bis. Cambio del 2026-11-26 (rama `estetica-oscura-toasts`)
+
+Pedido del usuario: el estilo claro no le gusta; usar la estética de `docs/referencias/Referencia_estetica_oscura_premium.jpeg`. Resultado (detalle en especificación 15.10): tema oscuro con relieve y brillo; el knob se reemplazó por un **slider 1-2-3 con marcas numeradas**; **FRÁGIL, factura y condición especial pasaron de interruptores a toasts** seleccionables (activo = tarjeta clara con tilde; inactivo = tarjeta oscura). Solo cambió la interfaz de pantalla: cartel, reglas e impresión intactos (12 casos y 100 autopruebas sin fallos). Las pruebas usan ahora `.marca-n[data-v=…]` en lugar del dial.
+
 ## 4. Producto vigente en pocas líneas
 
-- **Pantalla (tres columnas):** cliente (con condición especial y «+ Nuevo cliente»); envío (cantidad de cajas con − / +, cajas por bulto tipo knob, interruptores de FRÁGIL, factura y condición) y resumen; acciones y vista previa (siempre visible, escalada al ancho de su tarjeta, tope 360 px).
+- **Pantalla (tres columnas):** cliente (con condición especial y «+ Nuevo cliente»); envío (cantidad de cajas con − / +, cajas por bulto con slider, toasts de FRÁGIL, factura y condición) y resumen; acciones y vista previa (siempre visible, escalada al ancho de su tarjeta, tope 360 px).
 - **Cartel (media hoja A4, un solo formato):** franja superior opcional (condición y/o «FACTURA EN CAJA»; si hay una sola, ocupa todo el ancho); nombre fantasía como texto principal; razón social; dirección y teléfono; departamento; abajo «n de N» y remitente. Todos los textos (menos el remitente) usan el mayor tamaño que entra en su recuadro (especificación 15.7, con 3 % de margen de seguridad).
 - **FRÁGIL:** una hoja A4 apaisada por bulto, con dos franjas laterales solo de contorno (especificación 15.6).
 - **Cajas por bulto:** 1, 2 o 3 (3 por defecto); bultos = `techo(cajas / k)` (especificación 7.1). «Nuevo envío» la vuelve a 3 y apaga FRÁGIL.
@@ -48,8 +52,8 @@ Pedido del usuario y resultado:
 - Margen de seguridad del 3 % en los tamaños de letra: los textos quedan un poco más chicos que el máximo que entra.
 - Pesos de altura de los recuadros: fantasía 2,6 / razón social 1,5 / dirección-teléfono 1,6 / departamento 3,3 (clases `.e-fant`, `.e-razon`, `.e-dt`, `.e-depto` en `gas/Styles.html`). El departamento resulta algo más chico que antes (unos 105 px con datos cortos) porque la fantasía pasó a ser lo principal.
 - Cajas por bulto entendidas como «máximo de cajas por bulto» para todo el envío; mezclar bultos de distinto tamaño en un envío requeriría rediseñar.
-- Sobre la perilla del knob no se responde a clics; los números 1, 2 y 3 son clicables.
-- Estética neumórfica: las letras grises sobre fondo claro tienen poco contraste; conviene revisarlo en las pantallas de la oficina.
+- Los textos «Se imprime» / «No se imprime» de los toasts y el dorado como color de selección son decisión del desarrollador.
+- Revisar contraste y brillos de la estética oscura en las pantallas de la oficina.
 
 ## 6. Tareas abiertas
 
@@ -76,7 +80,7 @@ python3 verificar_pdf.py         # compara páginas y orientación (requiere: pi
 - La salida marca «desbordes» si algún texto se sale de su recuadro y compara páginas y orientación de los PDF. Con cientos de hojas solo se guarda el PDF, porque la captura completa excede la memoria del navegador de prueba.
 - El navegador de prueba usa Liberation Serif, de medidas equivalentes a Times New Roman; las medidas reales pueden variar levemente.
 - Mirar las capturas de `salida/` después de cualquier cambio de diseño: los números solos no detectan todo.
-- Para probar los controles (knob, alta de clientes, PNG, FRÁGIL) se usaron scripts descartables de Playwright; el knob responde a clic en el arco, clic en los números, arrastre y teclado (flechas, Inicio y Fin).
+- Para probar los controles (slider, toasts, alta de clientes, PNG, FRÁGIL) se usaron scripts descartables de Playwright.
 
 ## 8. Mapa rápido del código
 
@@ -84,8 +88,8 @@ python3 verificar_pdf.py         # compara páginas y orientación (requiere: pi
 |---|---|
 | `gas/Code.gs` | `doGet`, `cargarClientes` (lectura de `Hoja2`) y `agregarCliente` (única escritura, con bloqueo). |
 | `gas/Index.html` | Estructura de la interfaz; logo del encabezado incrustado en base64; `<style id="pagina">` para la hoja apaisada. |
-| `gas/Styles.html` | Interfaz neumórfica (variables en `:root`), cartel en recuadros, marca de agua, franjas FRÁGIL y reglas de impresión. |
-| `gas/JavaScript.html` | `Reglas` (lógica pura con `autopruebas()`), cartel (`crearCartelE`, `marca`, `entra`, `fijarTam`, `ajustarE`, `medirE`, `crearHojaFragil`), `renderCarteles`, `escalarVista`, knob (`pintarPorBulto`, `elegirPorBulto`), PNG, alta de clientes y eventos. |
+| `gas/Styles.html` | Interfaz oscura (variables en `:root`), toasts y slider, cartel en recuadros, marca de agua, franjas FRÁGIL y reglas de impresión. |
+| `gas/JavaScript.html` | `Reglas` (lógica pura con `autopruebas()`), cartel (`crearCartelE`, `marca`, `entra`, `fijarTam`, `ajustarE`, `medirE`, `crearHojaFragil`), `renderCarteles`, `escalarVista`, slider (`pintarPorBulto`, `elegirPorBulto`), PNG, alta de clientes y eventos. |
 
 ## 9. Notas de trabajo
 
