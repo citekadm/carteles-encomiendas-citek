@@ -302,9 +302,9 @@ La interfaz debe ser moderna, profesional y fácil de utilizar.
 
 Distribución prevista:
 
-- Pantalla principal en tres columnas: **cliente** (con su condición especial y el botón «+ Nuevo cliente»); **envío** (cajas, cajas por bulto, formato y opciones) y **resumen**; **acciones** (Generar carteles, Imprimir, Generar PNG, Nuevo envío) y **vista previa**. La vista previa está siempre visible, se escala al ancho de su tarjeta (hasta 360 px) y es solo una referencia.
+- Pantalla principal en tres columnas: **cliente** (con su condición especial y el botón «+ Nuevo cliente»); **envío** (cajas, cajas por bulto y opciones) y **resumen**; **acciones** (Generar carteles, Imprimir, Generar PNG, Nuevo envío) y **vista previa**. La vista previa está siempre visible, se escala al ancho de su tarjeta (hasta 360 px) y es solo una referencia.
 - **Encabezado:** el logo de CITEK en su color rojo de marca (`docs/referencias/Logo_Citek_rojo.png`, derivado de `Logo_Citek.png`, con fondo transparente) reemplaza al título visible. El título «Carteles de encomiendas» queda solo para lectores de pantalla y para la pestaña del navegador.
-- **Estilo visual** (decisión del usuario, basada en `docs/referencias/Referencia_estetica_neumorfismo_claro.jpeg`): neumorfismo claro. Fondo gris azulado; tarjetas, botones y casilleros con relieve suave (luz arriba a la izquierda y sombra abajo a la derecha); campos hundidos; acento azul; interruptores con riel y perilla en relieve; botones circulares «−» y «+»; selector de cajas por bulto tipo «knob» (perilla con puntos alrededor); etiquetas pequeñas en mayúsculas con espaciado. El cartel de la vista previa se muestra sobre fondo blanco y la impresión no cambia. No hay tema oscuro. (El estilo oscuro violeta anterior, de `Referencia_estetica_Obsidian_Home.png`, quedó reemplazado.)
+- **Estilo visual** (decisión del usuario del 2026-11-26, basada en `docs/referencias/Referencia_estetica_oscura_premium.jpeg`): tema oscuro con relieve y brillo. Fondo de pizarra oscura con textura sutil; tarjetas con borde fino de luz; azul acero como color principal; dorado para selección y títulos de tarjeta; brillo azul en foco y paso del mouse; campos hundidos; botones en forma de píldora; selección de opciones con notificaciones «toast». El cartel de la vista previa se muestra sobre fondo blanco y la impresión no cambia. Detalle en 15.10.
 
 Controles y acciones:
 
@@ -312,11 +312,11 @@ Controles y acciones:
 - Recargar clientes.
 - Campos editables para los datos del envío.
 - Cantidad de cajas, con botones circulares «−» y «+» que restan o suman 1 entre 1 y 999.
-- Selector «Cajas por bulto» tipo **knob**: perilla en relieve con 13 puntos alrededor, en un arco de 240° con tres posiciones (1 / 2 / 3; 3 por defecto); el punto de la opción elegida se pinta de azul y la perilla gira hacia él. Se elige con un clic o arrastre sobre el arco, con los números 1, 2 y 3 o con las flechas del teclado; sobre la perilla no responde. No lleva textos explicativos.
-- Casilla «Imprimir FRÁGIL».
-- Casilla «Imprimir FACTURA EN CAJA».
+- Selector «Cajas por bulto» tipo **slider** con tres posiciones (1 / 2 / 3; 3 por defecto): riel hundido con relleno azul, perilla dorada y marcas numeradas debajo. Se elige arrastrando, con un clic en el riel o en los números, o con las flechas, Inicio y Fin del teclado. Junto a la etiqueta se muestra el valor elegido. No lleva textos explicativos.
+- «Imprimir FRÁGIL», como toast seleccionable.
+- «Imprimir FACTURA EN CAJA», como toast seleccionable.
 - Campo de condición especial (dentro de los datos del cliente).
-- Casilla «Imprimir condición especial».
+- «Imprimir condición especial», como toast seleccionable.
 - Botón **«Generar carteles»**.
 - Botón **«Imprimir»**.
 - Botón **«Nuevo envío»**.
@@ -466,3 +466,14 @@ Decisión del usuario (2026-11-25), después de comparar las opciones en papel y
 - **Se eliminó el selector de logo:** el logo de fondo es una decisión fija del diseño (15.8).
 - **Nueva estética de la pantalla:** neumorfismo claro, descrita en la sección 10.
 - El logo del encabezado pasó a su color rojo de marca, porque el logo blanco ya no se distinguiría sobre el fondo claro (decisión del desarrollador, pendiente de confirmar).
+
+### 15.10 Estética oscura, slider y toasts (2026-11-26)
+
+Decisión del usuario: el estilo claro no le gusta; se adopta la estética de `docs/referencias/Referencia_estetica_oscura_premium.jpeg`. **Solo cambia la interfaz de pantalla: reglas de negocio, cartel e impresión no cambian.**
+
+- **Tokens** (variables CSS en `gas/Styles.html`): radios 4 / 8 / 12 / 16 px; bordes de 1 px (los campos con foco suman un anillo de brillo); tres niveles de sombra (`--sombra1/2/3`); espaciados de 4, 8, 16, 24, 32 y 48 px.
+- **Toasts en lugar de interruptores** para «Imprimir FRÁGIL», «Imprimir FACTURA EN CAJA» e «Imprimir condición especial». Cada toast es una tarjeta que se toca entera para activar o desactivar. **Activo:** tarjeta clara con tilde verde, borde dorado y la leyenda «Se imprime». **Inactivo:** tarjeta oscura con círculo vacío y la leyenda «No se imprime». La casilla real se mantiene (oculta pero accesible): Tab para enfocar y Espacio para alternar. Mismas reglas de siempre: FACTURA activa por defecto; la condición sigue al texto hasta que el usuario la toca (15.3); FRÁGIL apagado por defecto.
+- **Slider de cajas por bulto:** reemplaza al knob. Control `<input type="range">` de 1 a 3; mismas reglas de 7.1 y mismos efectos (actualiza resumen y vista previa; «Nuevo envío» vuelve a 3).
+- **Botones y campos:** botón principal azul con borde dorado; secundarios oscuros con brillo azul al pasar el mouse; «Nuevo envío» en rojo suave. Sugerencias de búsqueda en panel oscuro con la opción elegida resaltada en dorado. Ventana modal flotante con banda azul superior.
+- **Logo del encabezado:** se mantiene el rojo de marca, que se distingue sobre el fondo oscuro.
+- Decisiones del desarrollador pendientes de confirmar: los textos «Se imprime» / «No se imprime» de los toasts; el dorado como color de títulos de tarjeta y de selección.

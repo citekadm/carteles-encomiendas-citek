@@ -55,18 +55,19 @@
               <button type="button" id="b-mas" class="btn-paso" aria-label="Sumar una caja" title="Sumar una caja">+</button>
             </div>
           </div>
-          <label class="f" id="l-porbulto">Cajas por bulto</label>
-          <div class="dial" id="dial-porbulto" role="slider" tabindex="0" aria-labelledby="l-porbulto" aria-valuemin="1" aria-valuemax="3" aria-valuenow="3" aria-valuetext="3 cajas por bulto">
-            <svg viewBox="0 0 200 172" aria-hidden="true"></svg>
-            <div class="dial-knob"><div class="dial-giro" id="dial-giro"></div><b id="dial-num">3</b></div>
-            <button type="button" class="dial-pos" data-v="1" tabindex="-1" aria-label="1 caja por bulto">1</button>
-            <button type="button" class="dial-pos" data-v="2" tabindex="-1" aria-label="2 cajas por bulto">2</button>
-            <button type="button" class="dial-pos" data-v="3" tabindex="-1" aria-label="3 cajas por bulto">3</button>
+          <div class="cb-cab"><label class="f" id="l-porbulto" for="r-porbulto">Cajas por bulto</label><output id="o-porbulto" class="cb-val" for="r-porbulto">3</output></div>
+          <div class="slider">
+            <input type="range" id="r-porbulto" min="1" max="3" step="1" value="3" aria-labelledby="l-porbulto" aria-valuetext="3 cajas por bulto">
+            <div class="marcas" aria-hidden="true">
+              <button type="button" class="marca-n" data-v="1" tabindex="-1" style="--p:0">1</button>
+              <button type="button" class="marca-n" data-v="2" tabindex="-1" style="--p:.5">2</button>
+              <button type="button" class="marca-n" data-v="3" tabindex="-1" style="--p:1">3</button>
+            </div>
           </div>
-          <label class="sw"><span>Imprimir FRÁGIL</span><input type="checkbox" class="switch" id="c-fragil"></label>
+          <label class="toast"><input type="checkbox" class="toast-in" id="c-fragil"><span class="toast-box"><span class="toast-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="toast-tx"><b>Imprimir FRÁGIL</b><small></small></span></span></label>
           <p id="nota-fragil" class="nota" hidden>Frágil: se imprime un cartel por hoja A4 apaisada, con «FRÁGIL» en los laterales. Elegí orientación horizontal si el navegador no la toma solo.</p>
-          <label class="sw"><span>Imprimir FACTURA EN CAJA</span><input type="checkbox" class="switch" id="c-factura" checked></label>
-          <label class="sw"><span>Imprimir condición especial</span><input type="checkbox" class="switch" id="c-cond"></label>
+          <label class="toast"><input type="checkbox" class="toast-in" id="c-factura" checked><span class="toast-box"><span class="toast-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="toast-tx"><b>Imprimir FACTURA EN CAJA</b><small></small></span></span></label>
+          <label class="toast"><input type="checkbox" class="toast-in" id="c-cond"><span class="toast-box"><span class="toast-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="toast-tx"><b>Imprimir condición especial</b><small></small></span></span></label>
         </section>
         <section class="card" id="resumen">
           <h2>Resumen</h2>
