@@ -26,7 +26,7 @@ La aplicación debe ser sencilla de utilizar, confiable y especialmente cuidados
 - Opción para imprimir «FACTURA EN CAJA».
 - Vista previa de los carteles.
 - Impresión en A4 vertical, dos carteles por hoja.
-- Dos formatos de cartel a elegir: A (clásico) y E (cuadros) (secciones 8 y 15.5).
+- Un único formato de cartel, en recuadros, con el logo de CITEK como marca de agua fija (secciones 15.5 y 15.8).
 - Opción FRÁGIL: un cartel por hoja A4 apaisada, con franjas laterales (sección 15.6).
 - Alta explícita de clientes nuevos con «+ Nuevo cliente» (sección 4.1).
 - Imagen PNG del primer bulto copiada al portapapeles (sección 15).
@@ -204,9 +204,9 @@ Características generales:
 - Distribución limpia, sin elementos superpuestos.
 - Adaptación de tamaño de texto según el contenido disponible.
 
-Las secciones 8.1 a 8.5 describen el **formato A (clásico)**. El **formato E (cuadros)** y su regla de ajuste de texto están en las secciones 15.5 y 15.7.
+**Desde el 2026-11-25 existe un único formato de cartel (en recuadros).** Su descripción vigente está en las secciones 15.5 a 15.8. El formato clásico (A) fue **eliminado**: las secciones 8.1 y 8.5 se conservan solo como referencia histórica del Word original. Siguen vigentes en el formato actual las reglas de «FACTURA EN CAJA» (8.2), de la condición especial (8.3) y el texto del remitente (8.4).
 
-### 8.1 Orden de los elementos
+### 8.1 Orden de los elementos (histórico: formato clásico, eliminado)
 
 Cada cartel debe presentar los elementos en este orden:
 
@@ -254,7 +254,7 @@ Estilo:
 - Segunda y tercera líneas más pequeñas.
 - No reemplazar «Rte.:» por «Remitente».
 
-### 8.5 Adaptación de contenido
+### 8.5 Adaptación de contenido (histórico: formato clásico, eliminado; ver 15.7)
 
 El contenido puede variar en longitud. El diseño debe adaptar automáticamente el tamaño del texto a la zona disponible:
 
@@ -303,8 +303,8 @@ La interfaz debe ser moderna, profesional y fácil de utilizar.
 Distribución prevista:
 
 - Pantalla principal en tres columnas: **cliente** (con su condición especial y el botón «+ Nuevo cliente»); **envío** (cajas, cajas por bulto, formato y opciones) y **resumen**; **acciones** (Generar carteles, Imprimir, Generar PNG, Nuevo envío) y **vista previa**. La vista previa está siempre visible, se escala al ancho de su tarjeta (hasta 360 px) y es solo una referencia.
-- **Encabezado:** el logo de CITEK en blanco (`docs/referencias/Logo_Citek_blanco.png`, derivado de `Logo_Citek.png`) reemplaza al título visible, con un leve resplandor violeta para destacar sobre el fondo oscuro. El título «Carteles de encomiendas» queda solo para lectores de pantalla y para la pestaña del navegador.
-- **Estilo visual** (decisión del usuario, basada en `docs/referencias/Referencia_estetica_Obsidian_Home.png`): tema oscuro único; tarjetas grandes de esquinas muy redondeadas con relieve suave; campos hundidos; acento violeta; interruptores con perilla luminosa; botones circulares «−» y «+»; control segmentado para el formato; chips y puntos de color para los estados; ventanas emergentes oscuras con fondo desenfocado. El cartel de la vista previa se muestra siempre sobre fondo blanco y la impresión no cambia. No hay tema claro.
+- **Encabezado:** el logo de CITEK en su color rojo de marca (`docs/referencias/Logo_Citek_rojo.png`, derivado de `Logo_Citek.png`, con fondo transparente) reemplaza al título visible. El título «Carteles de encomiendas» queda solo para lectores de pantalla y para la pestaña del navegador.
+- **Estilo visual** (decisión del usuario, basada en `docs/referencias/Referencia_estetica_neumorfismo_claro.jpeg`): neumorfismo claro. Fondo gris azulado; tarjetas, botones y casilleros con relieve suave (luz arriba a la izquierda y sombra abajo a la derecha); campos hundidos; acento azul; interruptores con riel y perilla en relieve; botones circulares «−» y «+»; selector de cajas por bulto tipo «knob» (perilla con puntos alrededor); etiquetas pequeñas en mayúsculas con espaciado. El cartel de la vista previa se muestra sobre fondo blanco y la impresión no cambia. No hay tema oscuro. (El estilo oscuro violeta anterior, de `Referencia_estetica_Obsidian_Home.png`, quedó reemplazado.)
 
 Controles y acciones:
 
@@ -312,9 +312,8 @@ Controles y acciones:
 - Recargar clientes.
 - Campos editables para los datos del envío.
 - Cantidad de cajas, con botones circulares «−» y «+» que restan o suman 1 entre 1 y 999.
-- Selector «Cajas por bulto»: **dial circular** con arco de 240°, marcas finas y perilla, como el dial de la referencia (1 / 2 / 3; 3 por defecto). Se elige con un clic o arrastre sobre el arco, con los números 1, 2 y 3 o con las flechas del teclado; el centro muestra el valor y no lleva textos explicativos.
-- Selector «Formato de cartel» (control segmentado: E · Cuadros / A · Clásico).
-- Casilla «Imprimir FRÁGIL» (solo con el formato E).
+- Selector «Cajas por bulto» tipo **knob**: perilla en relieve con 13 puntos alrededor, en un arco de 240° con tres posiciones (1 / 2 / 3; 3 por defecto); el punto de la opción elegida se pinta de azul y la perilla gira hacia él. Se elige con un clic o arrastre sobre el arco, con los números 1, 2 y 3 o con las flechas del teclado; sobre la perilla no responde. No lleva textos explicativos.
+- Casilla «Imprimir FRÁGIL».
 - Casilla «Imprimir FACTURA EN CAJA».
 - Campo de condición especial (dentro de los datos del cliente).
 - Casilla «Imprimir condición especial».
@@ -392,9 +391,9 @@ Registro de las decisiones tomadas durante el análisis y la implementación. Co
 - **N4.** Dirección y teléfono van en líneas separadas.
 - **N5.** El departamento se imprime siempre en mayúsculas y negrita.
 - **N6.** La condición especial se imprime en mayúsculas y negrita, en un recuadro de ancho completo, con tamaño menor que «FACTURA EN CAJA».
-- **N7.** (Formato A) Los tamaños del Word original son máximos: razón social 36 pt, fantasía/dirección/teléfono 28 pt, departamento 72 pt, factura 55 pt, condición 24 pt, remitente 28 pt y 18 pt. Cada elemento tiene un tamaño mínimo legible.
+- **N7.** (Formato clásico, eliminado) Los tamaños del Word original son máximos: razón social 36 pt, fantasía/dirección/teléfono 28 pt, departamento 72 pt, factura 55 pt, condición 24 pt, remitente 28 pt y 18 pt. Cada elemento tiene un tamaño mínimo legible.
 - Nombre fantasía entre comillas tipográficas “ ”.
-- **Ajuste de texto (D9, formato A):** un elemento puede ocupar hasta dos líneas; si el cartel no entra en media hoja, se reducen todos los textos en cascada hasta el mínimo legible. Si aun así no entra, se avisa en pantalla y no se recorta ni se abrevia nada.
+- **Ajuste de texto (D9, formato clásico, eliminado):** un elemento puede ocupar hasta dos líneas; si el cartel no entra en media hoja, se reducen todos los textos en cascada hasta el mínimo legible. Si aun así no entra, se avisa en pantalla y no se recorta ni se abrevia nada.
 
 ### 15.3 Interfaz y datos
 
@@ -413,11 +412,10 @@ Registro de las decisiones tomadas durante el análisis y la implementación. Co
 - El ID de la planilla se guarda en la propiedad de script `SHEET_ID`, nunca en el repositorio.
 - No se usa caché: «Recargar clientes» lee siempre la hoja.
 
-### 15.5 Formato E (cuadros)
+### 15.5 Cartel en recuadros (formato único)
 
-Aprobado por el usuario a partir de las maquetas de la sesión de diseño y ajustado en la sesión de ajustes (parte 1). Se elige con el selector «Formato de cartel»; el formato A sigue disponible.
+Aprobado por el usuario a partir de las maquetas de la sesión de diseño y ajustado en las sesiones de ajustes. **Es el único formato** desde el 2026-11-25: el formato clásico (A) y el selector de formato se eliminaron.
 
-- **Formato por defecto:** E. El formato elegido se mantiene al pulsar «Nuevo envío»; no se guarda en ningún lado, así que al recargar la página vuelve a E.
 - **Estructura, de arriba abajo.** Todo va en recuadros con la **misma línea simple** de borde negro (también el departamento), sin superposición:
   1. **Franja superior** (solo si hay condición especial o «FACTURA EN CAJA»): si hay **ambas**, la condición va a la izquierda y «FACTURA EN CAJA» (fondo amarillo, solo Bulto 1) a la derecha; si hay **solo una**, esa ocupa **todo el ancho** de la franja (por ejemplo, «FACTURA EN CAJA» sola en el Bulto 1 y la condición sola en los demás carteles).
   2. **Nombre fantasía**, entre comillas y en negrita: es el **texto principal** del cartel, porque el servicio de cadetería se guía por él. Si no hay fantasía (o es igual a la razón social), la razón social ocupa este lugar como texto principal.
@@ -430,18 +428,18 @@ Aprobado por el usuario a partir de las maquetas de la sesión de diseño y ajus
 - **Campos vacíos** (fantasía, dirección, teléfono): no se imprime su recuadro ni su línea.
 - **Remitente:** las mismas tres líneas de 8.4, con tamaño fijo. El texto sigue en rojo (la especificación original) pero el recuadro es negro, porque las impresoras son blanco y negro.
 - **Condición especial:** mayúsculas, negrita y centrada; se repite en todos los carteles.
-- **Identificador del bulto (ambos formatos):** solo los números, sin la palabra «BULTO»: `1 de 1`, `2 de 5`. En el formato E va abajo, junto al remitente.
+- **Identificador del bulto:** solo los números, sin la palabra «BULTO»: `1 de 1`, `2 de 5`. Va abajo, junto al remitente.
 
 ### 15.6 FRÁGIL
 
-- Casilla **«Imprimir FRÁGIL»**, apagada por defecto y solo disponible con el formato E. Es una opción del envío: se aplica a todos los bultos y «Nuevo envío» la apaga.
-- Con FRÁGIL, cada bulto ocupa **una hoja A4 apaisada completa** (297 × 209 mm): al centro el cartel del formato E y a los lados dos franjas con la palabra «FRÁGIL» en vertical (la izquierda se lee de abajo hacia arriba, la derecha de arriba hacia abajo).
+- Casilla **«Imprimir FRÁGIL»**, apagada por defecto. Es una opción del envío: se aplica a todos los bultos y «Nuevo envío» la apaga.
+- Con FRÁGIL, cada bulto ocupa **una hoja A4 apaisada completa** (297 × 209 mm): al centro el cartel y a los lados dos franjas con la palabra «FRÁGIL» en vertical (la izquierda se lee de abajo hacia arriba, la derecha de arriba hacia abajo).
 - Las franjas son **solo contorno grueso con letras negras, sin relleno**, para no gastar tinta, y quedan a 6,35 mm del borde de la hoja para que la impresora no las recorte.
 - El papel pasa a apaisado mediante una regla `@page` que se agrega solo cuando FRÁGIL está activo.
 - No se agrega línea de corte. En el resumen, «hojas A4» cuenta una hoja por bulto.
-- **Pendientes de confirmar por el usuario** (decididos por el desarrollador): que FRÁGIL se aplique a todos los bultos del envío y no por bulto; que no esté disponible con el formato A; que quede a 6,35 mm del borde.
+- **Pendientes de confirmar por el usuario** (decididos por el desarrollador): que FRÁGIL se aplique a todos los bultos del envío y no por bulto; que quede a 6,35 mm del borde.
 
-### 15.7 Regla de ajuste de texto (formato E)
+### 15.7 Regla de ajuste de texto
 
 - **No hay tamaños fijos de letra** (salvo el remitente). Todos los textos impresos (condición, factura, fantasía, razón social, dirección, teléfono, departamento e identificador del bulto) crecen hasta el **mayor tamaño que entra** en su recuadro, respetando un margen interno de 1 mm arriba y abajo y 2,5 mm a los lados.
 - El tamaño final se reduce un 3 % respecto del máximo que entra, como margen de seguridad frente a diferencias mínimas de renderizado entre pantalla, vista previa reducida e impresión (un texto justo en el límite podría pasar a otra línea y cortarse).
@@ -451,3 +449,20 @@ Aprobado por el usuario a partir de las maquetas de la sesión de diseño y ajus
 - El identificador del bulto se mide con el número más largo del envío (el último bulto), así todos los carteles lo muestran con el mismo tamaño.
 - Nunca se corta ni se abrevia un texto. Los mínimos legibles son 14 px (factura 20 px, departamento 36 px); si no entra ni con el mínimo, se avisa en pantalla.
 - El ajuste se mide una vez por variante del envío (con y sin «FACTURA EN CAJA»). Si un bulto no tiene franja superior y otro sí, sus tamaños pueden diferir, porque el espacio disponible es distinto.
+
+### 15.8 Logo de CITEK como marca de agua (fijo)
+
+Decisión del usuario (2026-11-25), después de comparar las opciones en papel y en pantalla: el logo va **siempre** como marca de agua **centrada en medio de todo el cartel, por debajo de todo el texto**. Ya no hay selector de logo ni otras opciones (se descartó la de «solo en el remitente»).
+
+- **Aplicación:** todos los carteles, también con FRÁGIL y en el PNG. No afecta al ajuste de tamaños de texto.
+- **Tamaño e intensidad:** al 60 % del ancho del cartel, con una opacidad del 9 %. El logo es una imagen negra con transparencia (`docs/referencias/Logo_Citek_marca_de_agua.png`) y, con esa opacidad, en impresoras en blanco y negro sale como una trama gris clara que no perjudica la lectura. Los valores están en `gas/Styles.html` (`.marca-todo`).
+- **Recuadros:** son transparentes para que el logo se vea por debajo del texto; solo el recuadro amarillo de «FACTURA EN CAJA» mantiene su color.
+- **Impresión:** el logo es una imagen del documento, no un fondo de CSS, por lo que Chrome la imprime aunque «Gráficos de fondo» esté desactivado.
+- **Pendiente:** confirmar la intensidad con una impresión real en la impresora de la oficina; si hace falta, se ajusta la opacidad.
+
+### 15.9 Un único formato y nueva estética (2026-11-25)
+
+- **Se eliminó el formato clásico (A)** y el selector de formato: el usuario indicó que no se le iba a dar el uso necesario. Quedó solo el cartel en recuadros.
+- **Se eliminó el selector de logo:** el logo de fondo es una decisión fija del diseño (15.8).
+- **Nueva estética de la pantalla:** neumorfismo claro, descrita en la sección 10.
+- El logo del encabezado pasó a su color rojo de marca, porque el logo blanco ya no se distinguiría sobre el fondo claro (decisión del desarrollador, pendiente de confirmar).

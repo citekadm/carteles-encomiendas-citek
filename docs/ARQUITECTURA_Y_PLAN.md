@@ -1,7 +1,7 @@
 # Arquitectura prevista y plan de desarrollo
 
 **Proyecto:** Carteles de encomiendas — Citek  
-**Estado:** aplicación implementada (formatos A y E, FRÁGIL, alta de clientes); en pruebas, pendiente la impresión real desde Chrome.
+**Estado:** aplicación implementada (cartel en recuadros con logo de fondo, FRÁGIL, cajas por bulto, alta de clientes); en pruebas, pendiente la impresión real desde Chrome.
 
 ## 1. Principios técnicos
 
@@ -61,7 +61,7 @@ Responsabilidad de servidor:
 - Estilos de los carteles.
 - Reglas de impresión A4.
 - Reglas de salto de página, dimensiones, corte y adaptación de texto.
-- Estilos de los formatos A y E y de las franjas FRÁGIL. La regla `@page` apaisada no está aquí: JavaScript la agrega en `<style id="pagina">` (de `Index.html`) solo con FRÁGIL.
+- Estilos de la interfaz (neumorfismo claro), del cartel, de la marca de agua y de las franjas FRÁGIL. La regla `@page` apaisada no está aquí: JavaScript la agrega en `<style id="pagina">` (de `Index.html`) solo con FRÁGIL.
 - Diferenciación entre pantalla y papel mediante `@media print`.
 
 ### `gas/JavaScript.html`
@@ -73,7 +73,7 @@ Responsabilidad de servidor:
 - Estado de casillas y datos del envío.
 - Generación de carteles y actualización de vista previa.
 - Acciones de imprimir y nuevo envío.
-- Formato E: creación del cartel, ajuste de texto por recuadro (`ajustarE`) y hoja FRÁGIL.
+- Cartel: creación (`crearCartelE`), marca de agua (`marca`), ajuste de texto por recuadro (`ajustarE`) y hoja FRÁGIL.
 - Alta de clientes nuevos y autocompletado en los campos de razón social y fantasía.
 
 La distribución final de funciones podrá detallarse durante el diseño técnico, pero debe conservar esta separación conceptual.
@@ -98,7 +98,7 @@ Evitar duplicar estas reglas en distintos lugares del código.
 4. Seleccionar un cliente o elegir la carga manual (opcionalmente guardarlo con «+ Nuevo cliente»).
 5. Revisar y ajustar temporalmente los datos.
 6. Ingresar cantidad de cajas.
-7. Elegir el formato de cartel (A o E) y revisar las opciones FRÁGIL, factura y condición especial.
+7. Elegir las cajas por bulto (1, 2 o 3) y revisar las opciones FRÁGIL, factura y condición especial.
 8. Generar carteles y vista previa.
 9. Comprobar el resumen y la distribución de bultos.
 10. Imprimir desde Chrome.
@@ -193,8 +193,11 @@ Regla permanente: no inventar valores ni asumir decisiones no tomadas. Claude de
 - **Acceso:** ejecutar como propietario, acceso «solo yo», misma cuenta en ambas PC.
 - **Alcance de permisos:** `spreadsheets` (ver sección 15.4 de la especificación).
 - **Lógica:** toda la lógica de negocio corre en el navegador como funciones puras (`Reglas`); el servidor solo entrega la interfaz y lee la hoja.
-- **Formato E:** cartel armado con recuadros. La altura se reparte por pesos de flex (franjas superior e inferior fijas) y `ajustarE()` busca, por búsqueda binaria en píxeles enteros, el mayor tamaño de letra que entra en cada recuadro (una palabra: una línea; varias: hasta 2). El criterio compara el alto real del texto con el interior del recuadro (sin el margen interno). Se mide en el DOM, fuera de pantalla y a tamaño real, una vez por variante del envío, con el último bulto (número más largo); los tamaños se aplican a todos los carteles (ver 15.5 y 15.7 de la especificación).
+- **Cartel (formato único):** cartel armado con recuadros. La altura se reparte por pesos de flex (franjas superior e inferior fijas) y `ajustarE()` busca, por búsqueda binaria en píxeles enteros, el mayor tamaño de letra que entra en cada recuadro (una palabra: una línea; varias: hasta 2). El criterio compara el alto real del texto con el interior del recuadro (sin el margen interno). Se mide en el DOM, fuera de pantalla y a tamaño real, una vez por variante del envío, con el último bulto (número más largo); los tamaños se aplican a todos los carteles (ver 15.5 y 15.7 de la especificación).
 - **FRÁGIL:** hoja de 297 × 209 mm con el cartel central de 217,7 mm y dos franjas de 33,3 mm. La regla `@page { size: A4 landscape }` se inyecta en `#pagina` al generar y se vacía en otro caso, para no alterar la hoja vertical.
 - **Hojas:** `Reglas.hojas(bultos, fragil)`: `ceil(bultos / 2)` o, con FRÁGIL, una por bulto.
 - **PNG:** mismo cartel (210 × 148 mm) o, con FRÁGIL, la hoja apaisada completa, a unos 150 ppp.
 - **Herramienta de prueba automática:** Chromium sin interfaz con Playwright, sobre una copia de la interfaz con `google.script.run` simulado. Los scripts no se versionan; sus resultados se registran en el plan de pruebas (sección 11).
+- **Marca de agua:** el logo se incrusta como constante `LOGO_MARCA` (imagen en base64) y se inserta en cada cartel como `<img class="marca marca-todo">` centrada, con opacidad del 9 %. Es una imagen y no un fondo de CSS para que se imprima aunque «Gráficos de fondo» esté desactivado. No entra en la medición de textos.
+- **Un solo formato:** el 2026-11-25 se eliminó el cartel clásico (formato A) y los selectores de formato y de logo; se borraron `crearCartel`, `ajustar`, `medir` y los estilos asociados.
+- **Interfaz:** neumorfismo claro con variables CSS en `:root` de `gas/Styles.html` (`--bg`, `--luz`, `--som`, `--ac`…) y sombras compartidas (`--relieve`, `--relieve-s`, `--hundido`). El selector de cajas por bulto es un «knob»: puntos en un SVG y una perilla HTML que gira con la variable CSS `--ang`.

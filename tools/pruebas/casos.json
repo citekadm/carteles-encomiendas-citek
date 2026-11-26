@@ -71,21 +71,6 @@
   "bultos": 1
  },
  {
-  "id": "c6_formatoA",
-  "formato": "A",
-  "razon": "RUTA DOCE SAS",
-  "fant": "ANCAP RUTA 12",
-  "dir": "Ruta 12 km 4",
-  "tel": "4544 8888",
-  "depto": "Colonia",
-  "cajas": 3,
-  "cond": "ENVIAR POR NUÑEZ",
-  "factura": true,
-  "paginas": 1,
-  "orientacion": "v",
-  "bultos": 1
- },
- {
   "id": "c7_999",
   "razon": "RUTA DOCE SAS",
   "fant": "ANCAP RUTA 12",

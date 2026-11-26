@@ -1,7 +1,7 @@
 # Plan de pruebas y aceptación
 
 **Proyecto:** Carteles de encomiendas — Citek  
-**Estado:** checklist en ejecución. La sección 11 (formato E y FRÁGIL) tiene resultados de pruebas automáticas en Chromium; el resto de las secciones sigue pendiente y falta la impresión real desde Chrome.  
+**Estado:** checklist en ejecución. Las secciones 11 a 15 tienen resultados de pruebas automáticas en Chromium; el resto sigue pendiente y falta la impresión real desde Chrome.
 **Objetivo:** verificar reglas de negocio, integridad de datos, vista previa y resultado impreso.
 
 ## 1. Datos y protección de la hoja
@@ -136,7 +136,7 @@ Comprobar que cada cartel diga solamente `n de N` como identificación del bulto
 
 ## 7. Paginación e impresión
 
-Las secciones 6 y 7 se repiten para cada formato (A y E); el formato E y FRÁGIL tienen además la sección 11.
+Desde el 2026-11-25 hay un único formato de cartel (en recuadros); FRÁGIL y el ajuste de texto tienen además la sección 11.
 
 Probar cantidades de bultos pares e impares:
 
@@ -191,7 +191,7 @@ Probar cantidades de bultos pares e impares:
 - [ ] Tras «Generar carteles», los cambios del formulario actualizan la vista previa.
 - [ ] Autopruebas (`autopruebas()` en la consola): todas OK.
 
-## 11. Formato E, FRÁGIL y ajuste de texto
+## 11. Cartel en recuadros, FRÁGIL y ajuste de texto
 
 Las marcas [x] corresponden a pruebas automáticas (la última el 2026-11-20, con las herramientas de `tools/pruebas/`) hechas con **Chromium sin interfaz (Playwright)**, que usa la tipografía Liberation Serif (compatible en medidas con Times New Roman). Esas pruebas **no reemplazan** la impresión real desde Chrome en las PC de uso (ver 11.4).
 
@@ -213,7 +213,7 @@ Resultados de la última corrida (2026-11-20, tras el margen de seguridad del 3 
 - [x] En el PDF de impresión de Chromium los textos no se parten ni se cortan (casos 1, 2 y 8 revisados mirando el PDF).
 - [x] El nombre fantasía es el texto principal y la razón social queda secundaria; sin fantasía, la razón social ocupa su lugar.
 - [x] El recuadro del departamento tiene línea simple, igual que los demás.
-- [x] El identificador del bulto dice solo `n de N` (`1 de 3`) en los formatos A y E.
+- [x] El identificador del bulto dice solo `n de N` (`1 de 3`) en el cartel.
 - [x] Una palabra: se achica y queda en una línea. Varias palabras: hasta 2 líneas. El teléfono siempre en una línea.
 - [x] No hay textos cortados, abreviados ni superpuestos, y el texto respeta el margen interno del recuadro.
 - [x] Sin condición ni factura, la franja superior desaparece y el resto se agranda.
@@ -222,62 +222,75 @@ Resultados de la última corrida (2026-11-20, tras el margen de seguridad del 3 
 - [ ] Probar más textos reales de la base (razones sociales y direcciones largas de clientes verdaderos).
 - [ ] Revisar visualmente un cartel con tres cifras (`333 de 333`) impreso.
 
-### 11.2 Selector de formato
+### 11.2 Opciones del envío
 
-- [x] Por defecto está el formato E.
-- [x] Cambiar a A muestra el cartel clásico; FRÁGIL se apaga y se deshabilita.
-- [x] «Nuevo envío» mantiene el formato elegido y apaga FRÁGIL.
-- [x] El resumen muestra una hoja por bulto con FRÁGIL.
 - [x] Autopruebas (`autopruebas()`): 100 comprobaciones OK.
+- [x] El resumen muestra una hoja por bulto con FRÁGIL.
+- [x] «Nuevo envío» apaga FRÁGIL y vuelve las cajas por bulto a 3.
+- [x] No existen selectores de formato ni de logo (eliminados el 2026-11-25).
 
 ### 11.3 FRÁGIL y PNG
 
 - [x] Con FRÁGIL el PDF de Chromium sale en A4 apaisada (297 × 210 mm), una hoja por bulto.
 - [x] Sin FRÁGIL el PDF sale en A4 vertical.
 - [x] Las franjas «FRÁGIL» son solo contorno, a 6,35 mm del borde, con la palabra en vertical en cada lado.
-- [x] PNG de 1240 × 874 px en los formatos A y E, y de 1754 × 1234 px con FRÁGIL.
+- [x] PNG de 1240 × 874 px, y de 1754 × 1234 px con FRÁGIL; ambos incluyen el logo de fondo.
 - [ ] Revisar el PNG pegado en WhatsApp y en un mail.
 
 ### 11.4 Pendiente: impresión real desde Chrome
 
-- [ ] Imprimir en papel formato E con 1, 2, 3 y 4 bultos: sin hojas extra, sin recortes, línea de corte en el centro.
+- [ ] Imprimir en papel con 1, 2, 3 y 4 bultos: sin hojas extra, sin recortes, línea de corte en el centro.
 - [ ] Imprimir con FRÁGIL (apaisada): comprobar que Chrome toma la orientación sola y, si no, que la nota de pantalla alcanza.
 - [ ] Verificar que las franjas FRÁGIL no se recortan en la impresora real (margen no imprimible).
 - [ ] Verificar la legibilidad del texto rojo y del fondo amarillo en la impresora en blanco y negro.
 - [ ] Comparar la hoja impresa con la vista previa.
 - [ ] Probar con la tipografía Times New Roman real de las PC (las medidas pueden variar levemente respecto de Liberation Serif).
 
-## 12. Aspecto de la interfaz (parte 3)
+## 12. Aspecto de la interfaz (neumorfismo claro)
 
-Verificado el 2026-11-20 con capturas de Chromium sin interfaz (ventana de 1180 px y de 420 px de ancho). No reemplaza la revisión en las PC de uso.
+Verificado el 2026-11-25 con capturas de Chromium sin interfaz (ventanas de 1180, 1366 y 420 px de ancho). No reemplaza la revisión en las PC de uso.
 
-- [x] Tema oscuro con tarjetas con relieve, campos hundidos y acento violeta en toda la pantalla.
-- [x] El encabezado muestra el logo de CITEK en blanco, con un leve resplandor violeta, en lugar del título.
-- [ ] Revisar el logo en las PC de uso (nitidez y tamaño) y en una ventana angosta.
-- [x] Interruptores con perilla luminosa; el de FRÁGIL se atenúa cuando está deshabilitado.
-- [x] Control segmentado de formato: el clic en E o A cambia el formato; FRÁGIL se apaga y se deshabilita con A y se habilita con E; «Nuevo envío» mantiene el formato elegido.
-- [x] Botones «−» y «+»: desde vacío ponen 1; respetan el mínimo 1 y el máximo 999.
-- [x] Los botones «Imprimir», «Generar PNG» y «Nuevo envío» entran cada uno en una línea.
-- [x] Ventana emergente de «¿Agregar número de cuenta?» y sugerencias de búsqueda con el estilo nuevo.
+- [x] Estética neumórfica clara: fondo gris azulado, tarjetas, botones y casilleros en relieve, campos hundidos, acento azul.
+- [x] Interruptores con riel y perilla en relieve; el activado se pinta de azul.
+- [x] Botón principal azul y botones secundarios en relieve; «Imprimir», «Generar PNG» y «Nuevo envío» entran cada uno en una línea.
+- [x] Casillero de búsqueda con lupa; ventana emergente de «¿Agregar número de cuenta?» y sugerencias con el estilo nuevo.
+- [x] Encabezado con el logo de CITEK en rojo; los textos de los interruptores no se parten.
 - [x] Con ventana angosta (420 px) las columnas se apilan.
-- [x] La impresión no cambia: los PDF de los ocho casos mantienen páginas y orientación.
-- [ ] Revisar en las PC de la oficina: legibilidad de las letras claras sobre fondo oscuro con la luz del lugar.
-- [ ] Revisar en Chrome real el aspecto de las ventanas emergentes y del selector (el desenfoque de fondo depende del navegador).
-- [ ] Confirmar con el usuario que no hace falta un tema claro.
+- [x] La impresión no cambia: los PDF de los 11 casos mantienen páginas y orientación.
+- [ ] Revisar el contraste de las letras grises sobre el fondo claro en las pantallas de la oficina (el neumorfismo tiene poco contraste por naturaleza).
+- [ ] Revisar en Chrome real el desenfoque de fondo de las ventanas emergentes.
 
-## 13. Ajustes de detalle: disposición, dial y franja superior
+## 13. Ajustes de detalle: disposición, selector de cajas por bulto y franja superior
 
 Verificado el 2026-11-23 con Chromium sin interfaz (pantallas de 1180 × 900 y de 1366 × 768) y la batería de `tools/pruebas/` (12 casos, 100 autopruebas, todos sin desbordes y con las páginas esperadas en los PDF).
 
 - [x] Franja superior: con condición y factura van lado a lado; con solo factura (Bulto 1) o solo condición (demás bultos) ocupa todo el ancho; sin ninguna, desaparece y el resto se agranda.
-- [x] Dial de cajas por bulto: un clic sobre el arco o sobre los números elige 1, 2 o 3; arrastrar sobre el arco cambia la opción; el centro no responde; las flechas, Inicio y Fin del teclado funcionan y respetan el mínimo 1 y el máximo 3; «Nuevo envío» vuelve a 3; cambiar la opción actualiza el resumen y los carteles ya generados.
-- [x] No hay textos explicativos junto al dial.
+- [x] Selector «knob» de cajas por bulto (ver 12 y 15.9): un clic sobre el arco o sobre los números elige 1, 2 o 3 y la perilla gira hacia el punto azul; arrastrar sobre el arco cambia la opción; sobre la perilla no responde; las flechas, Inicio y Fin del teclado funcionan y respetan el mínimo 1 y el máximo 3; «Nuevo envío» vuelve a 3; cambiar la opción actualiza el resumen y los carteles ya generados.
+- [x] No hay textos explicativos junto al selector.
 - [x] Nueva disposición: cliente (con la condición especial) a la izquierda; envío y resumen al centro; acciones y vista previa a la derecha, con la vista previa siempre visible y más grande.
 - [x] Los botones «Imprimir», «Generar PNG» y «Nuevo envío» entran en una línea en 1180 y en 1366 px de ancho.
 - [x] Al crear un cliente nuevo, la condición especial escrita en su campo se envía junto con los demás datos (columna G), y la ventana de confirmación la muestra.
 - [ ] Confirmar en la hoja real que la condición queda guardada en la columna G del cliente nuevo.
-- [ ] Revisar el dial con pantalla táctil y en las PC de la oficina.
+- [ ] Revisar el selector con pantalla táctil y en las PC de la oficina.
 - [ ] Revisar la vista previa en una ventana angosta (menos de 1000 px) y en una pantalla muy ancha.
+
+## 14. Logo de fondo (marca de agua fija)
+
+Verificado el 2026-11-25 con Chromium sin interfaz (11 casos, 100 autopruebas, sin desbordes y con las páginas esperadas en los PDF).
+
+- [x] Todos los carteles llevan el logo de CITEK centrado detrás de todo el texto; los recuadros son transparentes y el amarillo de «FACTURA EN CAJA» se mantiene.
+- [x] Con FRÁGIL el logo también aparece, y el PNG exportado lo incluye (1240 × 874 px; con FRÁGIL, 1754 × 1234 px).
+- [x] El logo no cambia los tamaños de letra ni la paginación.
+- [x] No existe selector de logo: es una decisión fija del diseño.
+- [ ] Imprimir en la impresora de la oficina (blanco y negro) y confirmar que el texto se lee bien con la intensidad actual (9 %); ajustar la opacidad si hace falta.
+- [ ] Probar la impresión con «Gráficos de fondo» desactivado.
+
+## 15. Formato único (eliminación del formato clásico)
+
+- [x] La pantalla no tiene selectores de formato ni de logo.
+- [x] Se eliminó del código el cartel clásico (JavaScript y CSS) y las pruebas automáticas se actualizaron (se quitaron los casos del formato clásico y de las opciones de logo); las 100 autopruebas y los 11 casos pasan.
+- [x] Alta de clientes, PNG, FRÁGIL y sugerencias del buscador siguen funcionando.
+- [ ] Revisar las secciones 6 y 7 con el cartel único: ya no existe el formato clásico, y los ítems que lo mencionan quedan como referencia histórica.
 
 ## 10. Criterio de aprobación
 

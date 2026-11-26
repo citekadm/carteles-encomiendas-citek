@@ -17,7 +17,6 @@ const auto = await p.evaluate(() => { const r = window.autopruebas(); return { t
 console.log('autopruebas:', JSON.stringify(auto));
 for (const c of casos) {
   await p.click('#b-nuevo');
-  await p.selectOption('#f-formato', c.formato || 'E');
   for (const [id, v] of [['#f-razon', c.razon], ['#f-fantasia', c.fant], ['#f-dir', c.dir], ['#f-tel', c.tel], ['#f-depto', c.depto], ['#f-cajas', String(c.cajas)], ['#f-cond', c.cond]]) await p.fill(id, v || '');
   if ((await p.isChecked('#c-cond')) !== !!c.cond) await p.click('#c-cond', { force: true });
   if ((await p.isChecked('#c-factura')) !== !!c.factura) await p.click('#c-factura', { force: true });
